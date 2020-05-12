@@ -12,6 +12,10 @@ use Validator;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Mail;
 use Twilio\Exceptions\TwilioException;
+use Illuminate\Support\Facades\Auth;
+use DB;
+
+
 class AuthController extends Controller
 {
     public $successStatus = 200;
@@ -38,16 +42,16 @@ class AuthController extends Controller
 
         $verifCode = mt_rand(1000, 9999);
 
-        try {
-            $client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
-
-            $client->messages->create($phone, // to
-                ["from" => "+12058090405", "body" => "Your verification code is ".$verifCode]
-            );
-        }catch (TwilioException $e){
-            $res->fail("Something went wrong. Please try again later");
-            return response()->json($res, 200);
-        }
+//        try {
+//            $client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
+//
+//            $client->messages->create($phone, // to
+//                ["from" => "+12058090405", "body" => "Your verification code is ".$verifCode]
+//            );
+//        }catch (TwilioException $e){
+//            $res->fail("Something went wrong. Please try again later");
+//            return response()->json($res, 200);
+//        }
 
         $verification = new Verification();
 
@@ -93,12 +97,13 @@ class AuthController extends Controller
         if ($verifCode === "0001"){
             $user = User::where('phone',$request['userPhone'])->first();
             if ($user) {
+                $input['email'] = $user->email;
 
-                $result = $this->issueToken($input, 'password');
-                $result['user'] = $user;
-                $result['isAlreadyUser'] = true;
-                $res->success($result);
-                return response()->json($res, 200);
+
+                $response = $this->issueToken($input, 'password');
+                $response['user'] = $user;
+                $response['isAlreadyUser'] = true;
+
             }else {
                 $response['user'] = [];
                 $response['isAlreadyUser'] = false;
@@ -220,39 +225,47 @@ class AuthController extends Controller
     }
 
 
+    public function refresh(Request $request){
+        $res = new Result();
+
+        $validator = Validator::make($request->all(),
+            [
+                'refresh_token' => 'required'
+            ]);
+        if ($validator->fails()) {
+            $res->fail("Wrong fields");
+            return response()->json($res, 200);
+        }
+
+        $input = $request->all();
+
+        $result = $this->issueToken($input, 'refresh_token');
+        if($result==null){
+            $res->fail("Wrong request");
+            return response()->json($res, 200);
+        }
+        if(!$result['access_token']){
+            $res->fail("Wrong token");
+            return response()->json($res, 200);
+        }
+        $res->success($result);
+        return response()->json($res, 200);
+    }
+
+    public function logout(Request $request){
+
+        $accessToken = Auth::user()->token();
+        $res = new Result();
+
+        DB::table('oauth_refresh_tokens')
+            ->where('access_token_id', $accessToken->id)
+            ->update(['revoked' => true]);
+
+        $accessToken->revoke();
+
+        $res->success([]);
+        return response()->json($res, 200);
+    }
 
 
-
-//
-//    /**
-//     * Resend the email verification notification.
-//     *
-//     * @param  \Illuminate\Http\Request  $request
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function resend(Request $request)
-//    {
-//        if ($request->user()->hasVerifiedPhone()) {
-//            return redirect($this->redirectPath());
-//        }
-//
-//        $phone = $request->user()->phone_number;
-//        $channel = $request->post('channel', 'sms');
-//        $verification = $this->verify->startVerification($phone, $channel);
-//
-//        if (!$verification->isValid()) {
-//
-//            $errors = new MessageBag();
-//            foreach($verification->getErrors() as $error) {
-//                $errors->add('verification', $error);
-//            }
-//
-//            return redirect('/verify')->withErrors($errors);
-//        }
-//
-//        $messages = new MessageBag();
-//        $messages->add('verification', "Another code sent to {$request->user()->phone_number}");
-//
-//        return redirect('/verify')->with('messages', $messages);
-//    }
 }
