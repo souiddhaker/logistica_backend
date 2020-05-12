@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Result;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use GuzzleHttp\Client;
@@ -19,15 +20,17 @@ trait IssueTokenTrait{
             'grant_type' => $grantType,
             'client_id' => $this->client->id,
             'client_secret' => $this->client->secret,
-            'scope' => $scope
+            'scope' => $scope,
+            'provider' => "password"
         ];
-
+//        return $request;
         if($grantType !== 'social' && $grantType!=="refresh_token"){
             $params['username'] = $request['email'];
+            $request['password'] = "logistica";
         }
-
-        $request =  array_merge($params, $request );
-
+//      return $request;
+      $request =  array_merge($params, $request );
+//      return $request;
         $http = new Client;
         try{
 

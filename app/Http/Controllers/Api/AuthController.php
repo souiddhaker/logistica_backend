@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
 use App\Models\User;
+use App\Models\Verification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Validator;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Mail;
-
+use Twilio\Exceptions\TwilioException;
 class AuthController extends Controller
 {
     public $successStatus = 200;
@@ -36,31 +38,28 @@ class AuthController extends Controller
 
         $verifCode = mt_rand(1000, 9999);
 
+        try {
+            $client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
 
-        $client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
+            $client->messages->create($phone, // to
+                ["from" => "+12058090405", "body" => "Your verification code is ".$verifCode]
+            );
+        }catch (TwilioException $e){
+            $res->fail("Something went wrong. Please try again later");
+            return response()->json($res, 200);
+        }
 
-        $client->messages->create(
-            $phone,
-            "+12058090405", // REPLACE WITH YOUR TWILIO NUMBER
-            ["body" => (string)$verifCode, "from" => "+12058090405"]
-        );
+        $verification = new Verification();
 
-        // Find your Account Sid and Auth Token at twilio.com/console
-        // DANGER! This is insecure. See http://twil.io/secure
-//        $sid    = "AC2ec964c33832184077fdf7ab6567271a";
-//        $token  = "7aeb7e7e98acdbac61de801c231d0e3f";
-//        $twilio = new Client($sid, $token);
-//
-//        $message = $twilio->messages
-//            ->create("+21650223908", // to
-//                ["body" => $verifCode, "from" => "+15005550006"]
-//            );
+        $verification->verification_code = $verifCode;
+        $verification->phone = $phone;
+        $verification->code_expiry_minute =15;
+        $verification->save();
 
 
         $res->success([]);
-        $res->message = "Le code de vérification a été envoyé";
+        $res->message = "Verification code has been sent";
         return response()->json($res, 200);
-
     }
 
 
@@ -83,36 +82,75 @@ class AuthController extends Controller
             }
             return response()->json($res, 200);
         }
+        $input = $request->all();
 
         $verifCode = $request['verificationCode'];
+        $phone = $request['userPhone'];
+
+
 
         $response = [];
         if ($verifCode === "0001"){
-            $user = User::where('phone',$request['userPhone']);
+            $user = User::where('phone',$request['userPhone'])->first();
             if ($user) {
-                $response['user'] = $user;
-                $response['isAlreadyUser'] = true;
+
+                $result = $this->issueToken($input, 'password');
+                $result['user'] = $user;
+                $result['isAlreadyUser'] = true;
+                $res->success($result);
+                return response()->json($res, 200);
             }else {
                 $response['user'] = [];
                 $response['isAlreadyUser'] = false;
             }
             $res->success($response);
-            $res->message = "User check";
+            $res->message = "Verification code correct";
             return response()->json($res, 200);
         }
 
         if ($verifCode === "0002"){
-            $res->fail("Code verification expired");
+            $res->fail("Verification code expired");
             return response()->json($res, 200);
         }
 
         if ($verifCode === "0003"){
-            $res->fail("Code verification incorrect");
+            $res->fail("Verification code incorrect");
             return response()->json($res, 200);
         }
 
-        $res->fail("Code verification incorrect");
+        $verification = Verification::where('verification_code',$verifCode)->where('phone',$phone)->first();
+
+        if (!$verification) {
+            $res->fail("Verification code incorrect");
+
+        } else {
+            $isExpired = (new Carbon($verification->created_at))->addMinutes($verification->code_expiry_minute) < Carbon::now();
+            if ($isExpired) {
+
+                $res->fail("Verification code expired");
+
+            } else {
+
+                $user = User::where('phone',$request['userPhone'])->first();
+                if ($user) {
+                    $input['email'] = $user->email;
+
+
+                    $response = $this->issueToken($input, 'password');
+                    $response['user'] = $user;
+                    $response['isAlreadyUser'] = true;
+
+                }else {
+                    $response['user'] = [];
+                    $response['isAlreadyUser'] = false;
+                }
+                $res->success($response);
+                $res->message = "Verification code correct";
+            }
+        }
+
         return response()->json($res, 200);
+
     }
 
 
@@ -121,20 +159,20 @@ class AuthController extends Controller
     {
         $res = new Result();
 
-        $validator = Validator::make($request->all(),
-            [
-                'provider' => 'required|in:facebook,password'
-            ]);
-
-        if ($validator->fails()) {
-            $res->fail($validator->errors()->get('provider')[0]);
-            return response()->json($res, 200);
-        }
-
-
+//        $validator = Validator::make($request->all(),
+//            [
+//                'provider' => 'required|in:facebook,password'
+//            ]);
+//
+//        if ($validator->fails()) {
+//            $res->fail($validator->errors()->get('provider')[0]);
+//            return response()->json($res, 200);
+//        }
+//
+//
         $input = $request->all();
-
-        if ($request->provider == "password") {
+//
+//        if ($request->provider == "password") {
 
             $validator = Validator::make($request->all(),
                 [
@@ -161,12 +199,12 @@ class AuthController extends Controller
                 'lastName' => request('lastName'),
                 'email' => request('email'),
                 'phone' => request('userPhone'),
-                'password' => bcrypt(request('password'))
+                'password' => bcrypt("logistica")
             ]);
             $result = $this->issueToken($input, 'password');
             $res->success($result);
             return response()->json($res, 200);
-        } else {
+//        } else {
 //            $result = $this->issueToken($input, 'social');
 //            if($result==null){
 //                $res->fail( "Invalid request");
@@ -178,22 +216,9 @@ class AuthController extends Controller
 //            }
 //            $res->success($result);
 //            return response()->json($res, 200);
-        }
+//        }
     }
 
-    public function login (){
-        $res  = new Result();
-        $test = true;
-        if ($test == true){
-
-            $res->success(array('userIsallowed'=>true) );
-
-            return response()->json($res, 200);
-        }else {
-            $res->fail("not found");
-            return response()->json($res, 200);
-        }
-    }
 
 
 
