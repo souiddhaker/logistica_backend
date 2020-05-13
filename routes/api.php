@@ -30,7 +30,7 @@ Route::prefix('user')->group(function () {
 
 Route::prefix('services')->group(function () {
     Route::get('/car_categories', 'Api\ServiceController@getListCarCategories');
-
+    Route::get('list_services', 'Api\ServiceController@getListServices');
 });
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
