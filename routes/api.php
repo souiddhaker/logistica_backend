@@ -37,6 +37,13 @@ Route::prefix('services')->group(function () {
 Route::prefix('promocode')->group(function () {
     Route::post('/verify', 'Api\PromocodeController@verify');
 });
+
+
+Route::prefix('payment')->group(function () {
+    Route::post('/add_card', 'Api\PaymentController@addCard')->middleware('auth:api');
+    Route::get('/get_cards', 'Api\PaymentController@getCardsByUser')->middleware('auth:api');
+
+});
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

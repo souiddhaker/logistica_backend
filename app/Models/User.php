@@ -11,6 +11,16 @@ class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
 
+
+
+    /**
+     * Get the cars for user.
+     */
+    public function cards()
+    {
+        return $this->hasMany(Card::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
