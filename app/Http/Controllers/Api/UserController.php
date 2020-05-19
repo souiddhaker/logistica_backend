@@ -41,12 +41,7 @@ class UserController extends Controller
                 'photo' => 'required|base64image',
             ]);
         if ($validator->fails()) {
-            $response['success'] = false;
-            $response['message'] = 'Toutes les entrées sont requises';
-            $response['response'] = [];
-
             $res->fail("Toutes les entrées sont requises");
-
             return response()->json($res, 200);
         }
 
@@ -57,6 +52,7 @@ class UserController extends Controller
             $name = time() . '.' . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
 
             $img = \Image::make($request->photo)->save(public_path('img/profile/') . $name);
+            $name = url('/') .'/img/profile/' . $name;
 
             $user = Auth::user();
             $user->update(['image_url' => $name]);
@@ -68,13 +64,24 @@ class UserController extends Controller
             return response()->json($res, 200);
 
         } catch (Exception $e) {
-            $response['success'] = false;
-            $response['message'] = $e;
-            $response['response'] = [];
+            $res->fail($e);
 
-            return response()->json($response, 200);
+
+            return response()->json($res, 200);
         }
 
 
+    }
+
+    public function getUser()
+    {
+        $res = new Result();
+
+        $user = Auth::user();
+
+        $res->success(['user' => $user]);
+        $res->message= 'User details';
+
+        return response()->json($res,200);
     }
 }

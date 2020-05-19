@@ -17,7 +17,10 @@ class CreateServicesTable extends Migration
             $table->increments('id');
             $table->string('label');
             $table->float('price');
-            $table->tinyInteger('type');
+            $table->unsignedInteger('category_id')->nullable();
+
+            $table->foreign('category_id')->references('id')->on('categories_services');
+
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 

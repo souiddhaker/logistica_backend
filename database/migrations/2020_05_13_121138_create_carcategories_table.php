@@ -17,8 +17,9 @@ class CreateCarcategoriesTable extends Migration
             $table->increments('id');
             $table->string('model');
             $table->float('price');
-            $table->tinyInteger('type');
-            $table->string('range_luggage');
+            $table->integer('capacity');
+            $table->tinyInteger('type')->nullable();
+            $table->string('range_luggage')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });

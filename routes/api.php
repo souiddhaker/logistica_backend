@@ -25,12 +25,13 @@ Route::prefix('auth')->group(function () {
 Route::prefix('user')->group(function () {
     Route::put('', 'Api\UserController@update')->middleware('auth:api');
     Route::post('/profileImage', 'Api\UserController@uploadImage')->middleware('auth:api');
+    Route::get('', 'Api\UserController@getUser')->middleware('auth:api');
 
 });
 
 Route::prefix('services')->group(function () {
-    Route::get('/car_categories', 'Api\ServiceController@getListCarCategories');
-    Route::get('/list_services', 'Api\ServiceController@getListServices');
+    Route::post('/car_categories', 'Api\ServiceController@getListCarCategories')->middleware('auth:api');
+    Route::post('/list_services', 'Api\ServiceController@getListServices')->middleware('auth:api');
 });
 
 
@@ -44,6 +45,14 @@ Route::prefix('payment')->group(function () {
     Route::get('/get_cards', 'Api\PaymentController@getCardsByUser')->middleware('auth:api');
 
 });
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+
+Route::prefix('notifs')->group(function () {
+    Route::post('/list', 'Api\PaymentController@getAllNotifs')->middleware('auth:api');
+    Route::get('/details', 'Api\PaymentController@getDetails')->middleware('auth:api');
+
+});
+
+
+Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
 });
