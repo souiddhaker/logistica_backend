@@ -23,9 +23,7 @@ class ServiceController extends Controller
 
         $validator = Validator::make($request->all(),
             [
-                'distance' => 'required',
-                'bags' => 'required'
-            ]);
+                'distance' => 'required']);
         if ($validator->fails()) {
 
             $res->fail("Please choose a pickup address");
@@ -33,11 +31,10 @@ class ServiceController extends Controller
             return response()->json($res, 200);
         }
 
-        $nbrBags = $request['bags'];
         $distance = $request['distance'];
 
         $priceKm = Price::where('from','<=',$distance)->where('to','>=',$distance)->first();
-        $listCarCategories = CarCategory::where('capacity','>=',$nbrBags)->get();
+        $listCarCategories = CarCategory::all();
 
         $list = [];
 
