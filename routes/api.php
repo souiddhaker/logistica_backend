@@ -48,12 +48,14 @@ Route::prefix('payment')->group(function () {
 
 Route::prefix('address')->group(function () {
     Route::get('/list', 'Api\AddressController@getAllFavoritesAddress')->middleware('auth:api');
+    Route::delete('/remove/{id}', 'Api\AddressController@remove')->middleware('auth:api');
+
 
 });
 
 Route::prefix('notifs')->group(function () {
-    Route::post('/list', 'Api\PaymentController@getAllNotifs')->middleware('auth:api');
-    Route::get('/details', 'Api\PaymentController@getDetails')->middleware('auth:api');
+    Route::get('/list', 'Api\NotifController@getAllNotifs')->middleware('auth:api');
+    Route::get('/{id}', 'Api\NotifController@getDetails')->middleware('auth:api');
 
 });
 

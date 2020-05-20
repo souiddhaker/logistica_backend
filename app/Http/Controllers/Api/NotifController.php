@@ -20,8 +20,8 @@ class NotifController extends Controller
 
         $notifs = Notif::where('user_id', '=', $userId)->get();
 
-        $res->success($notifs);
-        $res->message('List Notifs');
+        $res->response = $notifs;
+        $res->message = 'List Notifs';
         return response()->json($res,200);
     }
 
@@ -33,6 +33,25 @@ class NotifController extends Controller
 
         $notification = new Notif();
 
-//        $notification->
     }
+
+
+    public function getDetails(int $id)
+    {
+        $res = new Result();
+
+        $notif = Notif::find($id);
+        if ($notif)
+        {
+            $res->success($notif);
+            return response()->json($res,200);
+        }else{
+            $res->fail('Notif not found');
+            return response()->json($res,200);
+        }
+
+
+    }
+
+
 }
