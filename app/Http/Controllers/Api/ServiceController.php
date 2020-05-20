@@ -45,7 +45,7 @@ class ServiceController extends Controller
         }
 
 
-        $res->success($listCarCategories);
+        $res->success($list);
         $res->message = "List of car categories";
         return response()->json($res,200);
     }

@@ -46,6 +46,11 @@ Route::prefix('payment')->group(function () {
 
 });
 
+Route::prefix('address')->group(function () {
+    Route::get('/list', 'Api\AddressController@getAllFavoritesAddress')->middleware('auth:api');
+
+});
+
 Route::prefix('notifs')->group(function () {
     Route::post('/list', 'Api\PaymentController@getAllNotifs')->middleware('auth:api');
     Route::get('/details', 'Api\PaymentController@getDetails')->middleware('auth:api');

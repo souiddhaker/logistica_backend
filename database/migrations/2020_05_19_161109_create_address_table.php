@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNotifsTable extends Migration
+class CreateAddressTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateNotifsTable extends Migration
      */
     public function up()
     {
-        Schema::create('notifs', function (Blueprint $table) {
+        Schema::create('address', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('Title')->nullable();
-            $table->string('type')->nullable();
-            $table->string('description')->nullable();
+            $table->string('primaryName')->nullable();
+            $table->string('secondaryName')->nullable();
+            $table->string('longitude')->nullable();
+            $table->string('lattitude')->nullable();
             $table->integer('user_id')->unsigned();
 
             $table->foreign('user_id')->references('id')->on('users')
@@ -34,6 +35,6 @@ class CreateNotifsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notifs');
+        Schema::dropIfExists('address');
     }
 }
