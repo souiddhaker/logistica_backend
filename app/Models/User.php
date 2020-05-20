@@ -22,6 +22,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the cars for user.
+     */
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

@@ -49,6 +49,7 @@ Route::prefix('payment')->group(function () {
 Route::prefix('address')->group(function () {
     Route::get('/list', 'Api\AddressController@getAllFavoritesAddress')->middleware('auth:api');
     Route::delete('/remove/{id}', 'Api\AddressController@remove')->middleware('auth:api');
+    Route::post('/add', 'Api\AddressController@store')->middleware('auth:api');
 
 
 });
