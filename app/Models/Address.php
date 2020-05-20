@@ -8,6 +8,14 @@ class Address extends Model
 {
     protected $table = 'address';
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at'
+    ];
 
     /**
      * Get the user that owns the card.

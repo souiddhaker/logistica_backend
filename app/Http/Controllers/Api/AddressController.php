@@ -53,7 +53,7 @@ class AddressController extends Controller
         $address->lattitude = $input['lattitude'];
 //        $user = $user->addresses($address)->save();
         $address->user_id = $user->id;
-
+        $address->save();
         $res->success($address);
         return response()->json($res,200);
 
