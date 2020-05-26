@@ -51,7 +51,6 @@ class AddressController extends Controller
         $address->secondaryName = $input['secondaryName'];
         $address->longitude = $input['longitude'];
         $address->lattitude = $input['lattitude'];
-//        $user = $user->addresses($address)->save();
         $address->user_id = $user->id;
         $address->save();
         $res->success($address);

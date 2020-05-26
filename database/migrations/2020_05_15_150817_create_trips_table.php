@@ -21,7 +21,7 @@ class CreateTripsTable extends Migration
             $table->integer('nbr_luggage')->nullable();
             $table->unsignedInteger('type_car_id')->nullable();
             $table->unsignedInteger('promocode_id')->nullable();
-            $table->integer('driver_note')->nullable();
+            $table->string('driver_note')->nullable();
 
             $table->timestamp('pickup_at')->nullable();
             $table->integer('total_amount')->nullable();
@@ -29,10 +29,10 @@ class CreateTripsTable extends Migration
 
 
 
-            $table->unsignedInteger('client_id')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('driver_id')->nullable();
 
-            $table->foreign('client_id')->references('id')->on('clients');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('driver_id')->references('id')->on('drivers');
             $table->foreign('type_car_id')->references('id')->on('car_categories');
             $table->foreign('promocode_id')->references('id')->on('promocodes');

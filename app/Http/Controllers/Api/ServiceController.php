@@ -69,6 +69,13 @@ class ServiceController extends Controller
 
         $user = Auth::user();
 
+        $oldTrip = Trip::where('user_id',$user->id)->where('status','temp')->get();
+
+        foreach ($oldTrip as $trip)
+        {
+            $trip->delete();
+        }
+
         $trip = new Trip();
         $trip->status = 'temp';
         $trip->save();
