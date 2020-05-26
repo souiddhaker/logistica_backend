@@ -90,11 +90,17 @@ class ServiceController extends Controller
             $arraySubServices = [];
             foreach ($listServices[$category->title] as $service)
             {
-                $SubServices = SubService::where('service_id',$service->id)->get();
-                if (count($SubServices)>0){
-                    $service['sub_services'] = $SubServices;
+                $subServices = SubService::where('service_id',$service->id)->get();
+                if (count($subServices)>0){
+                    foreach ($subServices as $subservice){
+                        $subservice['price'] = $subservice['price']*$nbrBags;
+                    }
+                    $service['sub_services'] = $subServices;
+
+                }else{
+                    $service['price'] = $service['price']*$nbrBags;
+
                 }
-                $service['price'] = $service['price']*$nbrBags;
             }
         }
         $listServices['trip_id'] = $trip->id;
