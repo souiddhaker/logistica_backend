@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateServicesTable extends Migration
+class CreateSubservicesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,16 @@ class CreateServicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('subservices', function (Blueprint $table) {
             $table->increments('id');
             $table->string('label')->nullable();
             $table->float('price')->nullable();
-            $table->unsignedInteger('category_id')->nullable();
+            $table->unsignedInteger('service_id')->nullable();
 
-            $table->foreign('category_id')->references('id')->on('categories_services');
+            $table->foreign('service_id')->references('id')->on('services');
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
-
         });
     }
 
@@ -34,6 +33,6 @@ class CreateServicesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('subservices');
     }
 }

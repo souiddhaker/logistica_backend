@@ -32,11 +32,11 @@ class CreateTripsTable extends Migration
             $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('driver_id')->nullable();
 
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('driver_id')->references('id')->on('drivers');
-            $table->foreign('type_car_id')->references('id')->on('car_categories');
-            $table->foreign('promocode_id')->references('id')->on('promocodes');
-            $table->foreign('payment_method')->references('id')->on('cards');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
+            $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('restrict');
+            $table->foreign('type_car_id')->references('id')->on('car_categories')->onDelete('restrict');
+            $table->foreign('promocode_id')->references('id')->on('promocodes')->onDelete('restrict');
+            $table->foreign('payment_method')->references('id')->on('cards')->onDelete('restrict');
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));

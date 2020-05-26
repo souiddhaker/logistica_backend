@@ -8,6 +8,7 @@ use App\Models\CategoryServices;
 use App\Models\Price;
 use App\Models\Result;
 use App\Models\Service;
+use App\Models\SubService;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -86,8 +87,13 @@ class ServiceController extends Controller
         $listServices =[];
         foreach ($listCategory as $category){
             $listServices[$category->title] = Service::where('category_id', $category->id)->get();
+            $arraySubServices = [];
             foreach ($listServices[$category->title] as $service)
             {
+                $SubServices = SubService::where('service_id',$service->id)->get();
+                if (count($SubServices)>0){
+                    $service['sub_services'] = $SubServices;
+                }
                 $service['price'] = $service['price']*$nbrBags;
             }
         }

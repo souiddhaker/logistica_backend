@@ -21,7 +21,7 @@ class AddressController extends Controller
 
         $userId = Auth::id();
 
-        $listAddress = Address::where('user_id', '=', $userId)->get();
+        $listAddress = Address::where('user_id', '=', $userId)->paginate(5);
 
         $res->response = $listAddress;
         $res->message = 'List address stored';

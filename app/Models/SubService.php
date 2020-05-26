@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Service extends Model
+class SubService extends Model
 {
+    protected $table = 'subservices';
+
     //
 
     /**
@@ -17,7 +19,7 @@ class Service extends Model
         'created_at', 'updated_at',
     ];
 
-    public function subservices(){
-        return $this->hasMany(SubService::class);
+    public function service(){
+        $this->belongsTo(Service::class);
     }
 }
