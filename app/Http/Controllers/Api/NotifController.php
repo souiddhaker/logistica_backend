@@ -20,8 +20,9 @@ class NotifController extends Controller
 
         $notifs = Notif::where('user_id', '=', $userId)->get();
 
-        $res->response = $notifs;
+
         $res->message = 'List Notifs';
+        $res->success($notifs);
         return response()->json($res,200);
     }
 

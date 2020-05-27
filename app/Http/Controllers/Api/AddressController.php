@@ -23,8 +23,9 @@ class AddressController extends Controller
 
         $listAddress = Address::where('user_id', '=', $userId)->paginate(5);
 
-        $res->response = $listAddress;
+//        $res->response = $listAddress;
         $res->message = 'List address stored';
+        $res->success($listAddress);
         return response()->json($res,200);
     }
 

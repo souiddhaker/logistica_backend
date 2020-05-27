@@ -17,6 +17,8 @@ class CreateNotifsTable extends Migration
             $table->increments('id');
             $table->string('Title')->nullable();
             $table->string('type')->nullable();
+            $table->string('icon')->nullable();
+
             $table->string('description')->nullable();
             $table->integer('user_id')->unsigned();
 

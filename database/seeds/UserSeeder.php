@@ -41,18 +41,21 @@ class UserSeeder extends Seeder
                 Notif::create([
                     'title'=>'Your booking #1234 has been succesfull',
                     'type'=>'System',
+                    'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
                     'description'=>'Description booking',
                     'user_id'=>$user->id]);
 
                 Notif::create([
                     'title'=>'Your booking #1010 has been cancelled',
                     'type'=>'System',
+                    'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
                     'description'=>'Description booking',
                     'user_id'=>$user->id]);
 
                 Notif::create([
                     'title'=>'Invite friends - Get 3 coupons each!',
                     'type'=>'Promotion',
+                    'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
                     'description'=>'Invite friends - Get 3 coupons each!',
                     'user_id'=>$user->id]);
             }
