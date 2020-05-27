@@ -9,6 +9,8 @@ use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+use Illuminate\Support\Facades\File;
+
 
 class DocumentController extends Controller
 {
@@ -74,6 +76,37 @@ class DocumentController extends Controller
         }else{
             $res->fail('trip not found');
         }
+
+
+        return response()->json($res,200);
+    }
+
+    public function remove(int $id)
+    {
+        $res  = new Result();
+
+        $document = Document::find($id);
+        if ($document){
+            try {
+                $position  = strpos($document->path,'img/attachement/',0);
+                $image_path = public_path('img/attachement/').'/'.substr($document->path,$position+16,strlen($document->path));
+                unlink($image_path);
+                $res->success();
+            }catch (\ErrorException $e){
+                $res->fail('Fail to remove document');
+
+            }
+            $document->delete();
+        }else{
+            $res->fail('Document not found');
+        }
+//
+////        File::delete('1590578227.jpeg');
+//        $responses = [];
+//        $responses['position'] = $position;
+//        $responses['path'] = $image_path;
+//        $responses['newPath'] = substr($document->path,$position+16,strlen($document->path));
+//        $res->response = $responses;
 
 
         return response()->json($res,200);

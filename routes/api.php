@@ -63,7 +63,7 @@ Route::prefix('notifs')->group(function () {
 
 Route::prefix('trip')->group(function () {
     Route::post('/document', 'Api\DocumentController@store')->middleware('auth:api');
-    Route::delete('/document', 'Api\DocumentController@remove')->middleware('auth:api');
+    Route::delete('/document/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
     Route::get('/document/{id}', 'Api\DocumentController@getAttachement')->middleware('auth:api');
     Route::post('/note', 'Api\TripController@noteDriver')->middleware('auth:api');
 
