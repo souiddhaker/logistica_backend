@@ -21,7 +21,7 @@ class AddressController extends Controller
 
         $userId = Auth::id();
 
-        $listAddress = Address::where('user_id', '=', $userId)->paginate(5);
+        $listAddress = Address::where('user_id', '=', $userId)->orderBy('created_at' , 'desc')->paginate(5);
 
 //        $res->response = $listAddress;
         $res->message = 'List address stored';
@@ -34,9 +34,9 @@ class AddressController extends Controller
         $res = new Result();
         $validator = Validator::make($request->all(),
             [
-                'primaryName' => 'required',
-                'secondaryName' => 'required',
-                'place_id' => 'required',
+                'primaryName' => 'string|nullable',
+                'secondaryName' => 'string|nullable',
+                'place_id' => 'string|nullable',
             ]);
 
         if ($validator->fails()) {
