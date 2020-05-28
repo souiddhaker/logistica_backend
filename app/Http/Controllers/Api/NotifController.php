@@ -22,7 +22,7 @@ class NotifController extends Controller
 
 
         $res->message = 'List Notifs';
-        $res->success($notifs);
+        $res->response = $notifs;
         return response()->json($res,200);
     }
 
