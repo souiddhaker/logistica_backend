@@ -17,6 +17,8 @@ class CreateAddressTable extends Migration
             $table->increments('id');
             $table->string('primaryName')->nullable();
             $table->string('secondaryName')->nullable();
+            $table->string('place_id')->nullable();
+
             $table->string('longitude')->nullable();
             $table->string('lattitude')->nullable();
             $table->integer('user_id')->unsigned();
