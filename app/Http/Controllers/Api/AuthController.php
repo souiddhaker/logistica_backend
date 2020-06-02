@@ -219,7 +219,7 @@ class AuthController extends Controller
             ]);
             $result = $this->issueToken($input, 'password');
             $result['user'] = $user;
-            $result['isAlreadyUser'] = true;
+            $result['isAlreadyUser'] = false;
             $res->success($result);
             return response()->json($res, 200);
 //        } else {
