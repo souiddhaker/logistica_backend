@@ -36,7 +36,7 @@ Route::prefix('services')->group(function () {
 
 
 Route::prefix('promocode')->group(function () {
-    Route::post('/verify', 'Api\PromocodeController@verify');
+    Route::post('/verify', 'Api\PromocodeController@verify')->middleware('auth:api');
 });
 
 

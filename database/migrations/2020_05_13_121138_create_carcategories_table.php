@@ -18,6 +18,7 @@ class CreateCarcategoriesTable extends Migration
             $table->string('model');
             $table->float('price');
             $table->integer('capacity');
+            $table->string('image')->nullable();
             $table->tinyInteger('type')->nullable();
             $table->string('range_luggage')->nullable();
             $table->timestamp('created_at')->useCurrent();
