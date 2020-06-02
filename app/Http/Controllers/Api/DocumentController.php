@@ -30,11 +30,11 @@ class DocumentController extends Controller
             return response()->json($res, 200);
         }
 
-        $trip = Trip::find($request->trip_id);
-        if (!$trip){
-            $res->fail('trip not found');
-            return response()->json($res,200);
-        }
+//        $trip = Trip::find($request->trip_id);
+//        if (!$trip){
+//            $res->fail('trip not found');
+//            return response()->json($res,200);
+//        }
         try {
 
             $name = time() . '.' . explode('/', explode(':', substr($request->document, 0, strpos($request->document, ';')))[1])[1];
@@ -48,7 +48,7 @@ class DocumentController extends Controller
 
             $document->path = $name;
             $document->type = $request->type;
-            $document->trip_id = $request->trip_id;
+//            $document->trip_id = $request->trip_id;
 
             $document->save();
 

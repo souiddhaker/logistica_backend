@@ -40,7 +40,7 @@ class AddressController extends Controller
             ]);
 
         if ($validator->fails()) {
-            $res->fail($validator->errors());
+            $res->fail('Address already exist');
             return response()->json($res, 400);
         }
 

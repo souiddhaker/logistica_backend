@@ -25,4 +25,9 @@ class Document extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function trip()
+    {
+        return $this->belongsTo(Trip::class);
+    }
 }

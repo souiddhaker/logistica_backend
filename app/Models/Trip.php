@@ -29,11 +29,16 @@ class Trip extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','total_amount'
+        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id'
     ];
     public function services()
     {
         return $this->belongsToMany(Service::class);
+    }
+
+    public function subservices()
+    {
+        return $this->belongsToMany(SubService::class);
     }
 
     public function addresses()
@@ -50,8 +55,28 @@ class Trip extends Model
         return $this->belongsTo(Driver::class);
     }
 
+    public function attachements()
+    {
+        return $this->hasMany(Document::class);
+    }
+
     public function cancelRaison()
     {
         return $this->hasOne(CancelTrip::class);
+    }
+
+    public function promocode()
+    {
+        return $this->belongsTo(Promocode::class);
+    }
+
+    public function type_car()
+    {
+        return $this->belongsTo(CarCategory::class);
+    }
+
+    public function rating()
+    {
+        return $this->hasOne(Rating::class);
     }
 }

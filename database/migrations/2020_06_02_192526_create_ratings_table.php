@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDocumentsTable extends Migration
+class CreateRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,21 @@ class CreateDocumentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('ratings', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('path')->nullable();
-            $table->string('type')->nullable();
+            $table->float('value')->nullable();
             $table->unsignedInteger('trip_id')->nullable();
+            $table->unsignedInteger('user_id')->nullable();
+
 
             $table->foreign('trip_id')->references('id')->on('trips')
                 ->onDelete('cascade');
-            $table->timestamp('created_at')->useCurrent();
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('cascade');
+
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
-
     }
 
     /**
@@ -34,6 +37,6 @@ class CreateDocumentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('documents_tables');
+        Schema::dropIfExists('ratings');
     }
 }

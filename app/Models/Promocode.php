@@ -23,4 +23,13 @@ class Promocode extends Model
     {
         return Carbon::parse($value)->timestamp;
     }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->timestamp;
+    }
+    public function getUpdatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->timestamp;
+    }
 }

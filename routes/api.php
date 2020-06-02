@@ -71,6 +71,7 @@ Route::prefix('trip')->group(function () {
     Route::delete('/document/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
     Route::get('/document/{id}', 'Api\DocumentController@getAttachement')->middleware('auth:api');
     Route::post('/note', 'Api\TripController@noteDriver')->middleware('auth:api');
+    Route::post('/rate', 'Api\TripController@rateTrip')->middleware('auth:api');
 
 });
 

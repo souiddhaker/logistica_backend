@@ -5,7 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-class CancelTrip extends Model
+class Rating extends Model
 {
     //
     public function getCreatedAtAttribute($value)
