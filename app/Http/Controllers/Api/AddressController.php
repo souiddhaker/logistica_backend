@@ -36,7 +36,7 @@ class AddressController extends Controller
             [
                 'primaryName' => 'string|nullable',
                 'secondaryName' => 'string|nullable',
-                'place_id' => 'string|nullable',
+                'place_id' => 'required|unique:address,place_id',
             ]);
 
         if ($validator->fails()) {
