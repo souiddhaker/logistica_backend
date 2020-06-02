@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDriversTable extends Migration
+class CreateCancelTripsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,14 @@ class CreateDriversTable extends Migration
      */
     public function up()
     {
-        Schema::create('drivers', function (Blueprint $table) {
+        Schema::create('cancel_trips', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('firstName')->nullable();
-            $table->string('lastName')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->string('raison')->nullable();
+            $table->unsignedInteger('trip_id')->nullable();
+            $table->boolean('by_user')->nullable();
+            $table->foreign('trip_id')->references('id')->on('trips')->onDelete('cascade');
+
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
     }
@@ -29,6 +32,6 @@ class CreateDriversTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('drivers');
+        Schema::dropIfExists('cancel_trips');
     }
 }

@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
 use App\Models\User;
+use App\Models\Client;
+
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Validator;
-use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Mail;
 use Twilio\Exceptions\TwilioException;
 use Illuminate\Support\Facades\Auth;
@@ -105,7 +106,7 @@ class AuthController extends Controller
                 $response['isAlreadyUser'] = true;
 
             }else {
-                $response['user'] = [];
+                $response['user'] = $user;
                 $response['isAlreadyUser'] = false;
             }
             $res->success($response);
@@ -146,7 +147,7 @@ class AuthController extends Controller
                     $response['isAlreadyUser'] = true;
 
                 }else {
-                    $response['user'] = [];
+                    $response['user'] = $user;
                     $response['isAlreadyUser'] = false;
                 }
                 $res->success($response);
@@ -198,7 +199,17 @@ class AuthController extends Controller
 //                return response()->json($res, 200);
             }
 
-
+//            $client = new Client();
+//            $user = new User();
+////            $user = $client->user;
+//            $user->firstName = request('firstName');
+//            $user->lastName = request('lastName');
+//            $user->email = request('email');
+//            $user->phone = request('phone');
+//            $user->password = bcrypt("logistica");
+//         $client->user = $user;
+//
+//        $client->save();
             $user = User::create([
                 'firstName' => request('firstName'),
                 'lastName' => request('lastName'),

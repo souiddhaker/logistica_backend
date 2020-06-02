@@ -22,4 +22,6 @@ class SubService extends Model
     public function service(){
         $this->belongsTo(Service::class);
     }
+
+
 }

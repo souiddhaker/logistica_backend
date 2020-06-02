@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\Service;
+use App\Models\SubService;
 use App\Models\Price;
 use App\Models\Promocode;
 use App\Models\CategoryServices;
@@ -22,9 +23,12 @@ class ServiceSeeder extends Seeder
         Service::create(['label' => 'Delivery', 'price' => 15 ,'category_id' => $service->id]);
         Service::create(['label' => 'Boarding', 'price' => 2 ,'category_id' => $service->id]);
         Service::create(['label' => 'Shipping', 'price' => 5 ,'category_id' => $service->id]);
-        Service::create(['label' => 'Cartoon', 'price' => 5 ,'category_id' => $packaging->id]);
-        Service::create(['label' => 'Plastic Roll', 'price' => 2.6 ,'category_id' => $packaging->id]);
-
+        $cartoon = Service::create(['label' => 'Cartoon', 'price' => 5 ,'category_id' => $packaging->id]);
+        $rollPlastic = Service::create(['label' => 'Plastic Roll', 'price' => 2.6 ,'category_id' => $packaging->id]);
+        SubService::create(['label' => 'Big size', 'price' => 5 ,'service_id' => $cartoon->id]);
+        SubService::create(['label' => 'Small size', 'price' => 2 ,'service_id' => $cartoon->id]);
+        SubService::create(['label' => 'Big size', 'price' => 5 ,'service_id' => $rollPlastic->id]);
+        SubService::create(['label' => 'Small size', 'price' => 2 ,'service_id' => $rollPlastic->id]);
 
         Price::create(['from'=> 1, 'to' => 5 , 'cost' => 50]);
         Price::create(['from'=> 5.1, 'to' => 10 , 'cost' => 100]);

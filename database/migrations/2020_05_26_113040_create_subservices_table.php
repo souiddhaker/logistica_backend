@@ -24,6 +24,16 @@ class CreateSubservicesTable extends Migration
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
+        Schema::create('service_trip', function (Blueprint $table) {
+            $table->integer('service_id')->unsigned();
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+
+            $table->integer('trip_id')->unsigned();
+            $table->foreign('trip_id')->references('id')->on('trips')->onDelete('cascade');
+
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+        });
     }
 
     /**

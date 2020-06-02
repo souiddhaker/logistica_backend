@@ -20,4 +20,8 @@ class Service extends Model
     public function subservices(){
         return $this->hasMany(SubService::class);
     }
+
+    public function trips(){
+        $this->belongsToMany(Trip::class);
+    }
 }

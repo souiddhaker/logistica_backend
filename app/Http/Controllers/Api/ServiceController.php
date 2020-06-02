@@ -79,6 +79,7 @@ class ServiceController extends Controller
 
         $trip = new Trip();
         $trip->status = 'temp';
+        $trip->user()->associate($user)->save();
         $trip->save();
 
 

@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Models\Address;
 use App\Models\User;
+use App\Models\Driver;
 use App\Models\Notif;
 class UserSeeder extends Seeder
 {
@@ -14,6 +15,8 @@ class UserSeeder extends Seeder
     public function run()
     {
         //
+
+
         $listUser = User::all();
         foreach ($listUser as $user)
         {

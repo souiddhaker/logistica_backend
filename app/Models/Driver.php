@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Driver extends User
 {
     //
+    protected $table = 'drivers';
 
     public function trips()
     {

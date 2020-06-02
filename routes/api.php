@@ -62,6 +62,11 @@ Route::prefix('notifs')->group(function () {
 
 
 Route::prefix('trip')->group(function () {
+    Route::get('/list', 'Api\TripController@listTrips')->middleware('auth:api');
+    Route::get('/{id}', 'Api\TripController@getTrip')->middleware('auth:api');
+
+    Route::post('/create', 'Api\TripController@confirmTrip')->middleware('auth:api');
+    Route::post('/cancel', 'Api\TripController@cancelTrip')->middleware('auth:api');
     Route::post('/document', 'Api\DocumentController@store')->middleware('auth:api');
     Route::delete('/document/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
     Route::get('/document/{id}', 'Api\DocumentController@getAttachement')->middleware('auth:api');

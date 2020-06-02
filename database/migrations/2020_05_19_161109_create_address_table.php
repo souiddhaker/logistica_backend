@@ -18,6 +18,7 @@ class CreateAddressTable extends Migration
             $table->string('primaryName')->nullable();
             $table->string('secondaryName')->nullable();
             $table->string('place_id')->nullable();
+            $table->string('type')->nullable();
 
             $table->string('longitude')->nullable();
             $table->string('lattitude')->nullable();
@@ -25,6 +26,17 @@ class CreateAddressTable extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('cascade');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+        });
+
+        Schema::create('address_trip', function (Blueprint $table) {
+            $table->integer('address_id')->unsigned();
+            $table->foreign('address_id')->references('id')->on('address')->onDelete('cascade');
+
+            $table->integer('trip_id')->unsigned();
+            $table->foreign('trip_id')->references('id')->on('trips')->onDelete('cascade');
+
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });

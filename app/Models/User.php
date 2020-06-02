@@ -36,7 +36,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Document::class);
     }
-
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -44,7 +47,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstName', 'lastName', 'phone', 'email', 'password','image_url'
+        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles'
     ];
 
     /**

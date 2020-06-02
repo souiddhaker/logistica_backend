@@ -27,8 +27,8 @@ class UserController extends Controller
         $user->update($request->only(['firstName', 'lastName']));
 //        unset( $user->roles);
 
-        $response['user'] =$user;
-        $res->success($response);
+//        $response['user'] =$user;
+        $res->success($user);
         return response()->json($res, 200);
     }
 
@@ -59,8 +59,7 @@ class UserController extends Controller
             $user->update(['image_url' => $name]);
 
 //            unset( $user->roles);
-            $response['user'] =$user;
-            $res->success($response);
+            $res->success($user);
 
             return response()->json($res, 200);
 
@@ -80,7 +79,7 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-        $res->success(['user' => $user]);
+        $res->success($user);
         $res->message= 'User details';
 
         return response()->json($res,200);
