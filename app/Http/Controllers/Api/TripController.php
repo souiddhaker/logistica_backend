@@ -58,15 +58,42 @@ class TripController extends Controller
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','user','attachements','promocode','type_car','rating')->paginate(5);
-        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','user','attachements','promocode','type_car','rating')->paginate(5);
-        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','user','attachements','promocode','type_car','cancelRaison','rating')->paginate(5);
+        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating')->limit(5)->get();
+        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating')->limit(5)->get();
+        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating')->limit(5)->get();
         $listTrips['current'] = $currentTrip;
         $listTrips['finished'] = $finishedTrip;
         $listTrips['canceled'] = $canceledTrip;
 
         $res->success($listTrips);
         return response()->json($res,200);
+    }
+
+    public function search(Request $request)
+    {
+        $res = new Result();
+
+        $key = $request->input('key', "");
+        $page = $request->input('page', 1);
+        $trips = Trip::where('status', '=', $key)->with('driver','attachements','promocode','type_car','cancelTrip','rating')
+            ->paginate(5)
+            ->toArray();
+
+
+        foreach ($trips['data']  as &$elem){
+            unset($elem['user']['roles']);
+        }
+
+        $trips["first_page_url"] = $request->url() . "?key=" . $key . "&page=" . "1";
+        $trips["last_page_url"] = $request->url() . "?key=" . $key . "&page=" . $trips['last_page'];
+
+        if ($trips['last_page'] > $page) {
+            $nextpage = (int) $page + 1;
+            $trips["next_page_url"] = $request->url() . "?key=" . $key . "&page=" . $nextpage;
+        }
+
+        $res->success($trips);
+        return response()->json($res, 200);
     }
 
     public function confirmTrip(Request $request)
@@ -85,13 +112,13 @@ class TripController extends Controller
         $trip->status = '1';
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
+        $trip->driver_note = $data['note_driver'];
+//        $trip->payment_method = $data['note_driver'];
 
         $type_car = CarCategory::find($data['type_car_id']);
 
         if($type_car){
-//            $trip->type_car_id = $type_car->id;
             $trip->type_car()->associate($type_car)->save();
-
         }
 
 
@@ -116,19 +143,26 @@ class TripController extends Controller
         foreach ($listServices as $serviceId){
 
             $service = Service::find($serviceId);
-            $trip->services()->attach($service);
-            $subServices = SubService::where('service_id',$serviceId)->get();
-            if (count($subServices)>0){
-                foreach ($subServices as $subservice){
-                    $subservice['price'] = $subservice['price']*$data['nbr_luggage'];
-                    $trip->subservices()->attach($subservice);
-                }
-                $service['sub_services'] = $subServices;
 
-            }else{
+            if ($service)
+            {
                 $service['price'] = $service['price']*$data['nbr_luggage'];
+
+                $trip->services()->attach($service);
             }
-            array_push($services,$service);
+
+
+        }
+        $listSubServices = $data['sub_services'];
+
+        foreach ($listSubServices as $subServiceId){
+            $subService = SubService::find($subServiceId);
+            if ($subService)
+            {
+                $subService['price'] = $subService['price']*$data['nbr_luggage'];
+
+                $trip->subservices()->attach($subService);
+            }
         }
 
         $listAttachements = $data['attachements'];
@@ -136,10 +170,9 @@ class TripController extends Controller
             foreach ($listAttachements as $attachementId){
                 $attachement = Document::find($attachementId);
                 if($attachement)
-                $trip->attachements()->attach($attachement);
+                $trip->attachements()->save($attachement);
             }
         }
-//        return response()->json( $trip,200);
 
         $pickup_address = Address::where('place_id','=',request('place_idPickup'))->first();
         $destination_address = Address::where('place_id','=',request('place_idDestination'))->first();
@@ -150,6 +183,8 @@ class TripController extends Controller
                 'primaryName' => request('primaryNamePickup'),
                 'secondaryName' => request('secondaryPickup'),
                 'place_id' => request('place_idPickup'),
+                'longitude' => request('longitudePickup'),
+                'lattitude' => request('lattitudePickup'),
                 'type' => '1',
                 'user_id' => Auth::id()
             ]);
@@ -160,6 +195,8 @@ class TripController extends Controller
                 'primaryName' => request('primaryNameDestination'),
                 'secondaryName' => request('secondaryDestination'),
                 'place_id' => request('place_idDestination'),
+                'longitude' => request('longitudeDestination'),
+                'lattitude' => request('lattitudeDestination'),
                 'type' => '2',
                 'user_id' => Auth::id()
             ]);
@@ -175,28 +212,23 @@ class TripController extends Controller
 
     public function getById(int $id)
     {
-        $trip = Trip::find($id);
+        $trip = Trip::where('id',$id)->with('driver','attachements','promocode','type_car','cancelTrip','rating')->first();
         if ($trip)
         {
-        $services = [];
-        foreach ($trip->services as $item){
+            $services=[];
+            $subservicesCollection = collect($trip->subservices)->toArray();
 
-            $service = Service::find($item->id);
+            foreach($trip->services as $service){
+                $serviceModel = $service;
 
-            $trip->services()->attach($service);
-            $subServices = SubService::where('service_id',$item->id)->get();
+                $id = $service->id;
+                $serviceModel['sub_services']= array_filter($subservicesCollection, function ($event) use ($id) {
+                    return $event['service_id'] === $id;
+                });
 
-            if (count($subServices)>0){
-                foreach ($subServices as $subservice){
-                    $subservice['price'] = $subservice['price']*$trip->nbr_luggage;
-                }
-                $service['sub_services'] = $subServices;
+                array_push($services,$serviceModel);
 
-            }else{
-                $service['price'] = $service['price']*$trip->nbr_luggage;
             }
-            array_push($services,$service);
-        }
         $addresses = [];
 
         foreach ($trip->addresses as $address){
@@ -209,6 +241,11 @@ class TripController extends Controller
                 $addresses['destination'] = $tripAddress;
             }
         }
+
+        $trip['addresses_trip'] = $addresses;
+        $trip->services = $services;
+
+        $trip->payement_method = "Cash payment";
         return $trip;
 
         }else
@@ -242,14 +279,16 @@ class TripController extends Controller
             $cancelTrip->raison = $data['raison'];
             $cancelTrip->by_user = $data['canceledByUser'];
             $trip->status = '3';
-            $trip->cancelRaison()->save($cancelTrip);
+            $trip->cancelTrip()->save($cancelTrip);
             $trip->save();
-            $res->success('trip canceled');
 
         }else{
             $res->fail('trip not found');
             return response()->json($res,200);
         }
+        $res->success($cancelTrip);
+        $res->message = "Canceled Trip";
+
         return response()->json($res,200);
 
     }
@@ -263,6 +302,7 @@ class TripController extends Controller
         $rate = new Rating();
         $trip = Trip::find($data['trip_id']);
         $rate->value = $data['value'];
+        $rate->comment = $data['additionalComment'];
         $rate->user_id = Auth::id();
         $trip->rating()->save($rate);
         $res->success('Rating success');

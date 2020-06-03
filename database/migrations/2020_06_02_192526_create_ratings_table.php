@@ -16,6 +16,7 @@ class CreateRatingsTable extends Migration
         Schema::create('ratings', function (Blueprint $table) {
             $table->increments('id');
             $table->float('value')->nullable();
+            $table->string('comment')->nullable();
             $table->unsignedInteger('trip_id')->nullable();
             $table->unsignedInteger('user_id')->nullable();
 

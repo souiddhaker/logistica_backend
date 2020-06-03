@@ -14,7 +14,7 @@ class Address extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','longitude','lattitude','type'
+        'created_at', 'updated_at','type','pivot'
     ];
 
     /**

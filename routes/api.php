@@ -63,6 +63,8 @@ Route::prefix('notifs')->group(function () {
 
 Route::prefix('trip')->group(function () {
     Route::get('/list', 'Api\TripController@listTrips')->middleware('auth:api');
+    Route::get('/search', 'Api\TripController@search')->middleware('auth:api');
+
     Route::get('/{id}', 'Api\TripController@getTrip')->middleware('auth:api');
 
     Route::post('/create', 'Api\TripController@confirmTrip')->middleware('auth:api');

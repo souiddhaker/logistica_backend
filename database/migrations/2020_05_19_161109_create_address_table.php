@@ -20,8 +20,8 @@ class CreateAddressTable extends Migration
             $table->string('place_id')->nullable();
             $table->string('type')->nullable();
 
-            $table->string('longitude')->nullable();
-            $table->string('lattitude')->nullable();
+            $table->double('longitude')->nullable();
+            $table->double('lattitude')->nullable();
             $table->integer('user_id')->unsigned();
 
             $table->foreign('user_id')->references('id')->on('users')
