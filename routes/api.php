@@ -67,6 +67,7 @@ Route::prefix('trip')->group(function () {
 
     Route::get('/{id}', 'Api\TripController@getTrip')->middleware('auth:api');
 
+    Route::post('/changeStatus', 'Api\TripController@changeStatus')->middleware('auth:api');
     Route::post('/create', 'Api\TripController@confirmTrip')->middleware('auth:api');
     Route::post('/cancel', 'Api\TripController@cancelTrip')->middleware('auth:api');
     Route::post('/document', 'Api\DocumentController@store')->middleware('auth:api');

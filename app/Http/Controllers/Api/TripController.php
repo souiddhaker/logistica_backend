@@ -302,11 +302,33 @@ class TripController extends Controller
 
         $rate = new Rating();
         $trip = Trip::find($data['trip_id']);
-        $rate->value = $data['value'];
-        $rate->comment = $data['additionalComment'];
-        $rate->user_id = Auth::id();
-        $trip->rating()->save($rate);
-        $res->success('Rating success');
+            if ($trip){
+                $rate->value = $data['value'];
+                $rate->comment = $data['additionalComment'];
+                $rate->user_id = Auth::id();
+                $trip->rating()->save($rate);
+                $res->success($rate);
+
+            }else{
+                $res->fail('Trip not found');
+            }
+        return response()->json($res,200);
+    }
+
+
+    public function changeStatus(Request $request)
+    {
+        $res = new Result();
+        $data = $request->all();
+        $trip = Trip::find($data['trip_id']);
+        if ($trip)
+        {
+            $trip->status = $data['status'];
+            $trip->save();
+            $res->success($this->getById($trip->id));
+        }else{
+            $res->fail('trip not found');
+        }
         return response()->json($res,200);
     }
 }
