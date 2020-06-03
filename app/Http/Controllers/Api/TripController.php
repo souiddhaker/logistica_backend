@@ -177,8 +177,9 @@ class TripController extends Controller
         $pickup_address = Address::where('place_id','=',request('place_idPickup'))->first();
         $destination_address = Address::where('place_id','=',request('place_idDestination'))->first();
 
-        if(!$pickup_address)
+        if(!$pickup_address or (request('place_idPickup')== ""))
         {
+
             $pickup_address = Address::create([
                 'primaryName' => request('primaryNamePickup'),
                 'secondaryName' => request('secondaryPickup'),
@@ -189,7 +190,7 @@ class TripController extends Controller
                 'user_id' => Auth::id()
             ]);
         }
-        if (!$destination_address)
+        if (!$destination_address or (request('place_idDestination')== ""))
         {
             $destination_address = Address::create([
                 'primaryName' => request('primaryNameDestination'),
