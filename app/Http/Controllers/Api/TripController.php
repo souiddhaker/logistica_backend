@@ -144,9 +144,12 @@ class TripController extends Controller
         }
 
         $payment_method = Card::find($data['payment_method']);
-        if($payment_method){
+
+        if($payment_method)
+        {
             $trip->payment_method = $payment_method->id;
         }
+
         $trip->user_id = Auth::id();
         $trip->driver_id = 1;
 
@@ -188,8 +191,8 @@ class TripController extends Controller
             }
         }
 
-        $pickup_address = Address::where('place_id','=',request('place_idPickup'))->first();
-        $destination_address = Address::where('place_id','=',request('place_idDestination'))->first();
+        $pickup_address = Address::where('place_id','=',request('place_idPickup'))->where('user_id','=',Auth::id())->first();
+        $destination_address = Address::where('place_id','=',request('place_idDestination'))->where('user_id','=',Auth::id())->first();
 
         if(!$pickup_address or (request('place_idPickup')== ""))
         {
