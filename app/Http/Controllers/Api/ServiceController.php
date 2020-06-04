@@ -70,19 +70,6 @@ class ServiceController extends Controller
 
         $user = Auth::user();
 
-//        $oldTrip = Trip::where('user_id',$user->id)->where('status','temp')->get();
-//
-//        foreach ($oldTrip as $trip)
-//        {
-//            $trip->delete();
-//        }
-//
-//        $trip = new Trip();
-//        $trip->status = 'temp';
-//        $trip->user()->associate($user)->save();
-//        $trip->save();
-
-
         $nbrBags = $request['bags'];
         $listCategory =  CategoryServices::all();
         $listServices =[];
@@ -104,7 +91,6 @@ class ServiceController extends Controller
                 }
             }
         }
-//        $listServices['trip_id'] = $trip->id;
         $res->success($listServices);
         $res->message = "List services";
 

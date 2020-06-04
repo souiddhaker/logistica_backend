@@ -23,7 +23,6 @@ class AddressController extends Controller
 
         $listAddress = Address::where('user_id', '=', $userId)->where('type','=','3')->orderBy('created_at' , 'desc')->paginate(5);
 
-//        $res->response = $listAddress;
         $res->message = 'List address stored';
         $res->success($listAddress);
         return response()->json($res,200);

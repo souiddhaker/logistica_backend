@@ -165,20 +165,7 @@ class AuthController extends Controller
     {
         $res = new Result();
 
-//        $validator = Validator::make($request->all(),
-//            [
-//                'provider' => 'required|in:facebook,password'
-//            ]);
-//
-//        if ($validator->fails()) {
-//            $res->fail($validator->errors()->get('provider')[0]);
-//            return response()->json($res, 200);
-//        }
-//
-//
         $input = $request->all();
-//
-//        if ($request->provider == "password") {
 
             $validator = Validator::make($request->all(),
                 [
@@ -196,20 +183,8 @@ class AuthController extends Controller
                     $res->fail("This phone already exists");
                     return response()->json($res, 200);
                 }
-//                return response()->json($res, 200);
             }
 
-//            $client = new Client();
-//            $user = new User();
-////            $user = $client->user;
-//            $user->firstName = request('firstName');
-//            $user->lastName = request('lastName');
-//            $user->email = request('email');
-//            $user->phone = request('phone');
-//            $user->password = bcrypt("logistica");
-//         $client->user = $user;
-//
-//        $client->save();
             $user = User::create([
                 'firstName' => request('firstName'),
                 'lastName' => request('lastName'),
@@ -222,19 +197,7 @@ class AuthController extends Controller
             $result['isAlreadyUser'] = false;
             $res->success($result);
             return response()->json($res, 200);
-//        } else {
-//            $result = $this->issueToken($input, 'social');
-//            if($result==null){
-//                $res->fail( "Invalid request");
-//                return response()->json($res, 200);
-//            }
-//            if(!$result['access_token']){
-//                $res->fail("Wrong token");
-//                return response()->json($res, 200);
-//            }
-//            $res->success($result);
-//            return response()->json($res, 200);
-//        }
+
     }
 
 

@@ -58,7 +58,6 @@ class UserController extends Controller
             $user = Auth::user();
             $user->update(['image_url' => $name]);
 
-//            unset( $user->roles);
             $res->success($user);
 
             return response()->json($res, 200);
