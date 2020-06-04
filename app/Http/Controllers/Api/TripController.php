@@ -58,9 +58,9 @@ class TripController extends Controller
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating')->limit(5)->get();
-        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating')->limit(5)->get();
-        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating')->limit(5)->get();
+        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->limit(5)->get();
+        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->limit(5)->get();
+        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->limit(5)->get();
         $listTrips['current'] = $currentTrip;
         $listTrips['finished'] = $finishedTrip;
         $listTrips['canceled'] = $canceledTrip;
@@ -75,12 +75,13 @@ class TripController extends Controller
 
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
-        $trips = Trip::where('status', '=', $key)->with('driver','attachements','promocode','type_car','cancelTrip','rating')
+        $trips = Trip::where('status', '=', $key)->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')
             ->paginate(5)
             ->toArray();
 
 
         foreach ($trips['data']  as &$elem){
+
             unset($elem['user']['roles']);
         }
 
@@ -213,7 +214,7 @@ class TripController extends Controller
 
     public function getById(int $id)
     {
-        $trip = Trip::where('id',$id)->with('driver','attachements','promocode','type_car','cancelTrip','rating')->first();
+        $trip = Trip::where('id',$id)->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')->first();
         if ($trip)
         {
             $services=[];
@@ -243,7 +244,7 @@ class TripController extends Controller
             }
         }
 
-        $trip['addresses_trip'] = $addresses;
+//        $trip['addresses_trip'] = $addresses;
         $trip->services = $services;
 
         $trip->payement_method = "Cash payment";

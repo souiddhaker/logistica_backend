@@ -32,7 +32,7 @@ class ServiceSeeder extends Seeder
 
         Price::create(['from'=> 1, 'to' => 5 , 'cost' => 50]);
         Price::create(['from'=> 5.1, 'to' => 10 , 'cost' => 100]);
-        Price::create(['from'=> 10.1, 'to' => 20 , 'cost' => 150]);
+        Price::create(['from'=> 10.1, 'to' => 100000 , 'cost' => 150]);
 
         Promocode::create(['code' => '111111' , 'pourcentage' => 2 , 'status' => 'active', 'end_at'=>'2021-05-19 12:11:06']);
         Promocode::create(['code' => '222222' , 'pourcentage' => 5 , 'status' => 'active', 'end_at'=>'2021-05-19 12:11:06']);
