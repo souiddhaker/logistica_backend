@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Result;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Expr\Cast\Object_;
 use Validator;
 class TripController extends Controller
 {
@@ -53,17 +54,28 @@ class TripController extends Controller
 
     }
 
+    public function tripDataFromArray(array $data)
+    {
+        $arrayModel = [];
+        foreach ($data as $elem)
+        {
+            array_push($arrayModel,$this->getById($elem['id']));
+        }
+        return $arrayModel;
+    }
 
     public function listTrips()
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->limit(5)->get();
-        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->limit(5)->get();
-        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->limit(5)->get();
-        $listTrips['current'] = $currentTrip;
-        $listTrips['finished'] = $finishedTrip;
-        $listTrips['canceled'] = $canceledTrip;
+        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->paginate(5)->toArray();
+        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->paginate(5)->toArray();
+        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->paginate(5)->toArray();
+
+
+        $listTrips['current'] = $this->tripDataFromArray($currentTrip['data']);
+        $listTrips['finished'] = $this->tripDataFromArray($finishedTrip['data']);
+        $listTrips['canceled'] = $this->tripDataFromArray($canceledTrip['data']);
 
         $res->success($listTrips);
         return response()->json($res,200);
@@ -78,8 +90,9 @@ class TripController extends Controller
         $trips = Trip::where('status', '=', $key)->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')
             ->paginate(5)
             ->toArray();
+//        return response()->json($trips['data'], 200);
 
-
+        $trips['data'] = $this->tripDataFromArray($trips['data']);
         foreach ($trips['data']  as &$elem){
 
             unset($elem['user']['roles']);
