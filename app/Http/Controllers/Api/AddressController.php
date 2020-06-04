@@ -21,7 +21,7 @@ class AddressController extends Controller
 
         $userId = Auth::id();
 
-        $listAddress = Address::where('user_id', '=', $userId)->orderBy('created_at' , 'desc')->paginate(5);
+        $listAddress = Address::where('user_id', '=', $userId)->where('type','=','3')->orderBy('created_at' , 'desc')->paginate(5);
 
 //        $res->response = $listAddress;
         $res->message = 'List address stored';
@@ -50,6 +50,7 @@ class AddressController extends Controller
         $address->primaryName = $input['primaryName'];
         $address->secondaryName = $input['secondaryName'];
         $address->place_id = $input['place_id'];
+        $address->type = "3";
 
         $address->user_id = $user->id;
         $address->save();

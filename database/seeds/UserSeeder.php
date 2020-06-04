@@ -28,17 +28,20 @@ class UserSeeder extends Seeder
                     'primaryName'=>'King Abdulaziz International Airport',
                     'secondaryName'=>'Airport In Riyadh, Saudi Arabia',
                     'longitude'=>'39.156899',
+                    'type'=>'3',
                     'lattitude'=>'21.706231','user_id'=>$user->id]);
                 Address::create([
                     'primaryName'=>'King Fahd International Airport',
                     'secondaryName'=>'Dammam Arabie saoudite',
                     'longitude'=>'49.797523',
                     'lattitude'=>'26.482629',
+                    'type'=>'3',
                     'user_id'=>$user->id]);
                 Address::create([
                     'primaryName'=>'Medina Airport',
                     'secondaryName'=>'Medina Arabie saoudite',
                     'longitude'=>'24.557606',
+                    'type'=>'3',
                     'lattitude'=>'24.557606','user_id'=>$user->id]);
 
                 Notif::create([
