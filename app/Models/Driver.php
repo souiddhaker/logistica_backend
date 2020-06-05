@@ -13,4 +13,9 @@ class Driver extends User
     {
         return $this->hasMany(Trip::class);
     }
+
+    public function currentTrip()
+    {
+        return $this->hasOne(Trip::class);
+    }
 }

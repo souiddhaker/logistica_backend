@@ -156,7 +156,6 @@ class TripController extends Controller
         $trip->save();
 
         $listServices = $data['services'];
-        $services = [];
         foreach ($listServices as $serviceId){
 
             $service = Service::find($serviceId);
