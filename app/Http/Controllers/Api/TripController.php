@@ -87,7 +87,7 @@ class TripController extends Controller
 
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
-        $trips = Trip::where('status', '=', $key)->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')
+        $trips = Trip::where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')
             ->paginate(5)
             ->toArray();
 //        return response()->json($trips['data'], 200);
