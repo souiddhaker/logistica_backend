@@ -119,13 +119,16 @@ class TripController extends Controller
 
         $data = $request->all();
 
-        $trip = Trip::where('user_id',Auth::id())->where('status','=','3')->with('type_car')->first();
+//        $trip = Trip::where('user_id',Auth::id())->where('status','=','3')->with('type_car')->first();
+//
+//        if(!$trip)
+//        {
+//            $trip = new Trip();
+//            $trip->save();
+//        }
 
-        if(!$trip)
-        {
-            $trip = new Trip();
-            $trip->save();
-        }
+        $trip = new Trip();
+        $trip->save();
         $trip->status = '1';
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
