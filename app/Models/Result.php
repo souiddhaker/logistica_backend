@@ -34,16 +34,17 @@ class Result
 
         }
         $this->success = true;
-        $this->message = "success";
+        $this->message = ['en'=>'success','ar'=>'success'];
     }
 
     public function fail($msg)
     {
 
         $this->success = false;
-//        if (!$msg['ar'])
-//            $this->message = ['en'=>$msg,'ar'=>$msg];
-        $this->message = $msg;
+        if (gettype($msg) != "array")
+            $this->message = ['en'=>$msg,'ar'=>$msg];
+        else
+            $this->message = ['en'=>$msg,'ar'=>$msg];
         $this->time=Carbon::now()->timestamp;;
 
         $this->response = [];

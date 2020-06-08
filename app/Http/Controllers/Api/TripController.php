@@ -7,6 +7,7 @@ use App\Models\CancelTrip;
 use App\Models\CarCategory;
 use App\Models\Card;
 use App\Models\Document;
+use App\Models\Driver;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\SubService;
@@ -68,9 +69,9 @@ class TripController extends Controller
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::select('id','total_price')->where('status','=','1')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $finishedTrip = Trip::select('id','total_price')->where('status','=','2')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $canceledTrip = Trip::select('id','total_price')->where('status','=','3')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $finishedTrip = Trip::select('id','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $canceledTrip = Trip::select('id','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
 
         $listTrips['current'] = $currentTrip['data'];
@@ -87,7 +88,7 @@ class TripController extends Controller
 
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
-        $trips = Trip::select('id','total_price')->where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
+        $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
             ->paginate(10)
             ->toArray();
 
@@ -147,7 +148,7 @@ class TripController extends Controller
         }
 
         $trip->user_id = Auth::id();
-        $trip->driver_id = 1;
+        $trip->driver()->save(Driver::find(1));
 
         $trip->save();
 
@@ -255,17 +256,7 @@ class TripController extends Controller
             }
         }
 
-//        return response()->json($trip->cancelTrip->by_user,200);
-//        if ($trip->status == 3)
-//        {
-//            $canceledTrip = Trip::find($trip->canceled);
-//            if ($trip->cancelTrip->by_user == 0)
-//                $trip['cancel_trip']['by_user'] = true;
-//            else
-//                $trip['cancel_trip']['by_user'] = false;
-//
-//        }
-//        $trip['addresses_trip'] = $addresses;
+
         $trip->services = $services;
 
         $trip->payement_method = "Cash payment";
