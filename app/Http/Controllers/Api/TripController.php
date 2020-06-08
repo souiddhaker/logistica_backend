@@ -70,7 +70,7 @@ class TripController extends Controller
         $listTrips  = [];
         $currentTrip = Trip::select('id','total_price')->where('status','=','1')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
         $finishedTrip = Trip::select('id','total_price')->where('status','=','2')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $canceledTrip = Trip::select('id','total_price')->where('status','=','3')->where('user_id',Auth::id())->with('user','driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $canceledTrip = Trip::select('id','total_price')->where('status','=','3')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
 
 //        $listTrips['current'] = $this->tripDataFromArray($currentTrip['data']);
@@ -119,13 +119,7 @@ class TripController extends Controller
 
         $data = $request->all();
 
-//        $trip = Trip::where('user_id',Auth::id())->where('status','=','3')->with('type_car')->first();
-//
-//        if(!$trip)
-//        {
-//            $trip = new Trip();
-//            $trip->save();
-//        }
+
 
         $trip = new Trip();
         $trip->save();
