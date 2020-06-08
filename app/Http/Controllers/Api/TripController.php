@@ -73,10 +73,6 @@ class TripController extends Controller
         $canceledTrip = Trip::select('id','total_price')->where('status','=','3')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
 
-//        $listTrips['current'] = $this->tripDataFromArray($currentTrip['data']);
-//        $listTrips['finished'] = $this->tripDataFromArray($finishedTrip['data']);
-//        $listTrips['canceled'] = $this->tripDataFromArray($canceledTrip['data']);
-
         $listTrips['current'] = $currentTrip['data'];
         $listTrips['finished'] = $finishedTrip['data'];
         $listTrips['canceled'] = $canceledTrip['data'];
