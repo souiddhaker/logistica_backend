@@ -176,11 +176,11 @@ class AuthController extends Controller
                 ]);
             if ($validator->fails()) {
                 if($validator->errors()->has("email")){
-                    $res->fail("This email already exists");
+                    $res->fail(['en'=>'This email already exists','ar'=>'هذا البريد الإلكتروني موجود بالفعل']);
                     return response()->json($res, 200);
                 }
                 else if($validator->errors()->has("userPhone")){
-                    $res->fail("This phone already exists");
+                    $res->fail(['en'=>'This phone already exists','ar'=>'هذا الهاتف موجود بالفعل']);
                     return response()->json($res, 200);
                 }
             }

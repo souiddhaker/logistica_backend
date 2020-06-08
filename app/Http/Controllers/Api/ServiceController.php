@@ -54,7 +54,7 @@ class ServiceController extends Controller
     public function getListServices(Request $request)
     {
 
-
+        app()->setLocale('en');
         $res  =  new Result();
 
         $validator = Validator::make($request->all(),
@@ -68,6 +68,10 @@ class ServiceController extends Controller
             return response()->json($res, 200);
         }
 
+        app()->setLocale('en');
+        if ($request['language'])
+            app()->setLocale($request['language']);
+
         $user = Auth::user();
 
         $nbrBags = $request['bags'];
@@ -75,7 +79,6 @@ class ServiceController extends Controller
         $listServices =[];
         foreach ($listCategory as $category){
             $listServices[$category->title] = Service::where('category_id', $category->id)->get();
-            $arraySubServices = [];
             foreach ($listServices[$category->title] as $service)
             {
                 $subServices = SubService::where('service_id',$service->id)->get();

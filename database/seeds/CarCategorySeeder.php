@@ -15,14 +15,14 @@ class CarCategorySeeder extends Seeder
         //
 
         CarCategory::create([
-            'model' => 'Logística Car',
+            'model' => ['en' => 'Logística Car' , 'ar' => 'سيارة لوجيستيكا'],
             'price' => 12,
             'capacity' => 3,
             'image' => 'https://logistica.wi-mobi.com/img/icon/car.png',
             'range_luggage' => '1-3',
         ]);
         CarCategory::create([
-            'model' => 'Logística Van',
+            'model' => ['en' => 'Logística Van' , 'ar' => 'شاحنة لوجيستيكا'],
             'price' => 15,
             'capacity' => 5,
             'image' => 'https://logistica.wi-mobi.com/img/icon/van.png',

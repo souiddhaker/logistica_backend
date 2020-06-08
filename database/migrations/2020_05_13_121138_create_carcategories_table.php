@@ -15,9 +15,9 @@ class CreateCarcategoriesTable extends Migration
     {
         Schema::create('car_categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('model');
-            $table->float('price');
-            $table->integer('capacity');
+            $table->string('model')->nullable();
+            $table->float('price')->nullable();
+            $table->integer('capacity')->nullable();
             $table->string('image')->nullable();
             $table->tinyInteger('type')->nullable();
             $table->string('range_luggage')->nullable();

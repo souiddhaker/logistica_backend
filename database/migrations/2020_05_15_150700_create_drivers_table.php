@@ -17,6 +17,8 @@ class CreateDriversTable extends Migration
             $table->increments('id');
             $table->string('firstName')->nullable();
             $table->string('lastName')->nullable();
+            $table->string('image_url')->default("");
+
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use Carbon\Carbon;
+use Spatie\Translatable\HasTranslations;
 
 class Result
 {
@@ -40,6 +41,8 @@ class Result
     {
 
         $this->success = false;
+//        if (!$msg['ar'])
+//            $this->message = ['en'=>$msg,'ar'=>$msg];
         $this->message = $msg;
         $this->time=Carbon::now()->timestamp;;
 

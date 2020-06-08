@@ -15,7 +15,7 @@ class CreateCategoriesServicesTable extends Migration
     {
         Schema::create('categories_services', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });

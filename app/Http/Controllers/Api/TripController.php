@@ -68,14 +68,18 @@ class TripController extends Controller
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::where('status','=','1')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->paginate(5)->toArray();
-        $finishedTrip = Trip::where('status','=','2')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->paginate(5)->toArray();
-        $canceledTrip = Trip::where('status','=','3')->where('user_id',Auth::id())->with('driver','attachements','promocode','type_car','cancelTrip','rating','addresses')->paginate(5)->toArray();
+        $currentTrip = Trip::select('id','total_price')->where('status','=','1')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $finishedTrip = Trip::select('id','total_price')->where('status','=','2')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $canceledTrip = Trip::select('id','total_price')->where('status','=','3')->where('user_id',Auth::id())->with('user','driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
 
-        $listTrips['current'] = $this->tripDataFromArray($currentTrip['data']);
-        $listTrips['finished'] = $this->tripDataFromArray($finishedTrip['data']);
-        $listTrips['canceled'] = $this->tripDataFromArray($canceledTrip['data']);
+//        $listTrips['current'] = $this->tripDataFromArray($currentTrip['data']);
+//        $listTrips['finished'] = $this->tripDataFromArray($finishedTrip['data']);
+//        $listTrips['canceled'] = $this->tripDataFromArray($canceledTrip['data']);
+
+        $listTrips['current'] = $currentTrip['data'];
+        $listTrips['finished'] = $finishedTrip['data'];
+        $listTrips['canceled'] = $canceledTrip['data'];
 
         $res->success($listTrips);
         return response()->json($res,200);
@@ -87,12 +91,11 @@ class TripController extends Controller
 
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
-        $trips = Trip::where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')
-            ->paginate(5)
+        $trips = Trip::select('id','total_price')->where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
+            ->paginate(10)
             ->toArray();
-//        return response()->json($trips['data'], 200);
 
-        $trips['data'] = $this->tripDataFromArray($trips['data']);
+//        $trips['data'] = $this->tripDataFromArray($trips['data']);
         foreach ($trips['data']  as &$elem){
 
             unset($elem['user']['roles']);
@@ -259,6 +262,16 @@ class TripController extends Controller
             }
         }
 
+//        return response()->json($trip->cancelTrip->by_user,200);
+//        if ($trip->status == 3)
+//        {
+//            $canceledTrip = Trip::find($trip->canceled);
+//            if ($trip->cancelTrip->by_user == 0)
+//                $trip['cancel_trip']['by_user'] = true;
+//            else
+//                $trip['cancel_trip']['by_user'] = false;
+//
+//        }
 //        $trip['addresses_trip'] = $addresses;
         $trip->services = $services;
 

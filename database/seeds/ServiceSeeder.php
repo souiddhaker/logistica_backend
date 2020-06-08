@@ -17,18 +17,18 @@ class ServiceSeeder extends Seeder
     {
         //
 
-        $service = CategoryServices::create(['title' => 'Service']);
-        $packaging = CategoryServices::create(['title' => 'Packaging']);
+        $service = CategoryServices::create(['title' => ['en' => 'Service' , 'ar' => 'الخدمات']]);
+        $packaging = CategoryServices::create(['title' => ['en' => 'Packaging' , 'ar' => 'التعبئة والتغليف']]);
 
-        Service::create(['label' => 'Delivery', 'price' => 15 ,'category_id' => $service->id]);
-        Service::create(['label' => 'Boarding', 'price' => 2 ,'category_id' => $service->id]);
-        Service::create(['label' => 'Shipping', 'price' => 5 ,'category_id' => $service->id]);
-        $cartoon = Service::create(['label' => 'Cartoon', 'price' => 5 ,'category_id' => $packaging->id]);
-        $rollPlastic = Service::create(['label' => 'Plastic Roll', 'price' => 2.6 ,'category_id' => $packaging->id]);
-        SubService::create(['label' => 'Big size', 'price' => 5 ,'service_id' => $cartoon->id]);
-        SubService::create(['label' => 'Small size', 'price' => 2 ,'service_id' => $cartoon->id]);
-        SubService::create(['label' => 'Big size', 'price' => 5 ,'service_id' => $rollPlastic->id]);
-        SubService::create(['label' => 'Small size', 'price' => 2 ,'service_id' => $rollPlastic->id]);
+        Service::create(['label' => ['en' => 'Delivery' , 'ar' => 'توصيل'], 'price' => 15 ,'category_id' => $service->id]);
+        Service::create(['label' => ['en' => 'Boarding' , 'ar' => 'التحميل و التنزيل'], 'price' => 2 ,'category_id' => $service->id]);
+        Service::create(['label' => ['en' => 'Shipping' , 'ar' => 'الشحن'], 'price' => 5 ,'category_id' => $service->id]);
+        $cartoon = Service::create(['label' => ['en' => 'Cartoon' , 'ar' => 'كارتون'], 'price' => 5 ,'category_id' => $packaging->id]);
+        $rollPlastic = Service::create(['label' => ['en' => 'Plastic Roll' , 'ar' => 'لفة بلاستيكية'], 'price' => 2.6 ,'category_id' => $packaging->id]);
+        SubService::create(['label' => ['en' => 'Big size' , 'ar' => 'حجم كبير'], 'price' => 5 ,'service_id' => $cartoon->id]);
+        SubService::create(['label' => ['en' => 'Small size' , 'ar' => 'حجم صغير'], 'price' => 2 ,'service_id' => $cartoon->id]);
+        SubService::create(['label' => ['en' => 'Big size' , 'ar' => 'حجم كبير'], 'price' => 5 ,'service_id' => $rollPlastic->id]);
+        SubService::create(['label' => ['en' => 'Small size' , 'ar' => 'حجم صغير'], 'price' => 2 ,'service_id' => $rollPlastic->id]);
 
         Price::create(['from'=> 1, 'to' => 5 , 'cost' => 50]);
         Price::create(['from'=> 5.1, 'to' => 10 , 'cost' => 100]);
