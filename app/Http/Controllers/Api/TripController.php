@@ -148,7 +148,7 @@ class TripController extends Controller
         }
 
         $trip->user_id = Auth::id();
-        $trip->driver()->save(Driver::find(1));
+        $trip->driver_id = 1;
 
         $trip->save();
 
