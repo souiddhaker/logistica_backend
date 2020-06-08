@@ -67,15 +67,11 @@ class UserSeeder extends Seeder
         $listUser = User::all();
         foreach ($listUser as $user)
         {
-            foreach (range(1, 15) as $i) {
-                $this->createTrip($user->id,"1");
-                $this->createTrip($user->id,"2");
-                $this->createTrip($user->id,"3");
-            }
+
             $userAddress = Address::where('user_id',$user->id)->get();
             if (count($userAddress) == 0)
             {
-                foreach (range(1, 10) as $i) {
+                foreach (range(1, 15) as $i) {
                     $this->createTrip($user->id,"1");
                     $this->createTrip($user->id,"2");
                     $this->createTrip($user->id,"3");
