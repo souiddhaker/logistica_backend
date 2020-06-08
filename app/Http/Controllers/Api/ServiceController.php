@@ -47,7 +47,7 @@ class ServiceController extends Controller
 
 
         $res->success($list);
-        $res->message = "List of car categories";
+        $res->message = ['en' => 'List of car categories','ar' => 'List of car categories'];
         return response()->json($res,200);
     }
 
@@ -95,7 +95,7 @@ class ServiceController extends Controller
             }
         }
         $res->success($listServices);
-        $res->message = "List services";
+        $res->message = ['en' => 'List services','ar' => 'List services'];
 
         return response()->json($res,200);
     }

@@ -63,7 +63,7 @@ class AuthController extends Controller
 
 
         $res->success([]);
-        $res->message = "Verification code has been sent";
+        $res->message =['en' => 'Verification code has been sent','ar' => 'Verification code has been sent'] ;
         return response()->json($res, 200);
     }
 
@@ -110,7 +110,7 @@ class AuthController extends Controller
                 $response['isAlreadyUser'] = false;
             }
             $res->success($response);
-            $res->message = "Verification code correct";
+            $res->message = ['en' => 'Verification code correct','ar' => 'Verification code correct'];
             return response()->json($res, 200);
         }
 
@@ -151,7 +151,7 @@ class AuthController extends Controller
                     $response['isAlreadyUser'] = false;
                 }
                 $res->success($response);
-                $res->message = "Verification code correct";
+                $res->message = ['en' => 'Verification code correct','ar' => 'Verification code correct'];;
             }
         }
 

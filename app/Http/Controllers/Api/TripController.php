@@ -301,7 +301,7 @@ class TripController extends Controller
             return response()->json($res,200);
         }
         $res->success($cancelTrip);
-        $res->message = "Canceled Trip";
+        $res->message = ['en' => 'Canceled Trip','ar' => 'Canceled Trip'];
 
         return response()->json($res,200);
 

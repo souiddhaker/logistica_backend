@@ -56,7 +56,7 @@ class PaymentController extends Controller
         $res = new Result();
 
         $res->success($listCards);
-        $res->message = "List cards";
+        $res->message = ['en' => 'List cards','ar' => 'List cards'];
 
         return response()->json($res,200);
 

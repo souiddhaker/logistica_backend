@@ -33,7 +33,7 @@ class PromocodeController extends Controller
             $res->fail('Promocode invalid');
         }else{
             $res->success($promocode);
-            $res->message = 'Promocode correct';
+            $res->message = ['en' => 'Promocode correct','ar' => 'Promocode correct'];
         }
         return response()->json($res ,200);
     }
