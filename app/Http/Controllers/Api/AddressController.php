@@ -12,9 +12,6 @@ use Validator;
 class AddressController extends Controller
 {
     //
-
-
-
     public function getAllFavoritesAddress()
     {
         $res = new Result();

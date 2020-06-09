@@ -13,7 +13,7 @@ return [
     'user_phone_exists' => 'هذا الهاتف موجود سابقا',
     'user_email_exists' => 'هذا البريد الإلكتروني موجود سابقا',
     'user_phone_invalid' => 'هاتف المستخدم غير صالح',
-
+    'user_details' => 'بيانات المستخدم',
     'document_empty' => 'المرفق غير صحيح',
     'document_remove_fail' => 'فشلت إزالة المرفق',
     'document_not_found' => 'المرفق غير موجود',

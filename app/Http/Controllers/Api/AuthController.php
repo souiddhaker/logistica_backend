@@ -9,9 +9,9 @@ use App\Models\User;
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Validation\Validator;
+use Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 
 class AuthController extends Controller

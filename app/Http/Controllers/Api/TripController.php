@@ -114,6 +114,7 @@ class TripController extends Controller
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
+        $trip->room_number = $data['roomNumber'];
 //        $trip->payment_method = $data['payment_method'];
 
         $type_car = CarCategory::find($data['type_car_id']);
@@ -255,7 +256,7 @@ class TripController extends Controller
         if ($trip)
             $res->success($trip);
         else
-            $res->fail('trip not found');
+            $res->fail(trans('message.trip_not_found'));
         return response()->json($res,200);
 
     }
@@ -278,11 +279,11 @@ class TripController extends Controller
             $trip->save();
 
         }else{
-            $res->fail('trip not found');
+            $res->fail(trans('message.trip_not_found'));
             return response()->json($res,200);
         }
         $res->success($cancelTrip);
-        $res->message = ['en' => 'Canceled Trip','ar' => 'Canceled Trip'];
+        $res->message = trans('message.cancel_trip');
 
         return response()->json($res,200);
 

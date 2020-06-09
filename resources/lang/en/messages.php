@@ -11,6 +11,7 @@ return [
     'user_phone_exists' => 'This phone already exists',
     'user_email_exists' => 'This email already exists',
     'user_phone_invalid' => 'User phone not valid',
+    'user_details' => 'User details',
 
     'document_empty' => 'Format document incorrect',
     'document_remove_fail' => 'Fail to remove document',
