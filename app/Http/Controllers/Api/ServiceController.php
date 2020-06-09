@@ -25,10 +25,9 @@ class ServiceController extends Controller
         $validator = Validator::make($request->all(),
             [
                 'distance' => 'required']);
-        if ($validator->fails()) {
-
-            $res->fail("Please choose a pickup address");
-
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.distance_error'));
             return response()->json($res, 200);
         }
 
@@ -45,34 +44,28 @@ class ServiceController extends Controller
             array_push($list,$carTypeWithPrice);
         }
 
-
         $res->success($list);
-        $res->message = ['en' => 'List of car categories','ar' => 'List of car categories'];
+        $res->message = trans('messages.list_cars');
         return response()->json($res,200);
     }
 
     public function getListServices(Request $request)
     {
-
-        app()->setLocale('en');
         $res  =  new Result();
 
         $validator = Validator::make($request->all(),
             [
                 'bags' => 'required'
             ]);
-        if ($validator->fails()) {
-
-            $res->fail("Please choose a pickup address");
-
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.bags_error'));
             return response()->json($res, 200);
         }
-
-        app()->setLocale('en');
         if ($request['language'])
             app()->setLocale($request['language']);
-
-        $user = Auth::user();
+        else
+            app()->setLocale('en');
 
         $nbrBags = $request['bags'];
         $listCategory =  CategoryServices::all();
@@ -82,20 +75,19 @@ class ServiceController extends Controller
             foreach ($listServices[$category->title] as $service)
             {
                 $subServices = SubService::where('service_id',$service->id)->get();
-                if (count($subServices)>0){
+                if (count($subServices)>0)
+                {
                     foreach ($subServices as $subservice){
                         $subservice['price'] = $subservice['price']*$nbrBags;
                     }
                     $service['sub_services'] = $subServices;
-
                 }else{
                     $service['price'] = $service['price']*$nbrBags;
-
                 }
             }
         }
         $res->success($listServices);
-        $res->message = ['en' => 'List services','ar' => 'List services'];
+        $res->message = trans('messages.services_list');
 
         return response()->json($res,200);
     }

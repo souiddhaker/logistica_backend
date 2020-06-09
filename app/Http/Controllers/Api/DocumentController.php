@@ -26,7 +26,7 @@ class DocumentController extends Controller
                 'document' => 'required|base64image',
             ]);
         if ($validator->fails()) {
-            $res->fail("Toutes les entrées sont requises");
+            $res->fail(trans('messages.document_empty'));
             return response()->json($res, 200);
         }
 
@@ -72,7 +72,7 @@ class DocumentController extends Controller
             $res->response = $documents;
 
         }else{
-            $res->fail('trip not found');
+            $res->fail(trans('messages.trip_not_found'));
         }
 
 
@@ -84,19 +84,20 @@ class DocumentController extends Controller
         $res  = new Result();
 
         $document = Document::find($id);
-        if ($document){
+        if ($document)
+        {
             try {
                 $position  = strpos($document->path,'img/attachement/',0);
                 $image_path = public_path('img/attachement/').'/'.substr($document->path,$position+16,strlen($document->path));
                 unlink($image_path);
                 $res->success();
             }catch (\ErrorException $e){
-                $res->fail('Fail to remove document');
+                $res->fail(trans('messages.document_remove_fail'));
 
             }
             $document->delete();
         }else{
-            $res->fail('Document not found');
+            $res->fail(trans('messages.document_not_found'));
         }
 
         return response()->json($res,200);

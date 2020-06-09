@@ -5,21 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
 use App\Models\User;
-use App\Models\Client;
 
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Validator;
-use Illuminate\Support\Facades\Mail;
-use Twilio\Exceptions\TwilioException;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Auth;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 
 class AuthController extends Controller
 {
-    public $successStatus = 200;
     use IssueTokenTrait;
     private $client;
 
@@ -36,7 +32,7 @@ class AuthController extends Controller
                 'userPhone' => 'required|min:6'
             ]);
         if ($validator->fails()) {
-            $res->fail($validator->errors()->get('userPhone')[0]);
+            $res->fail(trans('messages.user_phone_invalid'));
             return response()->json($res, 200);
         }
         $phone = $request['userPhone'];
@@ -63,12 +59,13 @@ class AuthController extends Controller
 
 
         $res->success([]);
-        $res->message =['en' => 'Verification code has been sent','ar' => 'Verification code has been sent'] ;
+        $res->message =trans('messages.verif_code_send');
         return response()->json($res, 200);
     }
 
 
-    public function verifyCode(Request $request){
+    public function verifyCode(Request $request)
+    {
         $res  = new Result();
 
         $validator = Validator::make($request->all(),
@@ -77,13 +74,13 @@ class AuthController extends Controller
                 'verificationCode' => 'required|min:4'
             ]);
         if ($validator->fails()) {
-            if($validator->errors()->has("userPhone")) {
-                $res->fail('User phone not valid');
-
+            if($validator->errors()->has("userPhone"))
+            {
+                $res->fail(trans('messages.user_phone_invalid'));
             }
-            if($validator->errors()->has("verificationCode")) {
-                $res->fail('Verification code not valid');
-
+            if($validator->errors()->has("verificationCode"))
+            {
+                $res->fail(trans('messages.verif_code_invalid'));
             }
             return response()->json($res, 200);
         }
@@ -92,15 +89,12 @@ class AuthController extends Controller
         $verifCode = $request['verificationCode'];
         $phone = $request['userPhone'];
 
-
-
         $response = [];
-        if ($verifCode === "0001"){
+        if ($verifCode === "0001")
+        {
             $user = User::where('phone',$request['userPhone'])->first();
             if ($user) {
                 $input['email'] = $user->email;
-
-
                 $response = $this->issueToken($input, 'password');
                 $response['user'] = $user;
                 $response['isAlreadyUser'] = true;
@@ -110,38 +104,38 @@ class AuthController extends Controller
                 $response['isAlreadyUser'] = false;
             }
             $res->success($response);
-            $res->message = ['en' => 'Verification code correct','ar' => 'Verification code correct'];
+            $res->message = trans('messages.verif_code_correct');
             return response()->json($res, 200);
         }
 
-        if ($verifCode === "0002"){
-            $res->fail("Verification code expired");
+        if ($verifCode === "0002")
+        {
+            $res->fail(trans('messages.verif_code_expired'));
             return response()->json($res, 200);
         }
 
-        if ($verifCode === "0003"){
-            $res->fail("Verification code incorrect");
+        if ($verifCode === "0003")
+        {
+            $res->fail(trans('messages.verif_code_incorrect'));
             return response()->json($res, 200);
         }
 
         $verification = Verification::where('verification_code',$verifCode)->where('phone',$phone)->first();
 
         if (!$verification) {
-            $res->fail("Verification code incorrect");
+            $res->fail(trans('messages.verif_code_incorrect'));
 
         } else {
             $isExpired = (new Carbon($verification->created_at))->addMinutes($verification->code_expiry_minute) < Carbon::now();
-            if ($isExpired) {
-
-                $res->fail("Verification code expired");
-
+            if ($isExpired)
+            {
+                $res->fail(trans('messages.verif_code_expired'));
             } else {
 
                 $user = User::where('phone',$request['userPhone'])->first();
-                if ($user) {
+                if ($user)
+                {
                     $input['email'] = $user->email;
-
-
                     $response = $this->issueToken($input, 'password');
                     $response['user'] = $user;
                     $response['isAlreadyUser'] = true;
@@ -151,12 +145,10 @@ class AuthController extends Controller
                     $response['isAlreadyUser'] = false;
                 }
                 $res->success($response);
-                $res->message = ['en' => 'Verification code correct','ar' => 'Verification code correct'];;
+                $res->message = trans('messages.verif_code_correct');
             }
         }
-
         return response()->json($res, 200);
-
     }
 
 
@@ -167,48 +159,52 @@ class AuthController extends Controller
 
         $input = $request->all();
 
-            $validator = Validator::make($request->all(),
-                [
-                    'firstName' => 'required',
-                    'lastName' => 'required',
-                    'email' => 'required|email|unique:users,email',
-                    'userPhone' => 'required|unique:users,phone'
-                ]);
-            if ($validator->fails()) {
-                if($validator->errors()->has("email")){
-                    $res->fail(['en'=>'This email already exists','ar'=>'هذا البريد الإلكتروني موجود بالفعل']);
-                    return response()->json($res, 200);
-                }
-                else if($validator->errors()->has("userPhone")){
-                    $res->fail(['en'=>'This phone already exists','ar'=>'هذا الهاتف موجود بالفعل']);
-                    return response()->json($res, 200);
-                }
-            }
-
-            $user = User::create([
-                'firstName' => request('firstName'),
-                'lastName' => request('lastName'),
-                'email' => request('email'),
-                'phone' => request('userPhone'),
-                'password' => bcrypt("logistica")
+        $validator = Validator::make($request->all(),
+            [
+                'firstName' => 'required',
+                'lastName' => 'required',
+                'email' => 'required|email|unique:users,email',
+                'userPhone' => 'required|unique:users,phone'
             ]);
-            $result = $this->issueToken($input, 'password');
-            $result['user'] = $user;
-            $result['isAlreadyUser'] = false;
-            $res->success($result);
-            return response()->json($res, 200);
+        if ($validator->fails())
+        {
+            if($validator->errors()->has("email"))
+            {
+                $res->fail(trans('messages.user_email_exists'));
+                return response()->json($res, 200);
+            }
+            else if($validator->errors()->has("userPhone")){
+                $res->fail(trans('messages.user_phone_exists'));
+                return response()->json($res, 200);
+            }
+        }
+
+        $user = User::create([
+            'firstName' => request('firstName'),
+            'lastName' => request('lastName'),
+            'email' => request('email'),
+            'phone' => request('userPhone'),
+            'password' => bcrypt("logistica")
+        ]);
+        $result = $this->issueToken($input, 'password');
+        $result['user'] = $user;
+        $result['isAlreadyUser'] = false;
+        $res->success($result);
+        return response()->json($res, 200);
 
     }
 
 
-    public function refresh(Request $request){
+    public function refresh(Request $request)
+    {
         $res = new Result();
 
         $validator = Validator::make($request->all(),
             [
                 'refresh_token' => 'required'
             ]);
-        if ($validator->fails()) {
+        if ($validator->fails())
+        {
             $res->fail("Wrong fields");
             return response()->json($res, 200);
         }
@@ -228,8 +224,8 @@ class AuthController extends Controller
         return response()->json($res, 200);
     }
 
-    public function logout(Request $request){
-
+    public function logout(Request $request)
+    {
         $accessToken = Auth::user()->token();
         $res = new Result();
 
