@@ -3,8 +3,14 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ */
 class Trip extends Model
 {
     //

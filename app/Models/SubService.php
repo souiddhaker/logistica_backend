@@ -2,9 +2,15 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ */
 class SubService extends Model
 {
 
