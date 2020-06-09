@@ -77,6 +77,13 @@ Route::prefix('trip')->group(function () {
     Route::post('/rate', 'Api\TripController@rateTrip')->middleware('auth:api');
 
 });
+Route::prefix('admin')->group(function(){
+    Route::post('/create/{name}','Api\AdminCrudController@create');
+    Route::delete('/delete/{name}/{id}','Api\AdminCrudController@delete');
+    Route::put('/update/{name}/{id}','Api\AdminCrudController@update');
+    Route::get('/get/{name}/{id}','Api\AdminCrudController@get');
+    Route::get('/all/{name}','Api\AdminCrudController@all');
+});
 
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
