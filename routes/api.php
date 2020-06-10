@@ -83,6 +83,13 @@ Route::prefix('admin')->group(function(){
     Route::put('/update/{name}/{id}','Api\AdminCrudController@update');
     Route::get('/get/{name}/{id}','Api\AdminCrudController@get');
     Route::get('/all/{name}','Api\AdminCrudController@all');
+    Route::prefix('auth')->group(function(){
+
+        Route::post('login', 'Api\AdminAuthController@login');
+        Route::post('logout', 'Api\AdminAuthController@logout');
+        Route::post('refresh', 'Api\AdminAuthController@refresh');
+        Route::post('me', 'Api\AdminAuthController@me');
+    });
 });
 
 
