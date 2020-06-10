@@ -2,7 +2,6 @@
 
 namespace App\Models;
 use Carbon\Carbon;
-use Spatie\Translatable\HasTranslations;
 
 class Result
 {
@@ -34,17 +33,15 @@ class Result
 
         }
         $this->success = true;
-        $this->message = ['en'=>'success','ar'=>'success'];
+        $this->message = trans('messages.success');
     }
 
     public function fail($msg)
     {
 
         $this->success = false;
-        if (gettype($msg) != "array")
-            $this->message = ['en'=>$msg,'ar'=>$msg];
-        else
-            $this->message = ['en'=>$msg,'ar'=>$msg];
+
+        $this->message = $msg;
         $this->time=Carbon::now()->timestamp;;
 
         $this->response = [];

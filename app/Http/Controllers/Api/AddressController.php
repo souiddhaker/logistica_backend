@@ -12,9 +12,6 @@ use Validator;
 class AddressController extends Controller
 {
     //
-
-
-
     public function getAllFavoritesAddress()
     {
         $res = new Result();
@@ -23,7 +20,7 @@ class AddressController extends Controller
 
         $listAddress = Address::where('user_id', '=', $userId)->where('type','=','3')->orderBy('created_at' , 'desc')->paginate(5);
 
-        $res->message = ['en' => 'List address stored','ar' => 'List address stored'];
+        $res->message = trans('messages.addresses_list');
         $res->success($listAddress);
         return response()->json($res,200);
     }
@@ -39,7 +36,7 @@ class AddressController extends Controller
             ]);
 
         if ($validator->fails()) {
-            $res->fail('Address already exists','العنوان موجود بالفعل');
+            $res->fail(trans('messages.address_exists'));
             return response()->json($res, 400);
         }
 
@@ -71,7 +68,6 @@ class AddressController extends Controller
             $res->fail($validator->errors());
             return response()->json($res, 400);
         }
-
 
         try
         {

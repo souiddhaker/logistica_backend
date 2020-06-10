@@ -23,17 +23,17 @@ class PromocodeController extends Controller
                 'promocode' => 'required|min:4'
             ]);
         if ($validator->fails()) {
-            $res->fail($validator->errors()->get('promocode')[0]);
+            $res->fail(trans('messages.promocode_invalid'));
             return response()->json($res, 200);
         }
 
         $promocode = Promocode::where('code',$request['promocode'])->where('end_at', '>', now())->where('status','active')->first();
 
         if (!$promocode){
-            $res->fail('Promocode invalid');
+            $res->fail(trans('messages.promocode_invalid'));
         }else{
             $res->success($promocode);
-            $res->message = ['en' => 'Promocode correct','ar' => 'Promocode correct'];
+            $res->message = trans('messages.promocode_success');
         }
         return response()->json($res ,200);
     }

@@ -28,11 +28,7 @@ class NotifController extends Controller
     public function store(Request $request)
     {
         $res = new Result();
-
-        $input = $request->all();
-
-        $notification = new Notif();
-
+        return response()->json($res,200);
     }
 
 
@@ -44,13 +40,10 @@ class NotifController extends Controller
         if ($notif)
         {
             $res->success($notif);
-            return response()->json($res,200);
         }else{
-            $res->fail('Notif not found');
-            return response()->json($res,200);
+            $res->fail(trans('messages.notif_not_found'));
         }
-
-
+        return response()->json($res,200);
     }
 
 

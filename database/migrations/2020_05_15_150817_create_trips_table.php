@@ -22,12 +22,10 @@ class CreateTripsTable extends Migration
             $table->unsignedInteger('type_car_id')->nullable();
             $table->unsignedInteger('promocode_id')->nullable();
             $table->string('driver_note')->nullable();
+            $table->string('room_number')->nullable();
 
             $table->timestamp('pickup_at')->nullable();
-            $table->integer('total_amount')->nullable();
             $table->unsignedInteger('payment_method')->nullable();
-
-
 
             $table->unsignedInteger('user_id')->nullable();
             $table->unsignedInteger('driver_id')->nullable();

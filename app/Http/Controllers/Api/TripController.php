@@ -8,6 +8,7 @@ use App\Models\CarCategory;
 use App\Models\Card;
 use App\Models\Document;
 use App\Models\Driver;
+use App\Models\Promocode;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\SubService;
@@ -32,9 +33,7 @@ class TripController extends Controller
                 'note' => 'required'
             ]);
         if ($validator->fails()) {
-
-            $res->fail("Trip id and note are missing");
-
+            $res->fail(trans('messages.note_error'));
             return response()->json($res, 200);
         }
 
@@ -43,16 +42,12 @@ class TripController extends Controller
         if ($trip)
         {
             $trip->update(['driver_note' => $request->note]);
-
             $res->response['trip_id']  = $request->trip_id;
             $res->response['note'] = $request->note;
-            return response()->json($res,200);
         }else{
-            $res->fail('Trip not found');
+            $res->fail(trans('messages.trip_not_found'));
         }
-
         return response()->json($res,200);
-
     }
 
     public function tripDataFromArray(array $data)
@@ -91,10 +86,8 @@ class TripController extends Controller
         $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
             ->paginate(10)
             ->toArray();
-
-//        $trips['data'] = $this->tripDataFromArray($trips['data']);
-        foreach ($trips['data']  as &$elem){
-
+        foreach ($trips['data']  as &$elem)
+        {
             unset($elem['user']['roles']);
         }
 
@@ -115,16 +108,14 @@ class TripController extends Controller
         $res = new Result();
 
         $data = $request->all();
-
-
-
         $trip = new Trip();
         $trip->save();
         $trip->status = '1';
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
-//        $trip->payment_method = $data['note_driver'];
+        $trip->room_number = $data['roomNumber'];
+//        $trip->payment_method = $data['payment_method'];
 
         $type_car = CarCategory::find($data['type_car_id']);
 
@@ -132,10 +123,9 @@ class TripController extends Controller
             $trip->type_car()->associate($type_car)->save();
         }
 
-
         $trip->pickup_at = $data['pickup_at'];
 
-        $promocode = Card::find($data['promocode_id']);
+        $promocode = Promocode::find($data['promocode_id']);
         if($promocode){
             $trip->promocode_id = $promocode->id;
         }
@@ -154,26 +144,19 @@ class TripController extends Controller
 
         $listServices = $data['services'];
         foreach ($listServices as $serviceId){
-
             $service = Service::find($serviceId);
-
             if ($service)
             {
                 $service['price'] = $service['price']*$data['nbr_luggage'];
-
                 $trip->services()->attach($service);
             }
-
-
         }
         $listSubServices = $data['sub_services'];
-
         foreach ($listSubServices as $subServiceId){
             $subService = SubService::find($subServiceId);
             if ($subService)
             {
                 $subService['price'] = $subService['price']*$data['nbr_luggage'];
-
                 $trip->subservices()->attach($subService);
             }
         }
@@ -192,7 +175,6 @@ class TripController extends Controller
 
         if(!$pickup_address or (request('place_idPickup')== ""))
         {
-
             $pickup_address = Address::create([
                 'primaryName' => request('primaryNamePickup'),
                 'secondaryName' => request('secondaryPickup'),
@@ -274,7 +256,7 @@ class TripController extends Controller
         if ($trip)
             $res->success($trip);
         else
-            $res->fail('trip not found');
+            $res->fail(trans('message.trip_not_found'));
         return response()->json($res,200);
 
     }
@@ -297,11 +279,11 @@ class TripController extends Controller
             $trip->save();
 
         }else{
-            $res->fail('trip not found');
+            $res->fail(trans('message.trip_not_found'));
             return response()->json($res,200);
         }
         $res->success($cancelTrip);
-        $res->message = ['en' => 'Canceled Trip','ar' => 'Canceled Trip'];
+        $res->message = trans('message.cancel_trip');
 
         return response()->json($res,200);
 

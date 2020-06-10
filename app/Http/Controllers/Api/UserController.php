@@ -79,7 +79,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         $res->success($user);
-        $res->message= ['en' => 'User details','ar' => 'User details'];
+        $res->message= trans('messages.user_details');
 
         return response()->json($res,200);
     }
