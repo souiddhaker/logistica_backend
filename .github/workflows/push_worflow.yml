@@ -24,7 +24,7 @@ jobs:
         with:
           user: root
           host: 51.91.255.126
-          path: /var/www/vhosts/logistica.wi-mobi.com/testing-github
+          path: /var/www/vhosts/vpsdev.wi-mobi.com/dev-logistica.wi-mobi.com
           owner: root
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
