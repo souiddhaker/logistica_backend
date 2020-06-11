@@ -97,7 +97,10 @@ return [
 
     'options' => [
         'application' => env('APP_NAME', 'Laravel'),
-        'repository' => 'git@github-medhamza911:souiddhaker/logistica_backend.git',
+        'repository' => 'https://medhamza911:tryme01131994@github.com/souiddhaker/logistica_backend.git',
+        'bin/php' => '/opt/plesk/php/7.2/bin/php',
+        'bin/composer' => '/opt/plesk/php/7.2/bin/php /usr/lib/plesk-9.0/composer.phar',
+        'composer_options' => '{{composer_action}} --verbose --prefer-dist --no-progress --no-interaction --no-dev --optimize-autoloader --no-suggest --no-scripts'
     ],
 
     /*
@@ -112,14 +115,14 @@ return [
     */
 
     'hosts' => [
-        'vpsdev.wi-mobi.com' => [
+        'logistica.wi-mobi.com' => [
             'deploy_path' => '/var/www/vhosts/logistica.wi-mobi.com/testing',
             'user' => 'root',
-            'configFile'   => '~/.ssh/config',
+            'configFile' => '~/.ssh/config',
             'identityFile' => '~/.ssh/id_rsa',
             'forwardAgent' => true,
             'multiplexing' => true,
-            'sshOptions'   => [
+            'sshOptions' => [
                 'UserKnownHostsFile' => '/dev/null',
                 'StrictHostKeyChecking' => 'no',
                 // ...
