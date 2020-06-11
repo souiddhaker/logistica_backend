@@ -18,7 +18,7 @@ jobs:
       - name: Speed up the packages installation process
         run: composer global require hirak/prestissimo
       - name: Install Packages
-        run: /opt/plesk/php/7.3/bin/php /usr/lib/plesk-9.0/composer.phar install --no-dev
+        run: composer install --no-dev
       - name: Deploy to Server
         uses: ngocquyhoang/deploy@laravel
         with:
