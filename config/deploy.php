@@ -98,9 +98,9 @@ return [
     'options' => [
         'application' => env('APP_NAME', 'Laravel'),
         'repository' => 'https://medhamza911:tryme01131994@github.com/souiddhaker/logistica_backend.git',
-        'bin/php' => '/opt/plesk/php/7.2/bin/php',
-        'bin/composer' => '/opt/plesk/php/7.2/bin/php /usr/lib/plesk-9.0/composer.phar',
-        'composer_options' => '{{composer_action}} --verbose --prefer-dist --no-progress --no-interaction --no-dev --optimize-autoloader --no-suggest --no-scripts'
+        'bin/php' => '/opt/plesk/php/7.3/bin/php',
+        'bin/composer' => '/opt/plesk/php/7.3/bin/php /usr/lib/plesk-9.0/composer.phar',
+        'composer_options' => '{{composer_action}} '
     ],
 
     /*
