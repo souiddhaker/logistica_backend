@@ -96,3 +96,8 @@ Route::prefix('admin')->group(function(){
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
 });
+Route::get('/debug-sentry', function () {
+//   dd( env('SENTRY_LARAVEL_DSN'));
+//    return 'hello world';
+    throw new Exception('My first Sentry error!');
+});

@@ -80,7 +80,7 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "trip":
-                $data = Trip::where('id', $id)->limit(1)->get();
+                $data = Trip::with(['driver','user','promocode'])->where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             default:
@@ -103,7 +103,7 @@ class AdminCrudController extends Controller
                 $list = User::where('roles', json_encode([$name]))->paginate(10);
                 break;
             case "trip":
-                $list = Trip::paginate(10);
+                $list = Trip::with(['driver','user'])->paginate(10);
                 break;
             default:
                 $success = false;
