@@ -24,7 +24,7 @@ class Promocode extends Model
      * @var array
      */
     protected $fillable = [
-        'code', 'pourcentage', 'status', 'end_at'
+        'code', 'pourcentage', 'status', 'end_at','type'
     ];
     /**
      * The attributes that should be hidden for arrays.
@@ -74,7 +74,8 @@ class Promocode extends Model
                 'code' => 'required|min:4',
                 'pourcentage' => 'required',
                 'status' => 'required',
-                'end_at' => 'required'
+                'end_at' => 'required',
+                'type' => 'required'
             ]);
         if ($validator->fails()) {
             $res->fail($validator->errors()->all());

@@ -131,8 +131,11 @@ class AdminCrudController extends Controller
             case "trip":
                 $list = Trip::with(['driver', 'user'])->paginate(10);
                 break;
-            case "coupon":
-                $list = Promocode::paginate(10);
+            case "couponCaptain":
+                $list = Promocode::where('type', 1)->paginate(10);
+                break;
+            case "couponClient":
+                $list = Promocode::where('type', 0)->paginate(10);
                 break;
             case "notif":
                 $list = Notif::paginate(10);
