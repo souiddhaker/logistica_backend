@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notif;
+use App\Models\Promocode;
 use App\Models\Result;
+use App\Models\Settings;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Stripe\Util\Set;
 
 class AdminCrudController extends Controller
 {
@@ -26,6 +30,10 @@ class AdminCrudController extends Controller
             case "captain":
                 $res = User::createOne($request, $name);
                 break;
+            case "coupon":
+                $res = Promocode::createOne($request);
+                break;
+
             default:
                 $res->fail("incorrect name");
 
@@ -45,6 +53,10 @@ class AdminCrudController extends Controller
                 User::destroy($id);
                 $res->success("deleted successfully");
                 break;
+            case "coupon":
+                Promocode::destroy($id);
+                $res->success("deleted successfully");
+                break;
             default:
                 $res->fail("incorrect name");
         }
@@ -59,7 +71,13 @@ class AdminCrudController extends Controller
             case "client":
             case "admin":
             case "captain":
-                $res = User::updateOne($request,$id,$name);
+                $res = User::updateOne($request, $id, $name);
+                break;
+            case "coupon":
+                $res = Promocode::updateOne($request, $id);
+                break;
+            case "setting":
+                $res = Settings::updateOne($request);
                 break;
             default:
                 $res->fail("incorrect name");
@@ -80,7 +98,15 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "trip":
-                $data = Trip::with(['driver','user','promocode'])->where('id', $id)->limit(1)->get();
+                $data = Trip::with(['driver', 'user', 'promocode'])->where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "coupon":
+                $data = Promocode::where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "setting":
+                $data = Settings::limit(1)->get();
                 $res->success($data);
                 break;
             default:
@@ -103,7 +129,13 @@ class AdminCrudController extends Controller
                 $list = User::where('roles', json_encode([$name]))->paginate(10);
                 break;
             case "trip":
-                $list = Trip::with(['driver','user'])->paginate(10);
+                $list = Trip::with(['driver', 'user'])->paginate(10);
+                break;
+            case "coupon":
+                $list = Promocode::paginate(10);
+                break;
+            case "notif":
+                $list = Notif::paginate(10);
                 break;
             default:
                 $success = false;

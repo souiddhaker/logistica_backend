@@ -2,9 +2,15 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ */
 class Notif extends Model
 {
     //
