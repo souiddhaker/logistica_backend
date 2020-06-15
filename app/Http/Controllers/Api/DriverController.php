@@ -27,7 +27,7 @@ class DriverController extends Controller
             $driver->addRole('captain');
             $driver->save();
             $driverProfile = new Driver();
-//            $driverProfile->carType = CarCategory::find($request->car_type);
+            $driverProfile->carType = CarCategory::find($request->car_type);
             $driver->profileDriver()->save($driverProfile);
 
         }
@@ -57,13 +57,9 @@ class DriverController extends Controller
 
         $user = User::find(Auth::id());
         $profileDriver = Driver::find($user->profileDriver->id);
-        $res->success($profileDriver);
-        return response()->json($res,200);
-        $user = User::find(Auth::id());
-        $profileDriver = Driver::find($user->profileDriver->id);
         $response = collect($user)->toArray();
         $listDocuments = $profileDriver->documents;
-        $response['car'] = CarCategory::find($profileDriver->cartype_id)->model;
+        $response['car'] = CarCategory::find($profileDriver->cartype_id);
         $response['attachements']['identity'] = array_filter($listDocuments->toArray(), function ($event) {
             if ($event['type'] === "3")
             return $event;
@@ -100,7 +96,6 @@ class DriverController extends Controller
     {
         $res = new Result();
         $user = User::find(Auth::id());
-//        $profileDriver = Driver::find($user->profileDriver->id);
         $listRatings = Rating::where('driver_id','=',$user->profileDriver->id)->paginate(2);
         $res->success($listRatings);
         return response()->json($res,200);
