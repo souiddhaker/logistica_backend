@@ -16,8 +16,7 @@ class CreateDriversTable extends Migration
         Schema::create('drivers', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->integer('cartype_id')->unsigned();
-
+            $table->unsignedInteger('cartype_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('cascade');
             $table->foreign('cartype_id')->references('id')->on('car_categories')
