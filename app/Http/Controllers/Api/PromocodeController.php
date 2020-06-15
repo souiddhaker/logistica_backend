@@ -37,4 +37,9 @@ class PromocodeController extends Controller
         }
         return response()->json($res ,200);
     }
+
+    public function usePromocode()
+    {
+        
+    }
 }
