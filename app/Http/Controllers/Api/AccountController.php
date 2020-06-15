@@ -17,6 +17,7 @@ class AccountController extends Controller
         $res = new Result();
 
         $account = Account::where('user_id',Auth::id())->first();
+        $balance = $account->balance + $request->credit;
         if (isset($request->coupon))
         {
             $requestVerif = new Request();
@@ -26,10 +27,19 @@ class AccountController extends Controller
             if (!$isActif->success)
             return response()->json($isActif,200);
             else
-                return response()->json($isActif->response[''],200);
+            {
+
+                if ($promocodeController->usePromocode($isActif->response[0]->id))
+                {
+                    $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
+                    $account->balance = $balance;
+                    $account->save();
+                    $res->success($account);
+                }else
+                    $res->fail('Promocode already used');
+            }
 
         }
-        $res->success($account);
         return response()->json($res,200);
     }
 

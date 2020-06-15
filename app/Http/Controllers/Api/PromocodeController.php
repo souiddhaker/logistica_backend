@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Promocode;
 use App\Models\Result;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 
 
@@ -38,8 +40,17 @@ class PromocodeController extends Controller
         return response()->json($res ,200);
     }
 
-    public function usePromocode()
+    public function usePromocode(int $promocodeId)
     {
-        
+        $promocode = Promocode::find($promocodeId);
+        $user = User::find(Auth::id());
+        if (count($user->promocodes)==$promocode->nbr_uses)
+        {
+            return false;
+        }else{
+            $user->promocodes()->attach($promocode);
+            return true;
+        }
+
     }
 }

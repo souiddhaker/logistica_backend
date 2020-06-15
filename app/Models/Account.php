@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Account extends Model
 {
     //
+    protected $guarded = [];
+
+    protected $fillable = ['balance'];
+
     /**
      * The attributes that should be hidden for arrays.
      *

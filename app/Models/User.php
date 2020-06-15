@@ -29,6 +29,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the promocodes for user.
+     */
+    public function promocodes()
+    {
+        return $this->belongsToMany(Promocode::class);
+    }
+
+    /**
      * Get the addresses for user.
      */
     public function addresses()

@@ -11,7 +11,7 @@ class Address extends Model
      * Address types :
      * 1 : Pickup trip
      * 2 : Destination trip
-     * 3 : Position Driver
+     * 3 : favorite
      *
      */
 

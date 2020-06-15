@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\CarCategory;
 use App\Models\Document;
 use App\Models\Driver;
@@ -43,6 +44,10 @@ class DriverController extends Controller
             {
                 $this->addAttachements($request->attachements);
             }
+            $accountDriver = new Account();
+            $accountDriver->balance = 0;
+            $accountDriver->user_id = $driver->id;
+            $accountDriver->save();
         }
         return response()->json($response,200);
     }
