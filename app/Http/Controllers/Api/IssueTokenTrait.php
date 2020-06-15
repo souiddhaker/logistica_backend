@@ -23,6 +23,7 @@ trait IssueTokenTrait{
             'scope' => $scope,
             'provider' => "password"
         ];
+        if (isset( $request['email']))
         $params['username'] = $request['email'];
         if($grantType !== 'social' && $grantType!=="refresh_token" && !isset($request['isAdmin'])){
             $request['password'] = "logistica";
