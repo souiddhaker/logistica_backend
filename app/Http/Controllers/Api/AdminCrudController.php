@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CancelTrip;
+use App\Models\CarCategory;
 use App\Models\Notif;
 use App\Models\Promocode;
 use App\Models\Result;
@@ -33,7 +35,9 @@ class AdminCrudController extends Controller
             case "coupon":
                 $res = Promocode::createOne($request);
                 break;
-
+            case "carType":
+                $res = CarCategory::createOne($request);
+                break;
             default:
                 $res->fail("incorrect name");
 
@@ -55,6 +59,10 @@ class AdminCrudController extends Controller
                 break;
             case "coupon":
                 Promocode::destroy($id);
+                $res->success("deleted successfully");
+                break;
+            case "carType":
+                CarCategory::destroy($id);
                 $res->success("deleted successfully");
                 break;
             default:
@@ -79,6 +87,12 @@ class AdminCrudController extends Controller
             case "setting":
                 $res = Settings::updateOne($request);
                 break;
+            case "carType":
+                $res = CarCategory::updateOne($request,$id);
+                break;
+            case "claims":
+                $res = CancelTrip::updateOne($request,$id);
+                break;
             default:
                 $res->fail("incorrect name");
         }
@@ -92,9 +106,12 @@ class AdminCrudController extends Controller
         $res = new Result();
         switch ($name) {
             case "client":
-            case "admin":
             case "captain":
                 $data = User::where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "admin":
+                $data = User::with(['adminRoles'])->where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             case "trip":
@@ -107,6 +124,14 @@ class AdminCrudController extends Controller
                 break;
             case "setting":
                 $data = Settings::limit(1)->get();
+                $res->success($data);
+                break;
+            case "carType":
+                $data = CarCategory::where('id',$id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "claims":
+                $data = CancelTrip::with(['trip','trip.driver','trip.user'])->where('id',$id)->limit(1)->get();
                 $res->success($data);
                 break;
             default:
@@ -139,6 +164,12 @@ class AdminCrudController extends Controller
                 break;
             case "notif":
                 $list = Notif::paginate(10);
+                break;
+            case "carType":
+                $list = CarCategory::paginate(10);
+                break;
+            case "claims":
+                $list = CancelTrip::with(['trip','trip.driver','trip.user'])->paginate(10);
                 break;
             default:
                 $success = false;

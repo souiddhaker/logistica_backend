@@ -45,6 +45,13 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Document::class);
     }
+    /**
+     * Get admin role
+     */
+    public function adminRoles()
+    {
+        return $this->hasOne(AdminRoles::class);
+    }
     public function trips()
     {
         return $this->hasMany(Trip::class);
@@ -78,13 +85,18 @@ class User extends Authenticatable implements JWTSubject
     ];
     static public function createOne(Request $request,$role="admin"):Result{
         $res = new Result();
-        $validator = Validator::make($request->all(),
+
+        $roleData=
             [
                 'firstName' => 'required',
                 'lastName' => 'required',
                 'email' => 'required|email|unique:users,email',
                 'phone' => 'required|unique:users,phone'
-            ]);
+            ];
+        if($role === "admin"){
+            $roleData['roles']='required';
+        }
+        $validator = Validator::make($request->all(),$roleData);
         if($validator->fails()){
             $res->fail($validator->errors()->all());
             return $res;
@@ -93,6 +105,9 @@ class User extends Authenticatable implements JWTSubject
         $data['password']=bcrypt("logistica");
         $data['roles']=json_encode([$role]);
         $user = User::create($data);
+        if($role==="admin"){
+            AdminRoles::updateOne($request,$user['id']);
+        }
         $res->success([
             "user"=>$user
         ]);
@@ -100,13 +115,17 @@ class User extends Authenticatable implements JWTSubject
     }
     static public function updateOne(Request $request,int $id,$role="admin"):Result{
         $res = new Result();
-        $validator = Validator::make($request->all(),
+        $roleData=
             [
                 'firstName' => 'required',
                 'lastName' => 'required',
                 'email' => 'required',
                 'phone' => 'required'
-            ]);
+            ];
+        if($role === "admin"){
+            $roleData['roles']='required';
+        }
+        $validator = Validator::make($request->all(),$roleData);
         if($validator->fails()){
             $res->fail($validator->errors()->all());
             return $res;
@@ -114,9 +133,12 @@ class User extends Authenticatable implements JWTSubject
         $data= $validator->valid();
         $data['password']=bcrypt("logistica");
         $data['roles']=json_encode([$role]);
-        $id = User::where('id',$id)->update($data);
+        $idUser=User::where('id',$id)->update($data);
+        if($role==="admin"){
+                AdminRoles::updateOne($request,$id);
+        }
         $res->success([
-            "user"=>$id
+            "user"=>$idUser
         ]);
         return $res;
     }
