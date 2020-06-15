@@ -27,7 +27,7 @@ class DriverController extends Controller
             $driver->addRole('captain');
             $driver->save();
             $driverProfile = new Driver();
-            $driverProfile->carType = CarCategory::find($request->car_type);
+            $driverProfile->cartype_id = CarCategory::find($request->car_type)->id;
             $driver->profileDriver()->save($driverProfile);
 
         }
