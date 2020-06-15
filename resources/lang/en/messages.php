@@ -6,7 +6,7 @@ return [
     'verif_code_invalid' => 'Verification code not valid',
     'verif_code_expired' => 'Verification code expired',
     'verif_code_incorrect' => 'Verification code incorrect',
-    'verif_code_correct' => 'Verification code incorrect',
+    'verif_code_correct' => 'Verification code correct',
     'verif_code_send' => 'Verification code has been sent',
     'user_phone_exists' => 'This phone already exists',
     'user_email_exists' => 'This email already exists',
