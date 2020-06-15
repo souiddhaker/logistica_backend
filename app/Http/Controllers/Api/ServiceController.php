@@ -91,4 +91,13 @@ class ServiceController extends Controller
 
         return response()->json($res,200);
     }
+
+    public function listCar()
+    {
+        $res = new Result();
+        $listCars = CarCategory::all();
+        $res->response = $listCars;
+        $res->success = true;
+        return response()->json($res,200);
+    }
 }

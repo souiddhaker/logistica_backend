@@ -82,6 +82,7 @@ Route::prefix('driver')->group(function(){
     });
 
 });
+Route::get('/listcar','Api\ServiceController@listCar');
 
 Route::prefix('document')->group(function(){
     Route::post('/upload', 'Api\DocumentController@store')->middleware('auth:api');
