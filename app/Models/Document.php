@@ -15,7 +15,7 @@ class Document extends Model
      * @var array
      */
     protected $hidden = [
-        'type', 'trip_id','updated_at','created_at'
+        'updated_at','created_at','pivot'
     ];
 
     /**
@@ -26,8 +26,4 @@ class Document extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function trip()
-    {
-        return $this->belongsTo(Trip::class);
-    }
 }

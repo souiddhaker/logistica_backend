@@ -19,62 +19,45 @@ class DocumentController extends Controller
 
     public function store(Request $request)
     {
-
         $res = new Result();
         $validator = Validator::make($request->all(),
             [
                 'document' => 'required|base64image',
+                'type' => 'required',
             ]);
         if ($validator->fails()) {
             $res->fail(trans('messages.document_empty'));
             return response()->json($res, 200);
         }
-
-
         try {
-
             $name = time() . '.' . explode('/', explode(':', substr($request->document, 0, strpos($request->document, ';')))[1])[1];
-
             $img = \Image::make($request->document)->save(public_path('img/attachement/') . $name);
             $name = url('/') .'/img/attachement/' . $name;
 
-            $user = Auth::user();
-
             $document = new Document();
-
             $document->path = $name;
             $document->type = $request->type;
-
             $document->save();
 
             $res->success($document);
-
             return response()->json($res, 200);
-
         } catch (Exception $e) {
             $res->fail($e);
-
-
             return response()->json($res, 200);
         }
-
     }
 
     public function getAttachement(int $id)
     {
         $res = new Result();
-
-        $trip = Trip::find($id)->get();
-
+        $trip = Trip::where('id',$id)->first();
         if ($trip)
         {
-            $documents = Document::where('trip_id',$id)->get();
-            $res->response = $documents;
-
+            $res->success = true;
+            $res->response  = $trip->attachements;
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }
-
 
         return response()->json($res,200);
     }

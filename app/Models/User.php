@@ -29,7 +29,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the cars for user.
+     * Get the addresses for user.
      */
     public function addresses()
     {
@@ -37,7 +37,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the cars for user.
+     * Get the documents for user.
      */
     public function documents()
     {
@@ -46,6 +46,11 @@ class User extends Authenticatable
     public function trips()
     {
         return $this->hasMany(Trip::class);
+    }
+
+    public function profileDriver()
+    {
+        return $this->hasOne(Driver::class);
     }
 
     /**
@@ -63,7 +68,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','updated_at','created_at','email_verified_at','roles'
+        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver'
     ];
 
     /**

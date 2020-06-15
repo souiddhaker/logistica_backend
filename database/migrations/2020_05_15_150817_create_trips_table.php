@@ -31,7 +31,7 @@ class CreateTripsTable extends Migration
             $table->unsignedInteger('driver_id')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('restrict');
+            $table->foreign('driver_id')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('type_car_id')->references('id')->on('car_categories')->onDelete('restrict');
             $table->foreign('promocode_id')->references('id')->on('promocodes')->onDelete('restrict');
             $table->foreign('payment_method')->references('id')->on('cards')->onDelete('restrict');

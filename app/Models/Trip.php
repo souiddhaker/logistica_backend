@@ -15,6 +15,15 @@ class Trip extends Model
 {
     //
 
+    /**
+     * Trip Status :
+     * 0 : not confirmed by driver
+     * 1 : current
+     * 2 : finished
+     * 3 : canceled
+     *
+     */
+
     protected $dates = ['created_at', 'updated_at', 'pickup_at'];
 
     public function getCreatedAtAttribute($value)
@@ -58,12 +67,12 @@ class Trip extends Model
     }
     public function driver()
     {
-        return $this->belongsTo(Driver::class);
+        return $this->belongsTo(User::class);
     }
 
     public function attachements()
     {
-        return $this->hasMany(Document::class);
+        return $this->belongsToMany(Document::class);
     }
 
     public function cancelTrip()
@@ -81,8 +90,5 @@ class Trip extends Model
         return $this->belongsTo(CarCategory::class);
     }
 
-    public function rating()
-    {
-        return $this->hasOne(Rating::class);
-    }
+
 }

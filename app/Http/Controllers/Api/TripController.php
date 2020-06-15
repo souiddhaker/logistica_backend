@@ -15,6 +15,7 @@ use App\Models\SubService;
 use App\Models\Trip;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\Cast\Object_;
@@ -64,10 +65,12 @@ class TripController extends Controller
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $finishedTrip = Trip::select('id','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $canceledTrip = Trip::select('id','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-
+        $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())
+            ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $finishedTrip = Trip::select('id','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())
+            ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $canceledTrip = Trip::select('id','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())
+            ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
         $listTrips['current'] = $currentTrip['data'];
         $listTrips['finished'] = $finishedTrip['data'];
@@ -83,9 +86,20 @@ class TripController extends Controller
 
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
-        $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
-            ->paginate(10)
-            ->toArray();
+        switch ($key) {
+            case "0":
+                $trips = Trip::select('id','total_price','user_id','created_at')->where('status', '=', '0')
+                    ->with('user','addresses')->orderBy('updated_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+                break;
+            default:
+                $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id',Auth::id())
+                    ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+        }
+
         foreach ($trips['data']  as &$elem)
         {
             unset($elem['user']['roles']);
@@ -103,14 +117,16 @@ class TripController extends Controller
         return response()->json($res, 200);
     }
 
-    public function confirmTrip(Request $request)
+    public function createTrip(Request $request)
     {
         $res = new Result();
 
         $data = $request->all();
         $trip = new Trip();
         $trip->save();
-        $trip->status = '1';
+
+        // status 0 not confirmed by driver
+        $trip->status = '0';
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
@@ -138,7 +154,7 @@ class TripController extends Controller
         }
 
         $trip->user_id = Auth::id();
-        $trip->driver_id = 1;
+        $trip->driver_id = null;
 
         $trip->save();
 
@@ -166,7 +182,7 @@ class TripController extends Controller
             foreach ($listAttachements as $attachementId){
                 $attachement = Document::find($attachementId);
                 if($attachement)
-                $trip->attachements()->save($attachement);
+                $trip->attachements()->attach($attachement);
             }
         }
 
@@ -296,12 +312,14 @@ class TripController extends Controller
         $data = $request->all();
 
         $rate = new Rating();
-        $trip = Trip::find($data['trip_id']);
-            if ($trip){
+        $userDriver = User::find($data['driver_id']);
+        $userDriver = Driver::find($userDriver->profileDriver->id);
+            if ($userDriver){
                 $rate->value = $data['value'];
                 $rate->comment = $data['additionalComment'];
                 $rate->user_id = Auth::id();
-                $trip->rating()->save($rate);
+                $userDriver->ratings()->save($rate);
+                $rate['driver_id'] = $data['driver_id'];
                 $res->success($rate);
 
             }else{
