@@ -16,7 +16,16 @@ use Illuminate\Support\Facades\Auth;
 class DriverController extends Controller
 {
     //
-
+    public function addAttachements(array $attachements)
+    {
+        $request = new Request();
+        foreach ($attachements as $attachement)
+        {
+            $request['type'] = $attachement['type'];
+            $request['document'] = $attachement['document'];
+            $response = $this->profileDocument($request);
+        }
+    }
     public function register(Request $request)
     {
         $authController = new AuthController();
@@ -29,7 +38,11 @@ class DriverController extends Controller
             $driverProfile = new Driver();
             $driverProfile->cartype_id = CarCategory::find($request->car_type)->id;
             $driver->profileDriver()->save($driverProfile);
-
+            Auth::login($driver);
+            if (isset($request->attachements))
+            {
+                $this->addAttachements($request->attachements);
+            }
         }
         return response()->json($response,200);
     }
