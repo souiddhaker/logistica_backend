@@ -106,7 +106,7 @@ Route::prefix('trip')->group(function () {
     Route::get('/document/{id}', 'Api\DocumentController@getAttachement')->middleware('auth:api');
     Route::post('/note', 'Api\TripController@noteDriver')->middleware('auth:api');
     Route::post('/rate', 'Api\TripController@rateTrip')->middleware('auth:api');
-
+    Route::post('/receipt', 'Api\TripController@uploadReceipt')->middleware('auth:api');
 });
 
 Route::prefix('admin')->group(function(){

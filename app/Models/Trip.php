@@ -23,6 +23,8 @@ class Trip extends Model
      * 3 : canceled
      *
      */
+    protected $guarded = [];
+
 
     protected $dates = ['created_at', 'updated_at', 'pickup_at'];
 
@@ -44,7 +46,7 @@ class Trip extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices'
+        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements'
     ];
     public function services()
     {
@@ -89,6 +91,5 @@ class Trip extends Model
     {
         return $this->belongsTo(CarCategory::class);
     }
-
 
 }

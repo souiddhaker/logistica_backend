@@ -19,6 +19,8 @@ class DocumentController extends Controller
 
     public function store(Request $request)
     {
+//        return response()->json($res, 200);
+
         $res = new Result();
         $validator = Validator::make($request->all(),
             [

@@ -130,7 +130,8 @@ class TripController extends Controller
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
-        $trip->room_number = $data['roomNumber'];
+        $trip->route = $data['route'];
+
 //        $trip->payment_method = $data['payment_method'];
 
         $type_car = CarCategory::find($data['type_car_id']);
@@ -178,7 +179,7 @@ class TripController extends Controller
         }
 
         $listAttachements = $data['attachements'];
-        if($listServices){
+        if($listAttachements){
             foreach ($listAttachements as $attachementId){
                 $attachement = Document::find($attachementId);
                 if($attachement)
@@ -216,15 +217,20 @@ class TripController extends Controller
 
         $trip->addresses()->attach($pickup_address);
         $trip->addresses()->attach($destination_address);
-
         $reslut = $this->getById($trip->id);
         $res->success($reslut);
         return response()->json($res,200);
     }
 
+
+    public function attachAddressse()
+    {
+        //TODO : create trip with addresses
+    }
+
     public function getById(int $id)
     {
-        $trip = Trip::where('id',$id)->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')->first();
+        $trip = Trip::where('id',$id)->with('driver','addresses','promocode','type_car','cancelTrip')->first();
         if ($trip)
         {
             $services=[];
@@ -258,11 +264,34 @@ class TripController extends Controller
         $trip->services = $services;
 
         $trip->payement_method = "Cash payment";
-        return $trip;
+
+        $trip->rating = Rating::where('user_id',Auth::id())->first();
+        $attachementsCollection = collect($trip->attachements)->toArray();
+        $documents = [];
+        $documents['attachements']=[];
+        $documents['reservation_hotel']=null;
+        $documents['receipt']=null;
+        foreach ($attachementsCollection as $document)
+        {
+            switch ($document['type']){
+                case "1" : array_push($documents['attachements'],$document);
+                    break;
+                case "2" : $documents['reservation_hotel'] = $document;
+                    break;
+                case "3" : $documents['receipt'] = $document;
+                    break;
+            }
+        }
+        return array_merge($trip->toArray(),$documents);
 
         }else
             return null;
 
+    }
+
+    public function tripAttachements(array $attachementsCollection)
+    {
+        return $attachementsCollection;
     }
 
     public function getTrip(int $id)
@@ -312,8 +341,7 @@ class TripController extends Controller
         $data = $request->all();
 
         $rate = new Rating();
-        $userDriver = User::find($data['driver_id']);
-        $userDriver = Driver::find($userDriver->profileDriver->id);
+        $userDriver = Driver::where('user_id',$data['driver_id']);
             if ($userDriver){
                 $rate->value = $data['value'];
                 $rate->comment = $data['additionalComment'];
@@ -341,6 +369,26 @@ class TripController extends Controller
             $res->success($this->getById($trip->id));
         }else{
             $res->fail('trip not found');
+        }
+        return response()->json($res,200);
+    }
+
+
+    public function uploadReceipt(Request $request)
+    {
+        $res = new Result();
+        $trip = Trip::find($request['trip_id']);
+        if ($trip && $trip->status == 2) {
+            $documentController = new DocumentController();
+            $response = $documentController->store($request)->getData();
+
+            if ($response->success) {
+                $attachement = Document::find($response->response[0]->id);
+                $trip->attachements()->attach($attachement);
+                $res->success = true;
+            }
+        }else{
+            $res->fail('Fail to upload');
         }
         return response()->json($res,200);
     }

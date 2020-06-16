@@ -79,15 +79,15 @@ class DriverController extends Controller
         $listDocuments = $profileDriver->documents;
         $response['car'] = CarCategory::find($profileDriver->cartype_id);
         $response['attachements']['identity'] = array_filter($listDocuments->toArray(), function ($event) {
-            if ($event['type'] === "3")
+            if ($event['type'] === "4")
             return $event;
         });
         $response['attachements']['car_photo'] = array_filter($listDocuments->toArray(), function ($event) {
-            if ($event['type'] === "4")
+            if ($event['type'] === "5")
                 return $event;
         });
         $response['attachements']['licence'] = array_filter($listDocuments->toArray(), function ($event) {
-            if ($event['type'] === "5")
+            if ($event['type'] === "6")
                 return $event;
         });
         $res->success($response);

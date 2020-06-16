@@ -8,6 +8,14 @@ class Document extends Model
 {
     //
 
+    /**
+     * 1 trip attachement
+     * 2 trip Hotel reservation
+     * 3 trip receipt
+     * 4 Driver profile identity
+     * 5 Driver car photo
+     * 6 Driver licence
+     */
 
     /**
      * The attributes that should be hidden for arrays.
