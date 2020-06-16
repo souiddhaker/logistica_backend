@@ -39,17 +39,6 @@ class AuthController extends Controller
 
         $verifCode = mt_rand(1000, 9999);
 
-//        try {
-//            $client = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
-//
-//            $client->messages->create($phone, // to
-//                ["from" => "+12058090405", "body" => "Your verification code is ".$verifCode]
-//            );
-//        }catch (TwilioException $e){
-//            $res->fail("Something went wrong. Please try again later");
-//            return response()->json($res, 200);
-//        }
-
         $verification = new Verification();
 
         $verification->verification_code = $verifCode;

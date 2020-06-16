@@ -23,23 +23,20 @@ trait IssueTokenTrait{
             'scope' => $scope,
             'provider' => "password"
         ];
-//        return $request;
-        if($grantType !== 'social' && $grantType!=="refresh_token"){
-            $params['username'] = $request['email'];
+        if (isset( $request['email']))
+        $params['username'] = $request['email'];
+        if($grantType !== 'social' && $grantType!=="refresh_token" && !isset($request['isAdmin'])){
             $request['password'] = "logistica";
         }
-//      return $request;
-      $request =  array_merge($params, $request );
-//      return $request;
+
+        $request =  array_merge($params, $request );
         $http = new Client;
         try{
-
             $response = $http->request('POST', url("/")."/oauth/token", [
                 'form_params' => $request ,
                 'headers' => [
                     'Accept'     => 'application/json']
             ]);
-
             $result = json_decode((string) $response->getBody(), true);
             $result['expiration_date']=Carbon::now()->addSeconds($result['expires_in'])->timestamp;;
 
@@ -47,8 +44,6 @@ trait IssueTokenTrait{
         }catch(BadResponseException $ex){
             return null;
         }
-
-
     }
 
 }

@@ -22,7 +22,7 @@ class CreateTripsTable extends Migration
             $table->unsignedInteger('type_car_id')->nullable();
             $table->unsignedInteger('promocode_id')->nullable();
             $table->string('driver_note')->nullable();
-            $table->string('room_number')->nullable();
+            $table->string('route')->nullable();
 
             $table->timestamp('pickup_at')->nullable();
             $table->unsignedInteger('payment_method')->nullable();
@@ -31,7 +31,7 @@ class CreateTripsTable extends Migration
             $table->unsignedInteger('driver_id')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('restrict');
+            $table->foreign('driver_id')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('type_car_id')->references('id')->on('car_categories')->onDelete('restrict');
             $table->foreign('promocode_id')->references('id')->on('promocodes')->onDelete('restrict');
             $table->foreign('payment_method')->references('id')->on('cards')->onDelete('restrict');

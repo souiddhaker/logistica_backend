@@ -17,11 +17,11 @@ class CreateRatingsTable extends Migration
             $table->increments('id');
             $table->float('value')->nullable();
             $table->string('comment')->nullable();
-            $table->unsignedInteger('trip_id')->nullable();
+            $table->unsignedInteger('driver_id')->nullable();
             $table->unsignedInteger('user_id')->nullable();
 
 
-            $table->foreign('trip_id')->references('id')->on('trips')
+            $table->foreign('driver_id')->references('id')->on('drivers')
                 ->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')
                 ->onDelete('cascade');

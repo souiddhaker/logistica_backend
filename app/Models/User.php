@@ -31,7 +31,15 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Get the cars for user.
+     * Get the promocodes for user.
+     */
+    public function promocodes()
+    {
+        return $this->belongsToMany(Promocode::class);
+    }
+
+    /**
+     * Get the addresses for user.
      */
     public function addresses()
     {
@@ -39,7 +47,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Get the cars for user.
+     * Get the documents for user.
      */
     public function documents()
     {
@@ -57,6 +65,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Trip::class);
     }
 
+    public function profileDriver()
+    {
+        return $this->hasOne(Driver::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -72,7 +85,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','updated_at','created_at','email_verified_at','roles'
+        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver'
     ];
 
     /**

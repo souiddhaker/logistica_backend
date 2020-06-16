@@ -52,6 +52,12 @@ class Promocode extends Model
         return Carbon::parse($value)->timestamp;
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+
     static public function updateOne(Request $request, int $id): Result
     {
 

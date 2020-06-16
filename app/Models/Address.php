@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
+    /**
+     *
+     * Address types :
+     * 1 : Pickup trip
+     * 2 : Destination trip
+     * 3 : favorite
+     *
+     */
+
+
     protected $table = 'address';
     protected $guarded = [];
     /**

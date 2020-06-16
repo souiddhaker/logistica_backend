@@ -15,6 +15,7 @@ use App\Models\SubService;
 use App\Models\Trip;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\Cast\Object_;
@@ -64,10 +65,12 @@ class TripController extends Controller
     {
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $finishedTrip = Trip::select('id','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $canceledTrip = Trip::select('id','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-
+        $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())
+            ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $finishedTrip = Trip::select('id','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())
+            ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $canceledTrip = Trip::select('id','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())
+            ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
         $listTrips['current'] = $currentTrip['data'];
         $listTrips['finished'] = $finishedTrip['data'];
@@ -83,9 +86,20 @@ class TripController extends Controller
 
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
-        $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id','=',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
-            ->paginate(10)
-            ->toArray();
+        switch ($key) {
+            case "0":
+                $trips = Trip::select('id','total_price','user_id','created_at')->where('status', '=', '0')
+                    ->with('user','addresses')->orderBy('updated_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+                break;
+            default:
+                $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id',Auth::id())
+                    ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
+                    ->paginate(10)
+                    ->toArray();
+        }
+
         foreach ($trips['data']  as &$elem)
         {
             unset($elem['user']['roles']);
@@ -103,18 +117,21 @@ class TripController extends Controller
         return response()->json($res, 200);
     }
 
-    public function confirmTrip(Request $request)
+    public function createTrip(Request $request)
     {
         $res = new Result();
 
         $data = $request->all();
         $trip = new Trip();
         $trip->save();
-        $trip->status = '1';
+
+        // status 0 not confirmed by driver
+        $trip->status = '0';
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
-        $trip->room_number = $data['roomNumber'];
+        $trip->route = $data['route'];
+
 //        $trip->payment_method = $data['payment_method'];
 
         $type_car = CarCategory::find($data['type_car_id']);
@@ -125,10 +142,6 @@ class TripController extends Controller
 
         $trip->pickup_at = $data['pickup_at'];
 
-        $promocode = Promocode::find($data['promocode_id']);
-        if($promocode){
-            $trip->promocode_id = $promocode->id;
-        }
 
         $payment_method = Card::find($data['payment_method']);
 
@@ -138,7 +151,7 @@ class TripController extends Controller
         }
 
         $trip->user_id = Auth::id();
-        $trip->driver_id = 1;
+        $trip->driver_id = null;
 
         $trip->save();
 
@@ -162,11 +175,11 @@ class TripController extends Controller
         }
 
         $listAttachements = $data['attachements'];
-        if($listServices){
+        if($listAttachements){
             foreach ($listAttachements as $attachementId){
                 $attachement = Document::find($attachementId);
                 if($attachement)
-                $trip->attachements()->save($attachement);
+                $trip->attachements()->attach($attachement);
             }
         }
 
@@ -200,15 +213,20 @@ class TripController extends Controller
 
         $trip->addresses()->attach($pickup_address);
         $trip->addresses()->attach($destination_address);
-
         $reslut = $this->getById($trip->id);
         $res->success($reslut);
         return response()->json($res,200);
     }
 
+
+    public function attachAddressse()
+    {
+        //TODO : create trip with addresses
+    }
+
     public function getById(int $id)
     {
-        $trip = Trip::where('id',$id)->with('driver','attachements','addresses','promocode','type_car','cancelTrip','rating')->first();
+        $trip = Trip::where('id',$id)->with('driver','addresses','type_car','cancelTrip')->first();
         if ($trip)
         {
             $services=[];
@@ -242,11 +260,34 @@ class TripController extends Controller
         $trip->services = $services;
 
         $trip->payement_method = "Cash payment";
-        return $trip;
+
+        $trip->rating = Rating::where('user_id',Auth::id())->first();
+        $attachementsCollection = collect($trip->attachements)->toArray();
+        $documents = [];
+        $documents['attachements']=[];
+        $documents['reservation_hotel']=null;
+        $documents['receipt']=null;
+        foreach ($attachementsCollection as $document)
+        {
+            switch ($document['type']){
+                case "1" : array_push($documents['attachements'],$document);
+                    break;
+                case "2" : $documents['reservation_hotel'] = $document;
+                    break;
+                case "3" : $documents['receipt'] = $document;
+                    break;
+            }
+        }
+        return array_merge($trip->toArray(),$documents);
 
         }else
             return null;
 
+    }
+
+    public function tripAttachements(array $attachementsCollection)
+    {
+        return $attachementsCollection;
     }
 
     public function getTrip(int $id)
@@ -296,12 +337,13 @@ class TripController extends Controller
         $data = $request->all();
 
         $rate = new Rating();
-        $trip = Trip::find($data['trip_id']);
-            if ($trip){
+        $userDriver = Driver::where('user_id',$data['driver_id']);
+            if ($userDriver){
                 $rate->value = $data['value'];
                 $rate->comment = $data['additionalComment'];
                 $rate->user_id = Auth::id();
-                $trip->rating()->save($rate);
+                $userDriver->ratings()->save($rate);
+                $rate['driver_id'] = $data['driver_id'];
                 $res->success($rate);
 
             }else{
@@ -323,6 +365,26 @@ class TripController extends Controller
             $res->success($this->getById($trip->id));
         }else{
             $res->fail('trip not found');
+        }
+        return response()->json($res,200);
+    }
+
+
+    public function uploadReceipt(Request $request)
+    {
+        $res = new Result();
+        $trip = Trip::find($request['trip_id']);
+        if ($trip && $trip->status == 2) {
+            $documentController = new DocumentController();
+            $response = $documentController->store($request)->getData();
+
+            if ($response->success) {
+                $attachement = Document::find($response->response[0]->id);
+                $trip->attachements()->attach($attachement);
+                $res->success = true;
+            }
+        }else{
+            $res->fail('Fail to upload');
         }
         return response()->json($res,200);
     }

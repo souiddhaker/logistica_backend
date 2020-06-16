@@ -11,7 +11,7 @@ use App\Models\Notif;
 class UserSeeder extends Seeder
 {
 
-    public function createTrip(int $id,string $status)
+    public function createTrip(int $userID,int $driverID,string $status)
     {
         $trip1 = Trip::create([
             'status'=>$status,
@@ -19,9 +19,9 @@ class UserSeeder extends Seeder
             'nbr_luggage'=>2,
             'type_car_id'=>1,
             'driver_note'=>'driver note',
-            'user_id'=>$id,
+            'user_id'=>$userID,
             'pickup_at'=>'2020-06-12 08:00:00',
-            'driver_id'=>'1']);
+            'driver_id'=>$driverID]);
         $pickUp = Address::create([
             'primaryName'=>'King Abdulaziz International Airport',
             'secondaryName'=>'Airport In Riyadh, Saudi Arabia',
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             'longitude'=>round(0,1000),
             'lattitude'=>round(0,1000),
             'place_id'=>(string) rand(0,100),
-            'user_id'=>$id]);
+            'user_id'=>$userID]);
         $destination = Address::create([
             'primaryName'=>'King Fahd International Airport',
             'secondaryName'=>'Dammam Arabie saoudite',
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
             'lattitude'=>round(0,1000),
             'type'=>'2',
             'place_id'=>(string) rand(0,100),
-            'user_id'=>$id]);
+            'user_id'=>$userID]);
         $trip1->addresses()->attach($pickUp);
         $trip1->addresses()->attach($destination);
         $ar = [1, 3, 4];
@@ -62,9 +62,9 @@ class UserSeeder extends Seeder
     public function run()
     {
         //
+        $driver = User::where('roles','=',json_encode(['captain']))->first();
 
-
-        $listUser = User::all();
+        $listUser = User::where('roles','=', null)->get();
         foreach ($listUser as $user)
         {
 
@@ -72,9 +72,9 @@ class UserSeeder extends Seeder
             if (count($userAddress) == 0)
             {
                 foreach (range(1, 15) as $i) {
-                    $this->createTrip($user->id,"1");
-                    $this->createTrip($user->id,"2");
-                    $this->createTrip($user->id,"3");
+                    $this->createTrip($user->id,$driver->id,"1");
+                    $this->createTrip($user->id,$driver->id,"2");
+                    $this->createTrip($user->id,$driver->id,"3");
                 }
                 Address::create([
                     'primaryName'=>'King Abdulaziz International Airport',

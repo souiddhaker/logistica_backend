@@ -16,8 +16,8 @@ class Rating extends Model
     {
         return Carbon::parse($value)->timestamp;
     }
-    public function trip()
+    public function driver()
     {
-        return $this->belongsTo(Trip::class);
+        return $this->belongsTo(Driver::class);
     }
 }

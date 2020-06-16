@@ -23,14 +23,12 @@ class Result
             if (array_key_exists(0, $data)) {
                 $this->response = $data;
             } else if (count($data) == 0) {
-                $this->response = [];
+                $this->response = null;
             } else {
                 $this->response = [$data];
             }
         } else {
-
             array_push($this->response, $data);
-
         }
         $this->success = true;
         $this->message = trans('messages.success');
