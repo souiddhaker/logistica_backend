@@ -36,7 +36,7 @@ class CarCategory extends Model
         if ($data['data']) {
             $id = CarCategory::where('id', $id)->update($data['data']);
             $data['res']->success([
-                "coupon" => $id
+                "typeCar" => $id
             ]);
         }
         return $data['res'];
@@ -87,7 +87,7 @@ class CarCategory extends Model
         if ($data['data']) {
             $coupon = CarCategory::create($data['data']);
             $data['res']->success([
-                "coupon" => $coupon
+                "typeCar" => $coupon
             ]);
         }
         return $data['res'];

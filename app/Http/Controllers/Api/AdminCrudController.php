@@ -90,13 +90,13 @@ class AdminCrudController extends Controller
                 $res = Settings::updateOne($request);
                 break;
             case "carType":
-                $res = CarCategory::updateOne($request,$id);
+                $res = CarCategory::updateOne($request, $id);
                 break;
             case "claims":
-                $res = CancelTrip::updateOne($request,$id);
+                $res = CancelTrip::updateOne($request, $id);
                 break;
             case "tripTransaction":
-                $res = Trip::updateOneTransaction($request,$id);
+                $res = Trip::updateOneTransaction($request, $id);
                 break;
             default:
                 $res->fail("incorrect name");
@@ -111,15 +111,23 @@ class AdminCrudController extends Controller
         $res = new Result();
         switch ($name) {
             case "client":
+                $data = User::where('id', $id)->limit(1)->get();
+                $allTrips = Trip::where('user_id', $id);
+                $data['tripStats'] = [
+                    'finished' => $allTrips->where('status', [3, 2])->count('id'),
+                    'current' => $allTrips->where('status', [0, 1])->count('id'),
+                ];
+                $res->success($data);
+                break;
             case "captain":
                 $data = User::where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             case "admin":
                 $data = User::where('id', $id)->limit(1)->get();
-                $dataRoles=AdminRoles::where('user_id',$id)->first()->get('roles');
-                if(count($dataRoles)>0){
-                    $data[0]['adminRoles']=$dataRoles[0]['roles'];
+                $dataRoles = AdminRoles::where('user_id', $id)->first()->get('roles');
+                if (count($dataRoles) > 0) {
+                    $data[0]['adminRoles'] = $dataRoles[0]['roles'];
                 }
                 $res->success($data);
                 break;
@@ -136,11 +144,11 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "carType":
-                $data = CarCategory::where('id',$id)->limit(1)->get();
+                $data = CarCategory::where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             case "claims":
-                $data = CancelTrip::with(['trip','trip.driver','trip.user'])->where('id',$id)->limit(1)->get();
+                $data = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             default:
@@ -178,7 +186,7 @@ class AdminCrudController extends Controller
                 $list = CarCategory::paginate(10);
                 break;
             case "claims":
-                $list = CancelTrip::with(['trip','trip.driver','trip.user'])->paginate(10);
+                $list = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->paginate(10);
                 break;
             default:
                 $success = false;
