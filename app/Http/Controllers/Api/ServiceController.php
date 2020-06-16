@@ -24,18 +24,28 @@ class ServiceController extends Controller
 
         $validator = Validator::make($request->all(),
             [
-                'distance' => 'required']);
+                'distance' => 'required',
+                'nbr_bags' => 'required']);
         if ($validator->fails())
         {
-            $res->fail(trans('messages.distance_error'));
-            return response()->json($res, 200);
+            if($validator->errors()->has("distance"))
+            {
+                $res->fail(trans('messages.distance_error'));
+                return response()->json($res, 200);
+            }else{
+                $res->fail(trans('messages.distance_error'));
+                return response()->json($res, 200);
+            }
         }
 
         $distance = $request['distance'];
 
         $priceKm = Price::where('from','<=',$distance)->where('to','>=',$distance)->first();
-        $listCarCategories = CarCategory::all();
-
+        $listCarCategories = CarCategory::where('capacity','>=', $request['nbr_bags'])->get();
+        if (!$priceKm)
+        {
+            $priceKm = Price::first();
+        }
         $list = [];
 
         foreach ($listCarCategories as $type){
