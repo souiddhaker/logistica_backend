@@ -93,6 +93,9 @@ class AdminCrudController extends Controller
             case "claims":
                 $res = CancelTrip::updateOne($request,$id);
                 break;
+            case "tripTransaction":
+                $res = Trip::updateOneTransaction($request,$id);
+                break;
             default:
                 $res->fail("incorrect name");
         }

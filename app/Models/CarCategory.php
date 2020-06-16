@@ -18,7 +18,7 @@ class CarCategory extends Model
     //
     use HasTranslations;
 
-    protected  $fillable = ['model', 'type', 'capacity', 'price', 'image', 'range_luggage', 'type', 'price_100', 'price_101'];
+    protected  $fillable = ['model', 'type', 'capacity', 'price', 'image', 'range_luggage', 'price_100', 'price_101','price_1'];
     public $translatable = ['model'];
     /**
      * The attributes that should be hidden for arrays.
@@ -26,7 +26,7 @@ class CarCategory extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at', 'type'
+        'created_at', 'updated_at'
     ];
 
     static public function updateOne(Request $request, int $id): Result
@@ -55,7 +55,8 @@ class CarCategory extends Model
                 'price' => 'required',
                 'image' => 'required',
                 'price_100' => 'required',
-                'price_101' => 'required'
+                'price_101' => 'required',
+                'price_1'=>'required'
             ]);
         if ($validator->fails()) {
             $res->fail($validator->errors()->all());
@@ -74,7 +75,7 @@ class CarCategory extends Model
             ]);
 
         return array_filter($arr, function ($key) {
-            $attr = ['model', 'type', 'capacity', 'price', 'image', 'range_luggage', 'type', 'price_100', 'price_101'];
+            $attr = ['model', 'type', 'capacity', 'price', 'image', 'range_luggage', 'type', 'price_100', 'price_101','price_1'];
             return in_array($key,$attr);
         },ARRAY_FILTER_USE_KEY);
     }

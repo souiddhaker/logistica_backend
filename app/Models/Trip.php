@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Post
@@ -37,6 +38,25 @@ class Trip extends Model
     protected $hidden = [
         'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices'
     ];
+    public static function updateOneTransaction($request,$id){
+        $res = new Result();
+        $roleData=
+            [
+                'transaction_status' => 'required|between:0,2',
+                'transaction_note'=>'required'
+            ];
+        $validator = Validator::make($request->all(),$roleData);
+        if($validator->fails()){
+            $res->fail($validator->errors()->all());
+            return $res;
+        }
+        $data= $validator->valid();
+        $trip = Trip::where('id',$id)->update($data);
+        $res->success([
+            "update"=>$trip
+        ]);
+        return $res;
+    }
     public function services()
     {
         return $this->belongsToMany(Service::class);
