@@ -11,6 +11,7 @@ use App\Models\Result;
 use App\Models\Settings;
 use App\Models\Trip;
 use App\Models\User;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Stripe\Util\Set;
 
@@ -115,6 +116,7 @@ class AdminCrudController extends Controller
                 break;
             case "admin":
                 $data = User::with(['adminRoles'])->where('id', $id)->limit(1)->get();
+                $data[0]['adminRoles']=$data[0]['adminRoles']['roles'];
                 $res->success($data);
                 break;
             case "trip":
