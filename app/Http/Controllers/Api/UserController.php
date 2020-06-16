@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Result;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,9 +27,6 @@ class UserController extends Controller
 
         $user = Auth::user();
         $user->update($request->only(['firstName', 'lastName']));
-//        unset( $user->roles);
-
-//        $response['user'] =$user;
         $res->success($user);
         return response()->json($res, 200);
     }
@@ -47,10 +45,7 @@ class UserController extends Controller
             return response()->json($res, 200);
         }
 
-
-
         try {
-
             $name = time() . '.' . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
 
             $img = \Image::make($request->photo)->save(public_path('img/profile/') . $name);
@@ -83,5 +78,13 @@ class UserController extends Controller
         $res->message= trans('messages.user_details');
 
         return response()->json($res,200);
+    }
+
+    public function createAccount(int $id)
+    {
+        $accountDriver = new Account();
+        $accountDriver->balance = 0;
+        $accountDriver->user_id = $id;
+        $accountDriver->save();
     }
 }

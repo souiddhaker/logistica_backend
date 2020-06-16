@@ -131,9 +131,6 @@ class TripController extends Controller
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
         $trip->route = $data['route'];
-
-//        $trip->payment_method = $data['payment_method'];
-
         $type_car = CarCategory::find($data['type_car_id']);
 
         if($type_car){

@@ -85,7 +85,15 @@ class AuthController extends Controller
             if ($user) {
                 $input['email'] = $user->email;
                 $response = $this->issueToken($input, 'password');
-                $response['user'] = $user;
+                if ($user->getRoles() === json_encode(['captain']))
+                {
+                    Auth::login($user);
+                    $driverController = new DriverController();
+                    $response['user'] = $driverController->getProfile()->getData()->response[0];
+
+                }
+                else
+                    $response['user'] = $user;
                 $response['isAlreadyUser'] = true;
 
             }else {
@@ -175,6 +183,11 @@ class AuthController extends Controller
             'phone' => request('userPhone'),
             'password' => bcrypt("logistica")
         ]);
+
+        //Create User Credit account
+        $userController = new UserController();
+        $userController->createAccount($user->id);
+
         $result = $this->issueToken($input, 'password');
         $result['user'] = $user;
         $result['isAlreadyUser'] = false;

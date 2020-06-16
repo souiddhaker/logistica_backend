@@ -30,6 +30,7 @@ class DriverController extends Controller
     public function register(Request $request)
     {
         $authController = new AuthController();
+        $userController = new UserController();
         $response = $authController->register($request)->getData();
 
         if ($response->success){
@@ -44,10 +45,9 @@ class DriverController extends Controller
             {
                 $this->addAttachements($request->attachements);
             }
-            $accountDriver = new Account();
-            $accountDriver->balance = 0;
-            $accountDriver->user_id = $driver->id;
-            $accountDriver->save();
+            $userController->createAccount($driver->id);
+            $response->response[0]->user = $this->getProfile()->getData()->response[0];
+//            return response()->json($response->response[0]->user,200);
         }
         return response()->json($response,200);
     }
