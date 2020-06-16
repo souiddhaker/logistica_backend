@@ -142,10 +142,6 @@ class TripController extends Controller
 
         $trip->pickup_at = $data['pickup_at'];
 
-        $promocode = Promocode::find($data['promocode_id']);
-        if($promocode){
-            $trip->promocode_id = $promocode->id;
-        }
 
         $payment_method = Card::find($data['payment_method']);
 
