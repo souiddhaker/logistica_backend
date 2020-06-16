@@ -226,7 +226,7 @@ class TripController extends Controller
 
     public function getById(int $id)
     {
-        $trip = Trip::where('id',$id)->with('driver','addresses','promocode','type_car','cancelTrip')->first();
+        $trip = Trip::where('id',$id)->with('driver','addresses','type_car','cancelTrip')->first();
         if ($trip)
         {
             $services=[];
