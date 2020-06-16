@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminRoles;
 use App\Models\CancelTrip;
 use App\Models\CarCategory;
 use App\Models\Notif;
@@ -115,8 +116,11 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "admin":
-                $data = User::with(['adminRoles'])->where('id', $id)->limit(1)->get();
-                $data[0]['adminRoles']=$data[0]['adminRoles']['roles'];
+                $data = User::where('id', $id)->limit(1)->get();
+                $dataRoles=AdminRoles::where('user_id',$id)->first()->get('roles');
+                if(count($dataRoles)>0){
+                    $data[0]['adminRoles']=$dataRoles[0]['roles'];
+                }
                 $res->success($data);
                 break;
             case "trip":
