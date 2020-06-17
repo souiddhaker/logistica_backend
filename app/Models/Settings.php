@@ -22,6 +22,7 @@ class Settings extends Model
     protected $fillable = [
         'company_percent','abort_percent_client','abort_percent_captain','percent_from'
     ];
+    protected $hidden = ['created_at','updated_at'];
 
     static public function updateOne(Request $request):Result{
         $res = new Result();

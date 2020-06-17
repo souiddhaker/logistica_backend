@@ -61,6 +61,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        $this->createUser();
         //
         $driver = User::where('roles','=',json_encode(['captain']))->first();
 
@@ -119,5 +120,33 @@ class UserSeeder extends Seeder
             }
         }
 
+    }
+    public function createUser(){
+        if(User::where('email','client@mail.com')->count('id')===0){
+            User::create([
+                'firstName' => 'client firstName',
+                'lastName' => 'lastName',
+                'email' => 'client@mail.com',
+                'phone' => '123456321',
+                'password' => bcrypt('logistica'),
+                'roles'=>null
+            ]);
+            User::create([
+                'firstName' => 'captain firstName',
+                'lastName' => 'lastName',
+                'email' => 'captain@mail.com',
+                'phone' => '123456258',
+                'password' => bcrypt('logistica'),
+                'roles'=>json_encode(['captain'])
+            ]);
+            User::create([
+                'firstName' => 'admin firstName',
+                'lastName' => 'lastName',
+                'email' => 'admin@mail.com',
+                'phone' => '123456258',
+                'password' => bcrypt('logistica'),
+                'roles'=>json_encode(['admin'])
+            ]);
+        }
     }
 }

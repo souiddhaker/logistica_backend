@@ -48,8 +48,9 @@ class CarCategory extends Model
         $res = new Result();
         $validator = Validator::make($request->all(),
             [
-                'label_ar' => 'required',
-                'label_en' => 'required',
+                "model"=>'required',
+                "model.ar"=>'required',
+                "model.en"=>'required',
                 'type' => 'required:between:0,2',
                 'capacity' => 'required',
                 'price' => 'required',
@@ -70,8 +71,7 @@ class CarCategory extends Model
         $arr = array_merge(
             $request->all(),
             [
-                'range_luggage' => ($request->get('capacity') < 10 ? '1-' : '') . $request->get('capacity'),
-                "model" => ['ar' => $request->get('label_ar'), 'en' => $request->get('label_en')]
+                'range_luggage' => ($request->get('capacity') < 10 ? '1-' : '') . $request->get('capacity')
             ]);
 
         return array_filter($arr, function ($key) {

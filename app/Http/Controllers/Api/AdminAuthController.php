@@ -21,7 +21,6 @@ class AdminAuthController extends Controller
         $credentials = request(['email', 'password']);
 
         $user = User::where('email', $credentials['email'])->first();
-//        return response()->json($user->getRoles(), 401);
 
         if ($user && $user->getRoles() === json_encode(['admin']))
         {

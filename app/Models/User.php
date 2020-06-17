@@ -96,8 +96,7 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    static public function createOne(Request $request,$role="admin"):Result{
-        $res = new Result();
+    static public function validate(Request $request,$role="admin",$create = true):\Illuminate\Validation\Validator{
 
         $roleData=
             [
@@ -106,10 +105,28 @@ class User extends Authenticatable implements JWTSubject
                 'email' => 'required|email|unique:users,email',
                 'phone' => 'required|unique:users,phone'
             ];
+        if(!$create){
+            $roleData['email']='required';
+            $roleData['phone']='required';
+        }
         if($role === "admin"){
             $roleData['roles']='required';
         }
-        $validator = Validator::make($request->all(),$roleData);
+        if($role === "captain"){
+            $roleData['status']='required';
+        }
+        return Validator::make($request->all(),$roleData);
+    }
+    static public function filterRequest($data){
+        $data= array_filter($data,function ($key){
+            $User = new User();
+           return in_array($key,$User->getFillable());
+        },ARRAY_FILTER_USE_KEY);
+        return $data;
+    }
+    static public function createOne(Request $request,$role="admin"):Result{
+        $res = new Result();
+        $validator = User::validate($request,$role);
         if($validator->fails()){
             $res->fail($validator->errors()->all());
             return $res;
@@ -117,7 +134,10 @@ class User extends Authenticatable implements JWTSubject
         $data= $validator->valid();
         $data['password']=bcrypt("logistica");
         $data['roles']=json_encode([$role]);
-        $user = User::create($data);
+        $user = User::create(User::filterRequest($data));
+        if($role=="captain"){
+            $user->profileDriver()->create(['status'=>$data['status']]);
+        }
         if($role==="admin"){
             AdminRoles::updateOne($request,$user['id']);
         }
@@ -126,19 +146,10 @@ class User extends Authenticatable implements JWTSubject
         ]);
         return $res;
     }
+
     static public function updateOne(Request $request,int $id,$role="admin"):Result{
         $res = new Result();
-        $roleData=
-            [
-                'firstName' => 'required',
-                'lastName' => 'required',
-                'email' => 'required',
-                'phone' => 'required'
-            ];
-        if($role === "admin"){
-            $roleData['roles']='required';
-        }
-        $validator = Validator::make($request->all(),$roleData);
+        $validator = User::validate($request,$role,false);
         if($validator->fails()){
             $res->fail($validator->errors()->all());
             return $res;
@@ -146,7 +157,10 @@ class User extends Authenticatable implements JWTSubject
         $data= $validator->valid();
         $data['password']=bcrypt("logistica");
         $data['roles']=json_encode([$role]);
-        $idUser=User::where('id',$id)->update($data);
+        $idUser=User::where('id',$id)->update(User::filterRequest($data));
+        if($role=="captain"){
+            Driver::updateOrCreate(['user_id'=>$id],['status'=>$data['status']]);
+        }
         if($role==="admin"){
                 AdminRoles::updateOne($request,$id);
         }

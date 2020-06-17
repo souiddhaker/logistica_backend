@@ -15,7 +15,6 @@ class AddFieldsCars extends Migration
     {
         //
         Schema::table('car_categories', function (Blueprint $table) {
-            $table->integer('type')->nullable();
             $table->integer('price_100')->nullable();
             $table->integer('price_101')->nullable();
         });

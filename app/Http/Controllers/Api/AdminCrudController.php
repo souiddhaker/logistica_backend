@@ -12,9 +12,7 @@ use App\Models\Result;
 use App\Models\Settings;
 use App\Models\Trip;
 use App\Models\User;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
-use Stripe\Util\Set;
 
 class AdminCrudController extends Controller
 {
@@ -120,7 +118,7 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "captain":
-                $data = User::where('id', $id)->limit(1)->get();
+                $data = User::where('id', $id)->with(['profiledriver'])->limit(1)->get();
                 $res->success($data);
                 break;
             case "admin":
@@ -167,8 +165,10 @@ class AdminCrudController extends Controller
         switch ($name) {
             case "client":
             case "admin":
-            case "captain":
                 $list = User::where('roles', json_encode([$name]))->paginate(10);
+                break;
+            case "captain":
+                $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->paginate(10);
                 break;
             case "trip":
                 $list = Trip::with(['driver', 'user'])->paginate(10);

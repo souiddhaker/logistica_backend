@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Driver extends User
 {
+    protected $fillable = ['status','user_id','cartype_id'];
+    protected $hidden = ['created_at','updated_at','user_id'];
     //
     protected $table = 'drivers';
 
