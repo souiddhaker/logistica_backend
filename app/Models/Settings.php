@@ -39,7 +39,7 @@ class Settings extends Model
             return $res;
         }
         $data= $validator->valid();
-        Settings::updateOrCreate($data);
+        Settings::updateOrCreate(["id"=>1],$data);
         $res->success([]);
         return $res;
     }
