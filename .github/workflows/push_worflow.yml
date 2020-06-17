@@ -14,7 +14,7 @@ jobs:
       - name: Deploy to Server
         uses: ngocquyhoang/deploy@laravel
         with:
-          user: root
+          user: dhaker
           host: 51.91.255.126
           path: /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs
           owner: dhaker
@@ -23,7 +23,7 @@ jobs:
       - name: Deploy to production
         uses: appleboy/ssh-action@master
         with:
-          username: root
+          username: dhaker
           host: 51.91.255.126
-          password: xaaYlVJJn9uITFxfmzepbjhf6UVl1bJimw35oQEetF
+          password: 01131994
           script: 'cd /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs && ./server_deploy.sh'
