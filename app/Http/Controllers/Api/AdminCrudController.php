@@ -13,6 +13,8 @@ use App\Models\Settings;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
+use mysqli;
+use function Clue\StreamFilter\fun;
 
 class AdminCrudController extends Controller
 {
@@ -161,19 +163,43 @@ class AdminCrudController extends Controller
         return $res;
     }
 
-    public function all(string $name)
+    public function filter(Request $request, string $name)
+    {
+        switch ($name) {
+            case "client":
+            case "admin":
+            case"captain":
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['firstName', 'lastName', 'phone', 'email']);
+                }, ARRAY_FILTER_USE_BOTH);
+                break;
+            default:
+                $detailFilter = [];
+        }
+        $sql = [];
+        foreach ($detailFilter as $key => $value) {
+            $safeValue= addslashes($value);
+            $sql[] = "$key like '%$safeValue%'";
+        }
+        if(count($sql)===0)
+            return '1=1';
+        return implode(" and ", $sql);
+    }
+
+    public function all(Request $request, string $name)
     {
 
         $res = new Result();
         $success = true;
         $list = [];
+        $detailFilters = $this->filter($request, $name);
         switch ($name) {
             case "client":
             case "admin":
-                $list = User::where('roles', json_encode([$name]))->paginate(10);
+                $list = User::where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
                 break;
             case "captain":
-                $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->paginate(10);
+                $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
                 break;
             case "trip":
                 $list = Trip::with(['driver', 'user'])->paginate(10);
