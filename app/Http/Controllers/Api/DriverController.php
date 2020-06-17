@@ -29,6 +29,7 @@ class DriverController extends Controller
     }
     public function register(Request $request)
     {
+
         $authController = new AuthController();
         $userController = new UserController();
         $response = $authController->register($request)->getData();
@@ -115,6 +116,19 @@ class DriverController extends Controller
         $user = User::find(Auth::id());
         $listRatings = Rating::where('driver_id','=',$user->profileDriver->id)->paginate(2);
         $res->success($listRatings);
+        return response()->json($res,200);
+    }
+
+
+    public function updateDriver(Request $request)
+    {
+        $res = new Result();
+        $user = Auth::user();
+        $driver = Driver::where('user_id', Auth::id())->first();
+        $user->update($request->only(['firstName', 'lastName']));
+        $driver->cartype_id = CarCategory::find($request->car_type)->id;
+        $driver->save();
+        $res->success();
         return response()->json($res,200);
     }
 }

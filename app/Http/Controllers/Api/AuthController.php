@@ -175,7 +175,6 @@ class AuthController extends Controller
                 return response()->json($res, 200);
             }
         }
-
         $user = User::create([
             'firstName' => request('firstName'),
             'lastName' => request('lastName'),

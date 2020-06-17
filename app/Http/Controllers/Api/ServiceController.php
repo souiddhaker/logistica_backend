@@ -9,14 +9,11 @@ use App\Models\Price;
 use App\Models\Result;
 use App\Models\Service;
 use App\Models\SubService;
-use App\Models\Trip;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class ServiceController extends Controller
 {
-    //
 
     public function getListCarCategories(Request $request)
     {
@@ -72,10 +69,6 @@ class ServiceController extends Controller
             $res->fail(trans('messages.bags_error'));
             return response()->json($res, 200);
         }
-        if ($request['language'])
-            app()->setLocale($request['language']);
-        else
-            app()->setLocale('en');
 
         $nbrBags = $request['bags'];
         $listCategory =  CategoryServices::all();

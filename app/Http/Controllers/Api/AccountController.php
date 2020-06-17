@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class AccountController extends Controller
 {
     //
+
     public function addCredit(Request $request)
     {
         $res = new Result();
@@ -29,25 +30,22 @@ class AccountController extends Controller
                 return response()->json($isActif,200);
             else
             {
-
                 if ($promocodeController->usePromocode($isActif->response[0]->id))
                 {
                     if ($user->getRoles() === json_encode(['captain']))
                         $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
                     else
-                        $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
-                    $account->balance = $balance;
-                    $account->save();
-                    $res->success($account);
-                }else
+                        $balance = $isActif->response[0]->pourcentage + $balance;
+                }else{
                     $res->fail('Promocode already used');
+                    return response()->json($res,200);
+                }
             }
 
-        }else{
-            $account->balance = $balance;
-            $account->save();
-            $res->success($account);
         }
+        $account->balance = $balance;
+        $account->save();
+        $res->success($account);
         return response()->json($res,200);
     }
 

@@ -8,7 +8,6 @@ use App\Models\CarCategory;
 use App\Models\Card;
 use App\Models\Document;
 use App\Models\Driver;
-use App\Models\Promocode;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\SubService;
@@ -18,7 +17,6 @@ use App\Models\Result;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Expr\Cast\Object_;
 use Validator;
 class TripController extends Controller
 {
@@ -51,18 +49,9 @@ class TripController extends Controller
         return response()->json($res,200);
     }
 
-    public function tripDataFromArray(array $data)
-    {
-        $arrayModel = [];
-        foreach ($data as $elem)
-        {
-            array_push($arrayModel,$this->getById($elem['id']));
-        }
-        return $arrayModel;
-    }
-
     public function listTrips()
     {
+
         $res = new Result();
         $listTrips  = [];
         $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())
@@ -124,7 +113,6 @@ class TripController extends Controller
         $data = $request->all();
         $trip = new Trip();
         $trip->save();
-
         // status 0 not confirmed by driver
         $trip->status = '0';
         $trip->total_price = $data['total_price'];
@@ -242,51 +230,37 @@ class TripController extends Controller
         return $documents;
     }
 
+    public function listServicesWithSubServices(Trip $trip)
+    {
+
+        $services=[];
+        $subservicesCollection = collect($trip->subservices)->toArray();
+
+        foreach($trip->services as $service){
+            $serviceModel = $service;
+
+            $id = $service->id;
+            $serviceModel['sub_services']= array_filter($subservicesCollection, function ($event) use ($id) {
+                return $event['service_id'] === $id;
+            });
+            array_push($services,$serviceModel);
+        }
+        return $services;
+    }
+
+
     public function getById(int $id)
     {
         $trip = Trip::where('id',$id)->with('driver','addresses','type_car','cancelTrip')->first();
         if ($trip)
         {
-            $services=[];
-            $subservicesCollection = collect($trip->subservices)->toArray();
-
-            foreach($trip->services as $service){
-                $serviceModel = $service;
-
-                $id = $service->id;
-                $serviceModel['sub_services']= array_filter($subservicesCollection, function ($event) use ($id) {
-                    return $event['service_id'] === $id;
-                });
-
-                array_push($services,$serviceModel);
-
-            }
-        $addresses = [];
-
-        foreach ($trip->addresses as $address){
-            $tripAddress = Address::find($address->id);
-            if ($tripAddress->type == '1'){
-                $addresses['pickup'] = $tripAddress;
-            }
-
-            if ($tripAddress->type == '2'){
-                $addresses['destination'] = $tripAddress;
-            }
-        }
-
-
-        $trip->services = $services;
-
-        $trip->payement_method = "Cash payment";
-
-        $trip->rating = Rating::where('user_id',Auth::id())->first();
-        $attachementsCollection = collect($trip->attachements)->toArray();
-
-        return array_merge($trip->toArray(),$this->tripAttachements($attachementsCollection));
-
+            $trip->services = $this->listServicesWithSubServices($trip);
+            $trip->payement_method = "Cash payment";
+            $trip->rating = Rating::where('user_id',Auth::id())->first();
+            $attachementsCollection = collect($trip->attachements)->toArray();
+            return array_merge($trip->toArray(),$this->tripAttachements($attachementsCollection));
         }else
             return null;
-
     }
 
 
@@ -300,7 +274,6 @@ class TripController extends Controller
         else
             $res->fail(trans('message.trip_not_found'));
         return response()->json($res,200);
-
     }
 
     public function cancelTrip(Request $request)

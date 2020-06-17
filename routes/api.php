@@ -65,12 +65,11 @@ Route::prefix('driver')->group(function(){
         Route::post('/login','Api\DriverController@register');
     });
     Route::prefix('trip')->group(function(){
-        Route::get('/list','Api\TripController@listTrips');
-        Route::post('/login','Api\DriverController@register');
+        Route::get('/list','Api\TripController@listTrips')->middleware('auth:api');
         Route::get('/search', 'Api\TripController@search')->middleware('auth:api');
     });
     Route::prefix('profile')->group(function(){
-        Route::put('/update','Api\UserController@update')->middleware('auth:api');;
+        Route::put('/update','Api\DriverController@updateDriver')->middleware('auth:api');;
         Route::get('','Api\DriverController@getProfile')->middleware('auth:api');;
     });
     Route::prefix('document')->group(function(){
