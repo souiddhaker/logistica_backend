@@ -32,7 +32,7 @@ class Promocode extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at', 'nbr_uses'
+        'created_at', 'updated_at'
     ];
 
     protected $dates = ['end_at'];
