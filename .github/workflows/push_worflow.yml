@@ -11,21 +11,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@master
-      - name: Setup Enviroment
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.3'
-      - name: Speed up the packages installation process
-        run: composer global require hirak/prestissimo
-      - name: Install Packages
-        run: composer install --no-dev
       - name: Deploy to Server
         uses: ngocquyhoang/deploy@laravel
         with:
           user: root
           host: 51.91.255.126
-          path: /var/www/vhosts/vpsdev.wi-mobi.com/dev-logistica.wi-mobi.com
-          owner: 10000
+          path: /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs
+          owner: dhaker
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
       - name: Deploy to production
@@ -34,4 +26,4 @@ jobs:
           username: root
           host: 51.91.255.126
           password: xaaYlVJJn9uITFxfmzepbjhf6UVl1bJimw35oQEetF
-          script: 'cd /var/www/vhosts/vpsdev.wi-mobi.com/dev-logistica.wi-mobi.com && ./server_deploy.sh'
+          script: 'cd /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs && ./server_deploy.sh'
