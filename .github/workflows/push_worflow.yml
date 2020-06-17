@@ -15,4 +15,4 @@ jobs:
           username: dhaker
           host: 51.91.255.126
           password: '01131994'
-          script: 'cd /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs && ./server_deploy.sh'
+          script: 'cd /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs && chmod 755 server_deploy.sh && ./server_deploy.sh'
