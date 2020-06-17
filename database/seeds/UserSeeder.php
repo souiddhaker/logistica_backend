@@ -65,7 +65,7 @@ class UserSeeder extends Seeder
         //
         $driver = User::where('roles','=',json_encode(['captain']))->first();
 
-        $listUser = User::where('roles','=', null)->get();
+        $listUser = User::where('roles','=', json_encode(['client']))->get();
         foreach ($listUser as $user)
         {
 
@@ -129,7 +129,7 @@ class UserSeeder extends Seeder
                 'email' => 'client@mail.com',
                 'phone' => '123456321',
                 'password' => bcrypt('logistica'),
-                'roles'=>null
+                'roles'=>json_encode(['client'])
             ]);
             User::create([
                 'firstName' => 'captain firstName',

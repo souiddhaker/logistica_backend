@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ use Spatie\Translatable\HasTranslations;
 class CarCategory extends Model
 {
     //
-    use HasTranslations;
+    use HasTranslations,SoftDeletes;
 
     protected  $fillable = ['model', 'type', 'capacity', 'price', 'image', 'range_luggage', 'price_100', 'price_101','price_1'];
     public $translatable = ['model'];

@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 class Promocode extends Model
 {
     //
-
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

@@ -113,12 +113,17 @@ class AdminCrudController extends Controller
                 $allTrips = Trip::where('user_id', $id);
                 $data['tripStats'] = [
                     'finished' => $allTrips->where('status', [3, 2])->count('id'),
-                    'current' => $allTrips->where('status', [0, 1])->count('id'),
+                    'current' => $allTrips->where('status', [1])->count('id'),
                 ];
                 $res->success($data);
                 break;
             case "captain":
                 $data = User::where('id', $id)->with(['profiledriver'])->limit(1)->get();
+                $allTrips = Trip::where('user_id', $id);
+                $data['tripStats'] = [
+                    'finished' => $allTrips->where('status', [3, 2])->count('id'),
+                    'current' => $allTrips->where('status', [1])->count('id'),
+                ];
                 $res->success($data);
                 break;
             case "admin":
