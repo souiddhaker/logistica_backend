@@ -221,6 +221,27 @@ class TripController extends Controller
         //TODO : create trip with addresses
     }
 
+    public function tripAttachements(array $attachementsCollection)
+    {
+
+        $documents = [];
+        $documents['attachements']=[];
+        $documents['reservation_hotel']=null;
+        $documents['receipt']=null;
+        foreach ($attachementsCollection as $document)
+        {
+            switch ($document['type']){
+                case "1" : array_push($documents['attachements'],$document);
+                    break;
+                case "2" : $documents['reservation_hotel'] = $document;
+                    break;
+                case "3" : $documents['receipt'] = $document;
+                    break;
+            }
+        }
+        return $documents;
+    }
+
     public function getById(int $id)
     {
         $trip = Trip::where('id',$id)->with('driver','addresses','type_car','cancelTrip')->first();
@@ -260,32 +281,15 @@ class TripController extends Controller
 
         $trip->rating = Rating::where('user_id',Auth::id())->first();
         $attachementsCollection = collect($trip->attachements)->toArray();
-        $documents = [];
-        $documents['attachements']=[];
-        $documents['reservation_hotel']=null;
-        $documents['receipt']=null;
-        foreach ($attachementsCollection as $document)
-        {
-            switch ($document['type']){
-                case "1" : array_push($documents['attachements'],$document);
-                    break;
-                case "2" : $documents['reservation_hotel'] = $document;
-                    break;
-                case "3" : $documents['receipt'] = $document;
-                    break;
-            }
-        }
-        return array_merge($trip->toArray(),$documents);
+
+        return array_merge($trip->toArray(),$this->tripAttachements($attachementsCollection));
 
         }else
             return null;
 
     }
 
-    public function tripAttachements(array $attachementsCollection)
-    {
-        return $attachementsCollection;
-    }
+
 
     public function getTrip(int $id)
     {

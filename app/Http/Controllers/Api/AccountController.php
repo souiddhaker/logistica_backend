@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\Promocode;
 use App\Models\Result;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,23 +16,26 @@ class AccountController extends Controller
     public function addCredit(Request $request)
     {
         $res = new Result();
-
+        $user = User::find(Auth::id());
         $account = Account::where('user_id',Auth::id())->first();
         $balance = $account->balance + $request->credit;
-        if (isset($request->coupon))
+        if (isset($request->coupon) or $request->coupon === "")
         {
             $requestVerif = new Request();
             $requestVerif['promocode'] = $request->coupon;
             $promocodeController = new PromocodeController();
             $isActif = $promocodeController->verify($requestVerif)->getData();
             if (!$isActif->success)
-            return response()->json($isActif,200);
+                return response()->json($isActif,200);
             else
             {
 
                 if ($promocodeController->usePromocode($isActif->response[0]->id))
                 {
-                    $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
+                    if ($user->getRoles() === json_encode(['captain']))
+                        $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
+                    else
+                        $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
                     $account->balance = $balance;
                     $account->save();
                     $res->success($account);
@@ -39,6 +43,10 @@ class AccountController extends Controller
                     $res->fail('Promocode already used');
             }
 
+        }else{
+            $account->balance = $balance;
+            $account->save();
+            $res->success($account);
         }
         return response()->json($res,200);
     }

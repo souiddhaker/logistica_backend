@@ -47,7 +47,6 @@ class DriverController extends Controller
             }
             $userController->createAccount($driver->id);
             $response->response[0]->user = $this->getProfile()->getData()->response[0];
-//            return response()->json($response->response[0]->user,200);
         }
         return response()->json($response,200);
     }
