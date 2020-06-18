@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Result;
 use App\Models\Trip;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -67,18 +68,28 @@ class DocumentController extends Controller
         $res  = new Result();
 
         $document = Document::find($id);
+
         if ($document)
         {
             try {
-                $position  = strpos($document->path,'img/attachement/',0);
-                $image_path = public_path('img/attachement/').'/'.substr($document->path,$position+16,strlen($document->path));
+                $user = User::find(Auth::id());
+
+                if ($user->getRoles() === json_encode(['captain']))
+                {
+                    $position  = strpos($document->path,'img/profile/',0);
+                    $image_path = public_path('img/profile/').'/'.substr($document->path,$position+12,strlen($document->path));
+                }else{
+                    $position  = strpos($document->path,'img/attachement/',0);
+                    $image_path = public_path('img/attachement/').'/'.substr($document->path,$position+16,strlen($document->path));
+                }
+
                 unlink($image_path);
                 $res->success();
+                $document->delete();
             }catch (\ErrorException $e){
                 $res->fail(trans('messages.document_remove_fail'));
 
             }
-            $document->delete();
         }else{
             $res->fail(trans('messages.document_not_found'));
         }
