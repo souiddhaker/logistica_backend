@@ -68,6 +68,7 @@ class Firebase {
         $url = 'https://fcm.googleapis.com/fcm/send';
 
         $client = new Client();
+        return 'key='.env('FCM_LEGACY_KEY');
         $result = $client->post( $url, [
             'json'    =>
                 $fields
