@@ -226,21 +226,15 @@ class DriverController extends Controller
         $attachement1 = Document::find(29);
         $attachement2 = Document::find(30);
         $attachement3 = Document::find(31);
-            $trip->attachements()->attach($attachement1);
-            $trip->attachements()->attach($attachement2);
-            $trip->attachements()->attach($attachement3);
+            $trip->attachements()->detach($attachement1);
+            $trip->attachements()->detach($attachement2);
 
-        $trip1->attachements()->attach($attachement1);
-        $trip1->attachements()->attach($attachement2);
-        $trip1->attachements()->attach($attachement3);
+        $trip1->attachements()->detach($attachement1);
+        $trip1->attachements()->detach($attachement3);
 
-        $trip2->attachements()->attach($attachement1);
-        $trip2->attachements()->attach($attachement2);
-        $trip2->attachements()->attach($attachement3);
+        $trip2->attachements()->detach($attachement2);
+        $trip2->attachements()->detach($attachement3);
 
-        $trip3->attachements()->attach($attachement1);
-        $trip3->attachements()->attach($attachement2);
-        $trip3->attachements()->attach($attachement3);
 
             return response()->json($trip->attachements,200);
     }
