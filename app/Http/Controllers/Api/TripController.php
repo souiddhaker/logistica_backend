@@ -256,7 +256,7 @@ class TripController extends Controller
         {
             $trip->services = $this->listServicesWithSubServices($trip);
             $trip->payement_method = "Cash payment";
-            $trip->rating = Rating::where('user_id',Auth::id())->first();
+            $trip->rating = Rating::find($trip->rating_id);
             $attachementsCollection = collect($trip->attachements)->toArray();
             return array_merge($trip->toArray(),$this->tripAttachements($attachementsCollection));
         }else
@@ -311,18 +311,22 @@ class TripController extends Controller
         $data = $request->all();
 
         $rate = new Rating();
-        $userDriver = Driver::where('user_id',$data['driver_id'])->first();
-            if ($userDriver){
-                $rate->value = $data['value'];
-                $rate->comment = $data['additionalComment'];
-                $rate->user_id = Auth::id();
-                $userDriver->ratings()->save($rate);
-                $rate['driver_id'] = $data['driver_id'];
-                $res->success($rate);
+        $trip = Trip::find($data['trip_id']);
+        if ($trip)
+        {
 
-            }else{
-                $res->fail('Trip not found');
-            }
+            $rate->value = $data['value'];
+            $rate->comment = $data['additionalComment'];
+            $rate->user_id = Auth::id();
+            $userDriver = Driver::where('user_id',$trip->driver_id)->first();
+            $userDriver->ratings()->save($rate);
+            $trip->rating_id = $rate->id;
+            $trip->save();
+            $res->success($rate);
+
+        }else{
+            $res->fail('Trip not found');
+        }
         return response()->json($res,200);
     }
 
