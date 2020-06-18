@@ -13,8 +13,6 @@ use App\Models\Settings;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
-use mysqli;
-use function Clue\StreamFilter\fun;
 
 class AdminCrudController extends Controller
 {
@@ -162,9 +160,38 @@ class AdminCrudController extends Controller
         $res = response()->json($res, 200);
         return $res;
     }
+    public function filterDate(&$detailFilter,$key){
+        $sql=[];
+        if(isset($detailFilter['d_start_at'])){
+            $sql[]="$key >= '".addslashes($detailFilter['d_start_at'])."'";
+        }
+        if(isset($detailFilter['d_end_at'])){
+            $sql[]="$key <= '".addslashes($detailFilter['d_end_at'])."'";
+        }
+        unset($detailFilter["d_start_at"]);
+        unset($detailFilter["d_end_at"]);
+        return $sql;
+    }
+    public function toQuery(&$detailFilter,$sql,$like=true,$applyOnly=[]){
+        foreach ($detailFilter as $key => $value) {
+            if((count($applyOnly)>0&&in_array($key,$applyOnly))
+            ||count($applyOnly)===0){
 
+                $safeValue = addslashes($value);
+                if($like){
+                    $sql[] = "$key like '%$safeValue%'";
+                }else{
+                    $sql[] = "$key = '$safeValue'";
+                }
+                unset($detailFilter[$key]);
+            }
+        }
+        return $sql;
+    }
     public function filter(Request $request, string $name)
     {
+
+        $sql = [];
         switch ($name) {
             case "client":
             case "admin":
@@ -173,15 +200,33 @@ class AdminCrudController extends Controller
                     return $value && in_array($key, ['firstName', 'lastName', 'phone', 'email']);
                 }, ARRAY_FILTER_USE_BOTH);
                 break;
+            case "trip":
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+                }, ARRAY_FILTER_USE_BOTH);
+                $sql = $this->toQuery($detailFilter,$sql,false,['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+                break;
+            case "couponCaptain":
+            case "couponClient":
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['id', 'status', 'd_start_at', 'd_end_at']);
+                }, ARRAY_FILTER_USE_BOTH);
+                $sql = $this->filterDate($detailFilter,"end_at");
+                $sql = $this->toQuery($detailFilter,$sql,false,["id","status"]);
+                break;
+            case "claims":
+
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['id', 'trip_id', 'by_user','status','d_start_at', 'd_end_at']);
+                }, ARRAY_FILTER_USE_BOTH);
+                $sql = $this->filterDate($detailFilter,"created_at");
+                $sql = $this->toQuery($detailFilter,$sql,false,['id', 'trip_id', 'by_user','status']);
+                break;
             default:
                 $detailFilter = [];
         }
-        $sql = [];
-        foreach ($detailFilter as $key => $value) {
-            $safeValue= addslashes($value);
-            $sql[] = "$key like '%$safeValue%'";
-        }
-        if(count($sql)===0)
+        $sql = $this->toQuery($detailFilter,$sql);
+        if (count($sql) === 0)
             return '1=1';
         return implode(" and ", $sql);
     }
@@ -202,13 +247,13 @@ class AdminCrudController extends Controller
                 $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
                 break;
             case "trip":
-                $list = Trip::with(['driver', 'user'])->paginate(10);
+                $list = Trip::with(['driver', 'user'])->whereRaw($detailFilters)->paginate(10);
                 break;
             case "couponCaptain":
-                $list = Promocode::where('type', 1)->paginate(10);
+                $list = Promocode::where('type', 1)->whereRaw($detailFilters)->paginate(10);
                 break;
             case "couponClient":
-                $list = Promocode::where('type', 0)->paginate(10);
+                $list = Promocode::where('type', 0)->whereRaw($detailFilters)->paginate(10);
                 break;
             case "notif":
                 $list = Notif::paginate(10);
@@ -217,7 +262,7 @@ class AdminCrudController extends Controller
                 $list = CarCategory::paginate(10);
                 break;
             case "claims":
-                $list = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->paginate(10);
+                $list = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->whereRaw($detailFilters)->paginate(10);
                 break;
             default:
                 $success = false;
