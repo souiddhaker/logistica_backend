@@ -26,6 +26,7 @@ Route::prefix('user')->group(function () {
     Route::put('', 'Api\UserController@update')->middleware('auth:api');
     Route::post('/profileImage', 'Api\UserController@uploadImage')->middleware('auth:api');
     Route::get('', 'Api\UserController@getUser')->middleware('auth:api');
+    Route::put('/fcm', 'Api\UserController@userFcmToken')->middleware('auth:api');
 
 });
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\Result;
+use App\Models\UserFcm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -86,5 +87,34 @@ class UserController extends Controller
         $accountDriver->balance = 0;
         $accountDriver->user_id = $id;
         $accountDriver->save();
+    }
+
+
+
+    public function userFcmToken(Request $request){
+
+        $res = new Result();
+
+        $validator = Validator::make($request->all(),
+            [
+                'fcm' => 'required|string'
+            ]);
+        if ($validator->fails()) {
+            $res->fail("FCM token not valid");
+            return response()->json($res, 200);
+        }
+        $user = Auth::user();
+        if ($user)
+        {
+            $fcm = new UserFcm();
+            $fcm->user_id = $user->id;
+            $fcm->token = $request['fcm'];
+            $fcm->save();
+            $res->success($fcm);
+        }else{
+            $res->fail('User Not Found');
+        }
+        return response()->json($res, 200);
+
     }
 }
