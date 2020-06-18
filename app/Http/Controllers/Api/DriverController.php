@@ -27,8 +27,90 @@ class DriverController extends Controller
             $response = $this->profileDocument($request);
         }
     }
+
+    public function saveProfileDocuments(Request $request,Driver $user)
+    {
+        /**
+         * id 2
+         * car 3
+         * licence 2
+         */
+        $identity1 = new Document();
+        $identity2 = new Document();
+        $car1 = new Document();
+        $car2 = new Document();
+        $car3 = new Document();
+        $licence1 = new Document();
+        $licence2 = new Document();
+
+        if ($request->file('identity1')){
+            $file = $request->file('identity1');
+            $img = \Image::make($file)->save(public_path('img/profile/') . time() .$file->getClientOriginalName());
+            $identity1->path = time().$file->getClientOriginalName();
+            $identity1->type = 4;
+            $identity1->save();
+            $user->documents()->attach($identity1);
+
+        }
+        if ($request->file('identity2')){
+            $file = $request->file('identity2');
+            $img = \Image::make($file)->save(public_path('img/profile/') . time() .$file->getClientOriginalName());
+            $identity2->path = time() .$file->getClientOriginalName();
+            $identity2->type = 4;
+            $identity2->save();
+            $user->documents()->attach($identity2);
+
+        }
+        if ($request->file('car1')){
+            $file = $request->file('car1');
+            $img = \Image::make($file)->save(public_path('img/profile/') .time() . $file->getClientOriginalName());
+            $car1->path = time() .$file->getClientOriginalName();
+            $car1->type = 5;
+            $car1->save();
+            $user->documents()->attach($car1);
+
+        }
+        if ($request->file('car2')){
+            $file = $request->file('car2');
+            $img = \Image::make($file)->save(public_path('img/profile/') .time() . $file->getClientOriginalName());
+            $car2->path = time() .$file->getClientOriginalName();
+            $car2->type = 5;
+            $car2->save();
+            $user->documents()->attach($car2);
+
+        }
+        if ($request->file('car3')){
+            $file = $request->file('car3');
+            $img = \Image::make($file)->save(public_path('img/profile/') . time() .$file->getClientOriginalName());
+            $car3->path = time() .$file->getClientOriginalName();
+            $car3->type = 5;
+            $car3->save();
+            $user->documents()->attach($car3);
+
+        }
+        if ($request->file('licence1')){
+            $file = $request->file('licence1');
+            $img = \Image::make($file)->save(public_path('img/profile/').time() . $file->getClientOriginalName());
+            $licence1->path = time() .$file->getClientOriginalName();
+            $licence1->type = 6;
+            $licence1->save();
+            $user->documents()->attach($licence1);
+
+        }
+        if ($request->file('licence2')){
+            $file = $request->file('licence2');
+            $img = \Image::make($file)->save(public_path('img/profile/').time() . $file->getClientOriginalName());
+            $licence2->path = time() .$file->getClientOriginalName();
+            $licence2->type = 6;
+            $licence2->save();
+            $user->documents()->attach($licence2);
+
+        }
+        return $user->documents;
+    }
     public function register(Request $request)
     {
+
 
         $authController = new AuthController();
         $userController = new UserController();
@@ -42,10 +124,11 @@ class DriverController extends Controller
             $driverProfile->cartype_id = CarCategory::find($request->car_type)->id;
             $driver->profileDriver()->save($driverProfile);
             Auth::login($driver);
-            if (isset($request->attachements))
-            {
-                $this->addAttachements($request->attachements);
-            }
+//            if (isset($request->attachements))
+//            {
+//                $this->addAttachements($request->attachements);
+//            }
+            $this->saveProfileDocuments($request,$driverProfile);
             $userController->createAccount($driver->id);
             $response->response[0]->user = $this->getProfile()->getData()->response[0];
         }
@@ -77,19 +160,21 @@ class DriverController extends Controller
         $profileDriver = Driver::find($user->profileDriver->id);
         $response = collect($user)->toArray();
         $listDocuments = $profileDriver->documents;
+
         $response['car'] = CarCategory::find($profileDriver->cartype_id);
-        $response['attachements']['identity'] = array_filter($listDocuments->toArray(), function ($event) {
-            if ($event['type'] === "4")
-            return $event;
-        });
-        $response['attachements']['car_photo'] = array_filter($listDocuments->toArray(), function ($event) {
-            if ($event['type'] === "5")
-                return $event;
-        });
-        $response['attachements']['licence'] = array_filter($listDocuments->toArray(), function ($event) {
-            if ($event['type'] === "6")
-                return $event;
-        });
+        $response['attachements']['identity'] = [];
+        $response['attachements']['car_photo'] = [];
+        $response['attachements']['licence'] = [];
+
+        foreach ($listDocuments as $document){
+            if ($document['type'] === "4")
+                array_push($response['attachements']['identity'],$document);
+            if ($document['type'] === "5")
+                array_push($response['attachements']['car_photo'],$document);
+            if ($document['type'] === "6")
+                array_push($response['attachements']['licence'],$document);
+        }
+
         $res->success($response);
         $res->message= trans('messages.user_details');
 
@@ -105,7 +190,6 @@ class DriverController extends Controller
             $driver = User::find(Auth::id())->profileDriver;
             $attachement = Document::find($response->response[0]->id);
             $driver->documents()->attach($attachement);
-
         }
         return response()->json($response,200);
     }
