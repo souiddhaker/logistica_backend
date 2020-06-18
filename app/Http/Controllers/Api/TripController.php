@@ -311,7 +311,7 @@ class TripController extends Controller
         $data = $request->all();
 
         $rate = new Rating();
-        $userDriver = Driver::where('user_id',$data['driver_id']);
+        $userDriver = Driver::where('user_id',$data['driver_id'])->first();
             if ($userDriver){
                 $rate->value = $data['value'];
                 $rate->comment = $data['additionalComment'];
