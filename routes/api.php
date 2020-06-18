@@ -123,7 +123,7 @@ Route::prefix('admin')->group(function(){
         Route::post('register', 'Api\AdminAuthController@register');
     });
 });
-
+Route::post('/test', 'Api\DriverController@test');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();

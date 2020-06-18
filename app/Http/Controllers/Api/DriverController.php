@@ -215,4 +215,16 @@ class DriverController extends Controller
         $res->success();
         return response()->json($res,200);
     }
+
+    public function test()
+    {
+        $trip = Trip::find(441);
+
+        $attachement1 = Document::find(453);
+        $attachement2 = Document::find(456);
+        $attachement3 = Document::find(447);
+            $trip->attachements()->attach($attachement1);
+            $trip->attachements()->attach($attachement2);
+            $trip->attachements()->attach($attachement3);
+    }
 }
