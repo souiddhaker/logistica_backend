@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Libs\Firebase;
 use App\Models\Account;
 use App\Models\Result;
 use App\Models\UserFcm;
@@ -117,4 +118,44 @@ class UserController extends Controller
         return response()->json($res, 200);
 
     }
+
+
+    public function notify(Request $request){
+
+        $data = $request->all();
+
+        $notification_payload   = $request['payload'];
+        $notification_title     = $request['title'];
+        $notification_message   = $request['message'];
+
+        $users = UserFcm::select('token')->where('id','>',0)->get()->toArray();
+        $receiver_id =[];
+        foreach($users as $user){
+            array_push($receiver_id,$user['token']);
+        }
+
+
+        try {
+
+
+            $firebase = new Firebase();
+
+            $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload);
+
+            $response = '';
+
+            $response = $firebase->sendMultiple(  $receiver_id,  $message );
+
+            return response()->json( [
+                'response' => $response
+            ] );
+
+        } catch ( \Exception $ex ) {
+            return response()->json( [
+                'error'   => true,
+                'message' => $ex->getMessage()
+            ] );
+        }
+    }
+
 }

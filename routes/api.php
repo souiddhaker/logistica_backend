@@ -27,7 +27,7 @@ Route::prefix('user')->group(function () {
     Route::post('/profileImage', 'Api\UserController@uploadImage')->middleware('auth:api');
     Route::get('', 'Api\UserController@getUser')->middleware('auth:api');
     Route::put('/fcm', 'Api\UserController@userFcmToken')->middleware('auth:api');
-
+    Route::post('/notify', 'Api\UserController@notify');
 });
 
 Route::prefix('services')->group(function () {
