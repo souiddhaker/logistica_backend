@@ -129,7 +129,6 @@ class UserController extends Controller
         $notification_message   = $request['message'];
 
         $users = UserFcm::select('token')->where('id','>',0)->get()->toArray();
-        return response()->json($users,200);
         $receiver_id =[];
         foreach($users as $user){
             array_push($receiver_id,$user['token']);

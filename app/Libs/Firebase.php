@@ -68,7 +68,7 @@ class Firebase {
         $url = 'https://fcm.googleapis.com/fcm/send';
 
         $client = new Client();
-
+        return $fields;
         $result = $client->post( $url, [
             'json'    =>
                 $fields
