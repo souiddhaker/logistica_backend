@@ -135,6 +135,7 @@ class DriverController extends Controller
 //            {
 //                $this->addAttachements($request->attachements);
 //            }
+
             $this->saveProfileDocuments($request,$driverProfile);
             $userController->createAccount($driver->id);
             $response->response[0]->user = $this->getProfile()->getData()->response[0];
@@ -164,26 +165,31 @@ class DriverController extends Controller
         $res = new Result();
 
         $user = User::find(Auth::id());
-        $profileDriver = Driver::find($user->profileDriver->id);
-        $response = collect($user)->toArray();
-        $listDocuments = $profileDriver->documents;
+       if($user){
+           $profileDriver = Driver::find($user->profileDriver->id);
+           $response = collect($user)->toArray();
+           $listDocuments = $profileDriver->documents;
 
-        $response['car'] = CarCategory::find($profileDriver->cartype_id);
-        $response['attachements']['identity'] = [];
-        $response['attachements']['car_photo'] = [];
-        $response['attachements']['licence'] = [];
+           $response['car'] = CarCategory::find($profileDriver->cartype_id);
+           $response['attachements']['identity'] = [];
+           $response['attachements']['car_photo'] = [];
+           $response['attachements']['licence'] = [];
 
-        foreach ($listDocuments as $document){
-            if ($document['type'] === "4")
-                array_push($response['attachements']['identity'],$document);
-            if ($document['type'] === "5")
-                array_push($response['attachements']['car_photo'],$document);
-            if ($document['type'] === "6")
-                array_push($response['attachements']['licence'],$document);
-        }
+           foreach ($listDocuments as $document){
+               if ($document['type'] === "4")
+                   array_push($response['attachements']['identity'],$document);
+               if ($document['type'] === "5")
+                   array_push($response['attachements']['car_photo'],$document);
+               if ($document['type'] === "6")
+                   array_push($response['attachements']['licence'],$document);
+           }
 
-        $res->success($response);
-        $res->message= trans('messages.user_details');
+           $res->success($response);
+           $res->message= trans('messages.user_details');
+       }else{
+           $res->fail('user not found');
+       }
+
 
         return response()->json($res,200);
     }
