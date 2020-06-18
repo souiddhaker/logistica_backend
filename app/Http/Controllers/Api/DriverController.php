@@ -226,5 +226,7 @@ class DriverController extends Controller
             $trip->attachements()->attach($attachement1);
             $trip->attachements()->attach($attachement2);
             $trip->attachements()->attach($attachement3);
+
+            return response()->json($trip->attachements,200);
     }
 }
