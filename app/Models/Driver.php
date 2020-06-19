@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Driver extends User
 {
+    use SoftDeletes;
+    protected $fillable = ['status','user_id','cartype_id'];
+    protected $hidden = ['created_at','updated_at','user_id'];
     //
     protected $table = 'drivers';
 

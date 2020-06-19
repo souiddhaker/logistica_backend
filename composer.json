@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5",
+        "ext-json": "*",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.5",
@@ -16,10 +17,11 @@
         "laravel/framework": "^7.0",
         "laravel/passport": "^9.0",
         "laravel/tinker": "^2.0",
+        "sentry/sentry-laravel": "1.8.0",
         "spatie/laravel-translatable": "^4.3",
         "stripe/stripe-php": "^7.32",
         "twilio/sdk": "^6.4",
-        "ext-json": "*"
+        "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.7",
@@ -57,6 +59,7 @@
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
+            "@php -v",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],

@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminRoles;
+use App\Models\CancelTrip;
+use App\Models\CarCategory;
+use App\Models\Notif;
+use App\Models\Promocode;
 use App\Models\Result;
+use App\Models\Settings;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,6 +19,7 @@ class AdminCrudController extends Controller
 
     public function __construct()
     {
+//            $this->middleware('auth:admin');
     }
 
     public function create(string $name, Request $request)
@@ -24,6 +31,12 @@ class AdminCrudController extends Controller
             case "admin":
             case "captain":
                 $res = User::createOne($request, $name);
+                break;
+            case "coupon":
+                $res = Promocode::createOne($request);
+                break;
+            case "carType":
+                $res = CarCategory::createOne($request);
                 break;
             default:
                 $res->fail("incorrect name");
@@ -44,6 +57,14 @@ class AdminCrudController extends Controller
                 User::destroy($id);
                 $res->success("deleted successfully");
                 break;
+            case "coupon":
+                Promocode::destroy($id);
+                $res->success("deleted successfully");
+                break;
+            case "carType":
+                CarCategory::destroy($id);
+                $res->success("deleted successfully");
+                break;
             default:
                 $res->fail("incorrect name");
         }
@@ -58,7 +79,22 @@ class AdminCrudController extends Controller
             case "client":
             case "admin":
             case "captain":
-                $res = User::updateOne($request,$id,$name);
+                $res = User::updateOne($request, $id, $name);
+                break;
+            case "coupon":
+                $res = Promocode::updateOne($request, $id);
+                break;
+            case "setting":
+                $res = Settings::updateOne($request);
+                break;
+            case "carType":
+                $res = CarCategory::updateOne($request, $id);
+                break;
+            case "claims":
+                $res = CancelTrip::updateOne($request, $id);
+                break;
+            case "tripTransaction":
+                $res = Trip::updateOneTransaction($request, $id);
                 break;
             default:
                 $res->fail("incorrect name");
@@ -73,13 +109,49 @@ class AdminCrudController extends Controller
         $res = new Result();
         switch ($name) {
             case "client":
-            case "admin":
-            case "captain":
                 $data = User::where('id', $id)->limit(1)->get();
+                $allTrips = Trip::where('user_id', $id);
+                $data['tripStats'] = [
+                    'finished' => $allTrips->where('status', [3, 2])->count('id'),
+                    'current' => $allTrips->where('status', [1])->count('id'),
+                ];
+                $res->success($data);
+                break;
+            case "captain":
+                $data = User::where('id', $id)->with(['profiledriver'])->limit(1)->get();
+                $allTrips = Trip::where('user_id', $id);
+                $data['tripStats'] = [
+                    'finished' => $allTrips->where('status', [3, 2])->count('id'),
+                    'current' => $allTrips->where('status', [1])->count('id'),
+                ];
+                $res->success($data);
+                break;
+            case "admin":
+                $data = User::where('id', $id)->limit(1)->get();
+                $dataRoles = AdminRoles::where('user_id', $id)->first()->get('roles');
+                if (count($dataRoles) > 0) {
+                    $data[0]['adminRoles'] = $dataRoles[0]['roles'];
+                }
                 $res->success($data);
                 break;
             case "trip":
-                $data = Trip::where('id', $id)->limit(1)->get();
+                $data = Trip::with(['driver', 'user', 'promocode'])->where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "coupon":
+                $data = Promocode::where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "setting":
+                $data = Settings::limit(1)->get();
+                $res->success($data);
+                break;
+            case "carType":
+                $data = CarCategory::where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "claims":
+                $data = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             default:
@@ -88,21 +160,109 @@ class AdminCrudController extends Controller
         $res = response()->json($res, 200);
         return $res;
     }
+    public function filterDate(&$detailFilter,$key){
+        $sql=[];
+        if(isset($detailFilter['d_start_at'])){
+            $sql[]="$key >= '".addslashes($detailFilter['d_start_at'])."'";
+        }
+        if(isset($detailFilter['d_end_at'])){
+            $sql[]="$key <= '".addslashes($detailFilter['d_end_at'])."'";
+        }
+        unset($detailFilter["d_start_at"]);
+        unset($detailFilter["d_end_at"]);
+        return $sql;
+    }
+    public function toQuery(&$detailFilter,$sql,$like=true,$applyOnly=[]){
+        foreach ($detailFilter as $key => $value) {
+            if((count($applyOnly)>0&&in_array($key,$applyOnly))
+            ||count($applyOnly)===0){
 
-    public function all(string $name)
+                $safeValue = addslashes($value);
+                if($like){
+                    $sql[] = "$key like '%$safeValue%'";
+                }else{
+                    $sql[] = "$key = '$safeValue'";
+                }
+                unset($detailFilter[$key]);
+            }
+        }
+        return $sql;
+    }
+    public function filter(Request $request, string $name)
+    {
+
+        $sql = [];
+        switch ($name) {
+            case "client":
+            case "admin":
+            case"captain":
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['firstName', 'lastName', 'phone', 'email']);
+                }, ARRAY_FILTER_USE_BOTH);
+                break;
+            case "trip":
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+                }, ARRAY_FILTER_USE_BOTH);
+                $sql = $this->toQuery($detailFilter,$sql,false,['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+                break;
+            case "couponCaptain":
+            case "couponClient":
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['id', 'status', 'd_start_at', 'd_end_at']);
+                }, ARRAY_FILTER_USE_BOTH);
+                $sql = $this->filterDate($detailFilter,"end_at");
+                $sql = $this->toQuery($detailFilter,$sql,false,["id","status"]);
+                break;
+            case "claims":
+
+                $detailFilter = array_filter($request->all(), function ($value, $key) {
+                    return $value && in_array($key, ['id', 'trip_id', 'by_user','status','d_start_at', 'd_end_at']);
+                }, ARRAY_FILTER_USE_BOTH);
+                $sql = $this->filterDate($detailFilter,"created_at");
+                $sql = $this->toQuery($detailFilter,$sql,false,['id', 'trip_id', 'by_user','status']);
+                break;
+            default:
+                $detailFilter = [];
+        }
+        $sql = $this->toQuery($detailFilter,$sql);
+        if (count($sql) === 0)
+            return '1=1';
+        return implode(" and ", $sql);
+    }
+
+    public function all(Request $request, string $name)
     {
 
         $res = new Result();
         $success = true;
         $list = [];
+        $detailFilters = $this->filter($request, $name);
         switch ($name) {
             case "client":
             case "admin":
+                $list = User::where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
+                break;
             case "captain":
-                $list = User::where('roles', json_encode([$name]))->paginate(10);
+                $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
                 break;
             case "trip":
-                $list = Trip::paginate(10);
+                $list = Trip::with(['driver', 'user'])->whereRaw($detailFilters)->paginate(10);
+                break;
+            case "couponCaptain":
+                $list = Promocode::where('type', 1)->whereRaw($detailFilters)->paginate(10);
+                break;
+            case "couponClient":
+                $list = Promocode::where('type', 0)->whereRaw($detailFilters)->paginate(10);
+                break;
+            case "notif":
+                $list = Notif::paginate(10);
+                break;
+            case "carType":
+                $list = CarCategory::paginate(10);
+                break;
+            case "claims":
+                $list = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->whereRaw($detailFilters)->paginate(10);
                 break;
             default:
                 $success = false;

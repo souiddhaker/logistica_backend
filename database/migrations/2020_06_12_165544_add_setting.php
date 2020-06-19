@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePromocodesTable extends Migration
+class AddSetting extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,15 @@ class CreatePromocodesTable extends Migration
      */
     public function up()
     {
-        Schema::create('promocodes', function (Blueprint $table) {
+        //
+        Schema::create('settings', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('code');
-            $table->float('pourcentage');
-            $table->string('status');
-            $table->timestamp('end_at');
-            $table->integer('nbr_uses')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->float('company_percent')->nullable();
+            $table->string('abort_percent_client')->nullable();
+            $table->string('abort_percent_captain')->nullable();
+            $table->string('percent_from')->nullable();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
-            $table->integer('type')->default(0);
-            $table->softDeletes();
         });
     }
 
@@ -34,6 +32,8 @@ class CreatePromocodesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('promocodes');
+        //
+
+        Schema::dropIfExists('settings');
     }
 }

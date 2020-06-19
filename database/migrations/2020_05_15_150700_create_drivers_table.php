@@ -15,6 +15,7 @@ class CreateDriversTable extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('status')->default(0);
             $table->integer('user_id')->unsigned();
             $table->unsignedInteger('cartype_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')
@@ -23,6 +24,7 @@ class CreateDriversTable extends Migration
                 ->onDelete('cascade');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->softDeletes();
         });
     }
 

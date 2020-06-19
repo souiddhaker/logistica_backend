@@ -1,0 +1,18 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - api
+
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to production
+        uses: appleboy/ssh-action@master
+        with:
+          username: dhaker
+          host: 51.91.255.126
+          password: '01131994'
+          script: 'cd /var/www/vhosts/vpsdev.wi-mobi.com/httpdocs && chmod 755 server_deploy.sh && ./server_deploy.sh'

@@ -36,6 +36,8 @@ class CreateTripsTable extends Migration
             $table->foreign('promocode_id')->references('id')->on('promocodes')->onDelete('restrict');
             $table->foreign('payment_method')->references('id')->on('cards')->onDelete('restrict');
 
+            $table->integer('transaction_status')->nullable();
+            $table->text('transaction_note')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
