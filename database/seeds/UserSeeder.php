@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AdminRoles;
+use App\Models\CancelTrip;
+use App\Models\Result;
 use Illuminate\Database\Seeder;
 use App\Models\Address;
 use App\Models\Trip;
@@ -52,6 +55,23 @@ class UserSeeder extends Seeder
 
         $subService = SubService::find(1);
         $trip1->subservices()->attach($subService);
+        return $trip1;
+    }
+    public function cancelTrip($data){
+
+
+        $trip = Trip::find($data['trip_id']);
+
+        if ($trip)
+        {
+            $cancelTrip = new CancelTrip();
+            $cancelTrip->raison = $data['raison'];
+            $cancelTrip->by_user = $data['canceledByUser'];
+            $trip->status = '3';
+            $trip->cancelTrip()->save($cancelTrip);
+            $trip->save();
+
+        }
 
     }
     /**
@@ -75,7 +95,9 @@ class UserSeeder extends Seeder
                 foreach (range(1, 15) as $i) {
                     $this->createTrip($user->id,$driver->id,"1");
                     $this->createTrip($user->id,$driver->id,"2");
-                    $this->createTrip($user->id,$driver->id,"3");
+                    $tripDetails= $this->createTrip($user->id,$driver->id,"2");
+                    $this->cancelTrip(['raison'=>'his didnt reach me in time','canceledByUser'=>true,'trip_id'=>$tripDetails['id']]);
+
                 }
                 Address::create([
                     'primaryName'=>'King Abdulaziz International Airport',
@@ -139,7 +161,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('logistica'),
                 'roles'=>json_encode(['captain'])
             ]);
-            User::create([
+            $admin=User::create([
                 'firstName' => 'admin firstName',
                 'lastName' => 'lastName',
                 'email' => 'admin@mail.com',
@@ -147,6 +169,14 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('logistica'),
                 'roles'=>json_encode(['admin'])
             ]);
+            AdminRoles::updateOne(["roles"=>[]],$admin['id']);
+            \App\Models\Settings::updateOne(
+                [
+                    'company_percent' => '15',
+                    'abort_percent_client' => '10',
+                    'abort_percent_captain' => '10',
+                    'percent_from' => '0'
+                ]);
         }
     }
 }

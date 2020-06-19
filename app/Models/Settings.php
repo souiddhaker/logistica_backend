@@ -24,9 +24,9 @@ class Settings extends Model
     ];
     protected $hidden = ['created_at','updated_at'];
 
-    static public function updateOne(Request $request):Result{
+    static public function updateOne(array $request):Result{
         $res = new Result();
-        $validator = Validator::make($request->all(),
+        $validator = Validator::make($request,
             [
                 'company_percent' => 'required',
                 'abort_percent_client' => 'required',

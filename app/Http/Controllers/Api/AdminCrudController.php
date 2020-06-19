@@ -85,7 +85,7 @@ class AdminCrudController extends Controller
                 $res = Promocode::updateOne($request, $id);
                 break;
             case "setting":
-                $res = Settings::updateOne($request);
+                $res = Settings::updateOne($request->all());
                 break;
             case "carType":
                 $res = CarCategory::updateOne($request, $id);
@@ -119,10 +119,13 @@ class AdminCrudController extends Controller
                 break;
             case "captain":
                 $data = User::where('id', $id)->with(['profiledriver'])->limit(1)->get();
-                $allTrips = Trip::where('user_id', $id);
                 $data['tripStats'] = [
-                    'finished' => $allTrips->where('status', [3, 2])->count('id'),
-                    'current' => $allTrips->where('status', [1])->count('id'),
+                    'finished' => Trip::where('driver_id', $id)->where('status', [3, 2])->count('id'),
+                    'current' => Trip::where('driver_id', $id)->where('status', [1])->count('id'),
+                ];
+                $data['payment']=[
+                    'got'=>Trip::where('driver_id', $id)->sum('total_price'),
+                    'notPayed'=>Trip::where('driver_id', $id)->where('payment_method','=',null)->sum('total_price'),
                 ];
                 $res->success($data);
                 break;
@@ -135,7 +138,7 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "trip":
-                $data = Trip::with(['driver', 'user', 'promocode'])->where('id', $id)->limit(1)->get();
+                $data = Trip::with(['driver', 'user', 'promocode','canceltrip'])->where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             case "coupon":
@@ -205,6 +208,7 @@ class AdminCrudController extends Controller
                     return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
                 }, ARRAY_FILTER_USE_BOTH);
                 $sql = $this->toQuery($detailFilter,$sql,false,['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+//                $sql[]="drivers.id = 3";
                 break;
             case "couponCaptain":
             case "couponClient":

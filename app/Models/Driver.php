@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Driver extends User
 {
     use SoftDeletes;
-    protected $fillable = ['status','user_id','cartype_id'];
+    protected $fillable = ['status','user_id','cartype_id','is_active'];
     protected $hidden = ['created_at','updated_at','user_id'];
     //
     protected $table = 'drivers';

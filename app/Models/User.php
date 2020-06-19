@@ -114,7 +114,7 @@ class User extends Authenticatable implements JWTSubject
             $roleData['roles']='required';
         }
         if($role === "captain"){
-            $roleData['status']='required';
+            $roleData['is_active']='required';
         }
         return Validator::make($request->all(),$roleData);
     }
@@ -137,10 +137,10 @@ class User extends Authenticatable implements JWTSubject
         $data['roles']=json_encode([$role]);
         $user = User::create(User::filterRequest($data));
         if($role=="captain"){
-            $user->profileDriver()->create(['status'=>$data['status']]);
+            $user->profileDriver()->create(["is_active"=>$data['is_active']]);
         }
         if($role==="admin"){
-            AdminRoles::updateOne($request,$user['id']);
+            AdminRoles::updateOne($request->all(),$user['id']);
         }
         $res->success([
             "user"=>$user
@@ -160,10 +160,10 @@ class User extends Authenticatable implements JWTSubject
         $data['roles']=json_encode([$role]);
         $idUser=User::where('id',$id)->update(User::filterRequest($data));
         if($role=="captain"){
-            Driver::updateOrCreate(['user_id'=>$id],['status'=>$data['status']]);
+            Driver::updateOrCreate(['user_id'=>$id],['is_active'=>$data['is_active']]);
         }
         if($role==="admin"){
-                AdminRoles::updateOne($request,$id);
+                AdminRoles::updateOne($request->all(),$id);
         }
         $res->success([
             "user"=>$idUser

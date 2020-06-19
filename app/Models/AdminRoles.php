@@ -27,10 +27,10 @@ class AdminRoles extends Model
         return $this->belongsTo(User::class);
     }
 
-    static public function updateOne(Request $request, int $id): Result
+    static public function updateOne(array $request, int $id): Result
     {
         $res = new Result();
-        $validator = Validator::make($request->all(),
+        $validator = Validator::make($request,
             [
                 'roles' => 'required'
             ]);
