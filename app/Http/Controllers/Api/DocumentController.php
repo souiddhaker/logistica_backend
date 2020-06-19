@@ -82,6 +82,7 @@ class DocumentController extends Controller
                     $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
                 }
                 str_replace("//","/",$image_path);
+                return response()->json($image_path,200);
 
                 unlink($image_path);
                 $res->success();
