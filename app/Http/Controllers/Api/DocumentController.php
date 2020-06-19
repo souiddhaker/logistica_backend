@@ -69,7 +69,7 @@ class DocumentController extends Controller
 
         $document = Document::find($id);
         $position  = stripos($document->path,'img/attachement/');
-        $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
+//        $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
         $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
 
 //                str_replace("//","/",$image_path);
@@ -78,7 +78,7 @@ class DocumentController extends Controller
         $res->success($image_path);
         $res->success(public_path('img/attachement/'));
         $res->success(substr($document->path,$position+16,strlen($document->path)));
-return response()->json($image_path,200);
+return response()->json($res,200);
 
 if ($document)
         {
