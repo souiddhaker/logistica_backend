@@ -182,7 +182,8 @@ class AuthController extends Controller
             'phone' => request('userPhone'),
             'password' => bcrypt("logistica")
         ]);
-
+        $user->addRole('captain');
+        $user->save();
         //Create User Credit account
         $userController = new UserController();
         $userController->createAccount($user->id);
