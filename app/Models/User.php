@@ -86,7 +86,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver'
+        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver','deleted_at'
     ];
 
     /**

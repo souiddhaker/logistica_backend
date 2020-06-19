@@ -169,12 +169,12 @@ class DriverController extends Controller
            $profileDriver = Driver::find($user->profileDriver->id);
            $response = collect($user)->toArray();
            $listDocuments = $profileDriver->documents;
+           $response['account'] = Account::where('user_id',$user->id)->first();
 
            $response['car'] = CarCategory::find($profileDriver->cartype_id);
            $response['attachements']['identity'] = [];
            $response['attachements']['car_photo'] = [];
            $response['attachements']['licence'] = [];
-
            foreach ($listDocuments as $document){
                if ($document['type'] === "4")
                    array_push($response['attachements']['identity'],$document);
