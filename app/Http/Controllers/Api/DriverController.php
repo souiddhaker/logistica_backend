@@ -13,6 +13,7 @@ use App\Models\Trip;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Validator;
 
 class DriverController extends Controller
 {
@@ -231,5 +232,34 @@ class DriverController extends Controller
         $res->success(Driver::all());
         return response()->json($res,200);
 
+    }
+
+    public function acceptTrip(Request $request)
+    {
+        $res = new Result();
+
+        $validator = Validator::make($request->all(),
+            [
+                'trip_id' => 'required'
+            ]);
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.trip_not_found'));
+            return response()->json($res, 200);
+        }
+
+        $trip = Trip::where('id',$request['trip_id'])
+            ->where('status',"=", "-1")->with('driver')->first();
+        if ($trip)
+        {
+//            $trip->status = "-1";
+//            $trip->driver_id = Auth::id();
+//            $trip->save();
+            $res->success($trip);
+        }else{
+            $res->fail('messages.trip_not_found');
+        }
+
+        return response()->json($res,200);
     }
 }

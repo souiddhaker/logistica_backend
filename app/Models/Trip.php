@@ -18,6 +18,8 @@ class Trip extends Model
 
     /**
      * Trip Status :
+     *
+     * -1 : not confirmed by user
      * 0 : not confirmed by driver
      * 1 : current
      * 2 : finished

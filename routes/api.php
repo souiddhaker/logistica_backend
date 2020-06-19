@@ -125,6 +125,8 @@ Route::prefix('admin')->group(function(){
     });
 });
 Route::post('/test', 'Api\DriverController@test');
+Route::post('/driver/trip/receipt', 'Api\DriverController@addReceipt');
+Route::post('/driver/trip/accept', 'Api\DriverController@acceptTrip')->middleware('auth:api');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
