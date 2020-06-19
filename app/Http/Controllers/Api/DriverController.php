@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Auth;
 
 class DriverController extends Controller
 {
-    //
     public function addAttachements(array $attachements)
     {
         $request = new Request();
@@ -125,17 +124,12 @@ class DriverController extends Controller
 
         if ($response->success){
             $driver = User::find($response->response[0]->user->id);
-            $driver->addRole('captain');
+            $driver->roles = json_encode(['captain']);
             $driver->save();
             $driverProfile = new Driver();
             $driverProfile->cartype_id = CarCategory::find($request->car_type)->id;
             $driver->profileDriver()->save($driverProfile);
             Auth::login($driver);
-//            if (isset($request->attachements))
-//            {
-//                $this->addAttachements($request->attachements);
-//            }
-
             $this->saveProfileDocuments($request,$driverProfile);
             $userController->createAccount($driver->id);
             $response->response[0]->user = $this->getProfile()->getData()->response[0];
@@ -229,4 +223,13 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
+
+    public function test()
+    {
+        $res = new Result();
+        $res->success(User::where('roles',"=", json_encode(['captain']))->get());
+        $res->success(Driver::all());
+        return response()->json($res,200);
+
+    }
 }
