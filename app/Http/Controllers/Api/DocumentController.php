@@ -70,7 +70,9 @@ class DocumentController extends Controller
         $document = Document::find($id);
         $position  = strpos($document->path,'img/attachement/',0);
         $image_path = public_path('img/attachement/').'/'.substr($document->path,$position+16,strlen($document->path));
-        $res->success($document, $position,$image_path);
+        $res->success($document);
+        $res->success($image_path);
+        $res->success($position);
         return response()->json($res,200);
 
         if ($document)
