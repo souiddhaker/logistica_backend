@@ -13,7 +13,6 @@ class AddSetting extends Migration
      */
     public function up()
     {
-        //
         Schema::create('settings', function (Blueprint $table) {
             $table->increments('id');
             $table->float('company_percent')->nullable();
@@ -32,7 +31,6 @@ class AddSetting extends Migration
      */
     public function down()
     {
-        //
 
         Schema::dropIfExists('settings');
     }

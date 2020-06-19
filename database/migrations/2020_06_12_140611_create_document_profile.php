@@ -32,6 +32,6 @@ class CreateDocumentProfile extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('document_profile');
+        Schema::dropIfExists('document_driver');
     }
 }

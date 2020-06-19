@@ -16,8 +16,6 @@ class AddRatingToTrip extends Migration
         Schema::table('trips', function (Blueprint $table) {
             $table->unsignedInteger('rating_id')->nullable();
             $table->foreign('rating_id')->references('id')->on('ratings');
-
-            //
         });
     }
 
@@ -28,8 +26,11 @@ class AddRatingToTrip extends Migration
      */
     public function down()
     {
-        Schema::table('trips', function (Blueprint $table) {
-            //
+
+        Schema::table('trips', function(Blueprint $table){
+
+            $table->dropForeign('trips_rating_id_foreign');
+
             $table->dropColumn('rating_id');
 
         });

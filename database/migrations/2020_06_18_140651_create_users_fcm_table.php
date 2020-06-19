@@ -31,6 +31,14 @@ class CreateUsersFcmTable extends Migration
      */
     public function down()
     {
+        Schema::table('users_fcm', function(Blueprint $table){
+
+            $table->dropForeign('users_fcm_user_id_foreign');
+            $table->dropColumn('user_id');
+
+        });
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Schema::dropIfExists('users_fcm');
+
     }
 }
