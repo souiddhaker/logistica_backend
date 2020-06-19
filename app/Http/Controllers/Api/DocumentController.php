@@ -68,7 +68,18 @@ class DocumentController extends Controller
         $res  = new Result();
 
         $document = Document::find($id);
-        if ($document)
+        $position  = stripos($document->path,'img/attachement/');
+        $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
+        $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
+
+//                str_replace("//","/",$image_path);
+        $res->success($document);
+        $res->success($position);
+        $res->success($image_path);
+        $res->success(public_path('img/attachement/'));
+return response()->json($image_path,200);
+
+if ($document)
         {
             try {
                 $user = User::find(Auth::id());
