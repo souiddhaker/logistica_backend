@@ -12,7 +12,7 @@ class Address extends Model
      * 1 : Pickup trip
      * 2 : Destination trip
      * 3 : favorite
-     *
+     * 4 : position driver
      */
 
 

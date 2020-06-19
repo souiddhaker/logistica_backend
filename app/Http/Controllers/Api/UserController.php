@@ -120,18 +120,22 @@ class UserController extends Controller
     }
 
 
-    public function notify(Request $request){
-
-        $data = $request->all();
+    public function notify(Request $request)
+    {
 
         $notification_payload   = $request['payload'];
         $notification_title     = $request['title'];
         $notification_message   = $request['message'];
-
-        $users = UserFcm::select('token')->where('id','>',0)->get()->toArray();
         $receiver_id =[];
-        foreach($users as $user){
-            array_push($receiver_id,$user['token']);
+
+        if (isset($request['user_id']))
+            $receiver_id = [UserFcm::where('user_id',$request['user_id'])->first()];
+        else
+        {
+            $users = UserFcm::select('token')->where('id','>',0)->get()->toArray();
+            foreach($users as $user){
+                array_push($receiver_id,$user['token']);
+            }
         }
 
 

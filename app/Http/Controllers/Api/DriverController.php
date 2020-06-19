@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\Address;
 use App\Models\CarCategory;
 use App\Models\Document;
 use App\Models\Driver;
@@ -220,7 +221,8 @@ class DriverController extends Controller
         $user->update($request->only(['firstName', 'lastName']));
         $driver->cartype_id = CarCategory::find($request->car_type)->id;
         $driver->save();
-        $res->success();
+        $res->response = [$this->getProfile()->getData()->response[0]];
+        $res->success = true;
         return response()->json($res,200);
     }
 
@@ -234,7 +236,7 @@ class DriverController extends Controller
 
     }
 
-    public function acceptTrip(Request $request)
+    public function acceptTripFromDriver(Request $request)
     {
         $res = new Result();
 
@@ -249,17 +251,93 @@ class DriverController extends Controller
         }
 
         $trip = Trip::where('id',$request['trip_id'])
-            ->where('status',"=", "-1")->with('driver')->first();
+            ->where('status',"=", "0")->first();
+
         if ($trip)
         {
-//            $trip->status = "-1";
-//            $trip->driver_id = Auth::id();
-//            $trip->save();
-            $res->success($trip);
+            $trip->candidates()->attach(User::find( Auth::id()));
+            $trip->save();
+            $res->success($trip->candidates);
         }else{
-            $res->fail('messages.trip_not_found');
+            $res->fail(trans('messages.trip_not_found'));
         }
 
         return response()->json($res,200);
     }
+
+    public function confirmTripFromUser(Request $request)
+    {
+        $res = new Result();
+
+        $validator = Validator::make($request->all(),
+            [
+                'trip_id' => 'required',
+                'driver_id' => 'required',
+                'accept' => 'required'
+            ]);
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.trip_not_found'));
+            return response()->json($res, 200);
+        }
+
+        $trip = Trip::where('id',$request['trip_id'])->with('driver')->first();
+        $driver = User::find($request['driver_id']);
+        if ($trip and $driver)
+        {
+            if ($request['accept'])
+            {
+                $trip->status = "1";
+                $trip->driver_id = $driver->id;
+                $trip->save();
+            }
+            else{
+                $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
+            }
+            $res->success($trip);
+        }else{
+            $res->fail(trans('messages.trip_not_found'));
+        }
+
+        return response()->json($res,200);
+    }
+
+    public function updatePosition(Request $request)
+    {
+        $res = new Result();
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+        $validator = Validator::make($request->all(),
+            [
+                'primaryName' => 'string|nullable',
+                'secondaryName' => 'string|nullable',
+                'longitude' => 'double|nullable',
+                'lattitude' => 'double|nullable',
+                'place_id' => 'required',
+            ]);
+
+        if ($validator->fails()) {
+            $res->fail(trans('messages.address_exists'));
+            return response()->json($res, 400);
+        }
+
+        $driverposition  = Address::where('user_id', Auth::id())->where('type', '=', '4')->first();
+
+        if ($driverposition)
+            $driverposition->update($data);
+        else
+            $driverposition = Address::create($data);
+
+        $res ->success($driverposition);
+        return response()->json($res,200);
+    }
+
+    public function getListDriverForTrip()
+    {
+        $res = new Result();
+
+        return response()->json($res, 200);
+    }
+
+
 }

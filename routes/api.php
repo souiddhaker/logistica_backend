@@ -126,7 +126,10 @@ Route::prefix('admin')->group(function(){
 });
 Route::post('/test', 'Api\DriverController@test');
 Route::post('/driver/trip/receipt', 'Api\DriverController@addReceipt');
-Route::post('/driver/trip/accept', 'Api\DriverController@acceptTrip')->middleware('auth:api');
+Route::post('/driver/trip/accept', 'Api\DriverController@acceptTripFromDriver')->middleware('auth:api');
+Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser')->middleware('auth:api');
+Route::post('/user/trip/refuse', 'Api\DriverController@refuseDriverFromUser')->middleware('auth:api');
+Route::post('/driver/updateposition', 'Api\DriverController@updatePosition');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
