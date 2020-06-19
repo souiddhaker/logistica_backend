@@ -75,16 +75,13 @@ class DocumentController extends Controller
 
                 if ($user->getRoles() === json_encode(['captain']))
                 {
-                    $position  = strpos($document->path,'img/profile/',0);
-//                    $image_path = public_path('img/profile/').substr($document->path,$position+12,strlen($document->path));
-                    $image_path = $document->path;
+                    $position  = strripos($document->path,'img/profile/');
+                    $image_path = public_path('img/profile/').substr($document->path,$position+12,strlen($document->path));
                 }else{
-                    $position  = strpos($document->path,'img/attachement/',0);
-//                    $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
-                    $image_path = $document->path;
-
+                    $position  = strripos($document->path,'img/attachement/');
+                    $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
                 }
-                str_replace("//","/",$image_path);
+//                str_replace("//","/",$image_path);
 //                return response()->json($image_path,200);
 
                 unlink($image_path);
