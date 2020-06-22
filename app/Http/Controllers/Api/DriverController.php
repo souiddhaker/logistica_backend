@@ -221,11 +221,16 @@ class DriverController extends Controller
         $res = new Result();
         $user = Auth::user();
         $driver = Driver::where('user_id', Auth::id())->first();
-        $user->update($request->only(['firstName', 'lastName']));
-        $driver->cartype_id = CarCategory::find($request->car_type)->id;
-        $driver->save();
-        $res->response = [$this->getProfile()->getData()->response[0]];
-        $res->success = true;
+        if ($driver){
+            $user->update($request->only(['firstName', 'lastName']));
+            $driver->cartype_id = CarCategory::find($request->car_type)->id;
+            $driver->save();
+            $res->response = [$this->getProfile()->getData()->response[0]];
+            $res->success = true;
+        }else{
+            $res->fail('driver not found');
+        }
+
         return response()->json($res,200);
     }
 
@@ -363,9 +368,9 @@ class DriverController extends Controller
 
         }
         $listDriverFiltered = collect($listDriverFiltered);
-        $listDriverFiltered->sortBy('position')->sortBy('average_rating');
-        $res->success($listDriverFiltered);
-        return response()->json($listDriverFiltered, 200);
+       $list =  $listDriverFiltered->sortBy('position');
+        $res->success($list);
+        return response()->json($res, 200);
     }
 
 
