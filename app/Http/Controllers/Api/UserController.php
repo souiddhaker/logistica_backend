@@ -126,8 +126,11 @@ class UserController extends Controller
         $notification_title     = $request['title'];
         $notification_message   = $request['message'];
         $receiver_id =[];
-
-        $receiver_id = [UserFcm::where('user_id',$request['user_id'])->first()];
+//        return [UserFcm::where('user_id',$request['user_id'])->first()];
+        $users = [UserFcm::where('user_id',$request['user_id'])->first()];
+        foreach ($users as $user){
+            array_push($receiver_id,$user['token']);
+        }
 //        return $receiver_id;
 //        if (isset($request['user_id'])){
 //

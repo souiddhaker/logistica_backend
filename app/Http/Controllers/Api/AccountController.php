@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
-use App\Models\Promocode;
 use App\Models\Result;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
 {
-    //
 
     public function addCredit(Request $request)
     {

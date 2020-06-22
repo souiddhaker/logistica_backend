@@ -54,11 +54,11 @@ class TripController extends Controller
 
         $res = new Result();
         $listTrips  = [];
-        $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())
+        $currentTrip = Trip::select('id','pickup_at','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())
             ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $finishedTrip = Trip::select('id','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())
+        $finishedTrip = Trip::select('id','pickup_at','total_price','driver_id')->where('status','=','2')->where('user_id',Auth::id())
             ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $canceledTrip = Trip::select('id','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())
+        $canceledTrip = Trip::select('id','pickup_at','total_price','driver_id')->where('status','=','3')->where('user_id',Auth::id())
             ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
         $listTrips['current'] = $currentTrip['data'];
@@ -77,13 +77,13 @@ class TripController extends Controller
         $page = $request->input('page', 1);
         switch ($key) {
             case "0":
-                $trips = Trip::select('id','total_price','user_id','created_at')->where('status', '=', '0')
+                $trips = Trip::select('id','pickup_at','total_price','user_id','created_at')->where('status', '=', '0')
                     ->with('user','addresses')->orderBy('updated_at', 'desc')
                     ->paginate(10)
                     ->toArray();
                 break;
             default:
-                $trips = Trip::select('id','total_price','driver_id')->where('status', '=', $key)->where('user_id',Auth::id())
+                $trips = Trip::select('id','pickup_at','total_price','driver_id')->where('status', '=', $key)->where('user_id',Auth::id())
                     ->orWhere('driver_id',Auth::id())->with('driver','addresses')->orderBy('updated_at', 'desc')
                     ->paginate(10)
                     ->toArray();
