@@ -78,6 +78,20 @@ class Notif extends Model
     static public function getTokens($user_id)
     {
         try {
+            $role=null;
+            if(intval($user_id)===0){
+                $role='client';
+            }
+            if(intval($user_id)===-1){
+                $role='captain';
+            }
+            if($role){
+                $user=User::where('roles',json_encode([$role]))->whereHas('fcmUser')->with(['fcmUser'])->get()->all();
+                $user=array_map(function ($u){
+                    return $u->fcmUser->token;
+                },$user);
+                return  $user;
+            }
             return [UserFcm::where("user_id", $user_id)->first()["token"]];
         } catch (\Exception $ex) {
             return [];

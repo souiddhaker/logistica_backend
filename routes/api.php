@@ -118,9 +118,6 @@ Route::prefix('admin')->group(function(){
 
     Route::prefix('auth')->group(function(){
         Route::post('login', 'Api\AdminAuthController@login');
-        Route::post('logout', 'Api\AuthController@logout');
-        Route::post('refresh', 'Api\AuthController@refresh');
-        Route::post('me', 'Api\UserController@getUser');
     });
 });
 Route::post('/test', 'Api\DriverController@getListDriverForTrip');
