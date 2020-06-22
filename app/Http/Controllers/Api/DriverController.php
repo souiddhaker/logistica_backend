@@ -365,14 +365,14 @@ class DriverController extends Controller
                 $pickupAddress['lattitude'],$pickupAddress['longitude'],
                 $driverposition->lattitude,$driverposition->longitude);
             $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
-            $this->notifyDriver($driver->user_id);
+            return response()->json($this->notifyDriver($driver->user_id));
             array_push($listDriverFiltered,$modelDriver);
 
         }
         $listDriverFiltered = collect($listDriverFiltered);
        $list =  $listDriverFiltered->sortBy('position');
         $res->success($list);
-        return response()->json($res, 200);
+        return response()->json($listDriver, 200);
     }
 
 
