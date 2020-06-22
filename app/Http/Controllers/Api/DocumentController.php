@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Result;
 use App\Models\Trip;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -19,8 +20,6 @@ class DocumentController extends Controller
 
     public function store(Request $request)
     {
-//        return response()->json($res, 200);
-
         $res = new Result();
         $validator = Validator::make($request->all(),
             [
@@ -69,18 +68,30 @@ class DocumentController extends Controller
         $res  = new Result();
 
         $document = Document::find($id);
+
         if ($document)
         {
             try {
-                $position  = strpos($document->path,'img/attachement/',0);
-                $image_path = public_path('img/attachement/').'/'.substr($document->path,$position+16,strlen($document->path));
-                unlink($image_path);
+                $user = User::find(Auth::id());
+
+//                if ($user->getRoles() === json_encode(['captain']))
+//                {
+//                    $position  = stripos($document->path,'img/profile/');
+//                    $image_path = public_path('img/profile/').substr($document->path,$position+12,strlen($document->path));
+//                }else{
+//                    $position  = stripos($document->path,'img/attachement/');
+//                    $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
+//                }
+////                str_replace("//","/",$image_path);
+//                return response()->json($image_path,200);
+//
+//                unlink($image_path);
                 $res->success();
+                $document->delete();
             }catch (\ErrorException $e){
                 $res->fail(trans('messages.document_remove_fail'));
 
             }
-            $document->delete();
         }else{
             $res->fail(trans('messages.document_not_found'));
         }

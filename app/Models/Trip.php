@@ -18,6 +18,8 @@ class Trip extends Model
 
     /**
      * Trip Status :
+     *
+     * -1 : not confirmed by user
      * 0 : not confirmed by driver
      * 1 : current
      * 2 : finished
@@ -47,7 +49,7 @@ class Trip extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements'
+        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements' ,'rating_id'
     ];
     public static function updateOneTransaction($request,$id){
         $res = new Result();
@@ -110,6 +112,16 @@ class Trip extends Model
     public function type_car()
     {
         return $this->belongsTo(CarCategory::class);
+    }
+
+    public function rating()
+    {
+        return $this->hasOne(Rating::class);
+    }
+
+    public function candidates()
+    {
+        return $this->belongsToMany(User::class);
     }
 
 }

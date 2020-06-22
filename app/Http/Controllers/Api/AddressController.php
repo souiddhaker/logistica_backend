@@ -45,6 +45,8 @@ class AddressController extends Controller
         $address = new Address();
         $address->primaryName = $input['primaryName'];
         $address->secondaryName = $input['secondaryName'];
+        $address->longitude = $input['longitude'];
+        $address->lattitude = $input['lattitude'];
         $address->place_id = $input['place_id'];
         $address->type = "3";
 

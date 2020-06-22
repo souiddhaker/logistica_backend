@@ -23,7 +23,7 @@ class Result
             if (array_key_exists(0, $data)) {
                 $this->response = $data;
             } else if (count($data) == 0) {
-                $this->response = null;
+                $this->response = [];
             } else {
                 $this->response = [$data];
             }

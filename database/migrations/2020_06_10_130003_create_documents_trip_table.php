@@ -32,6 +32,6 @@ class CreateDocumentsTripTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('documents_trip');
+        Schema::dropIfExists('document_trip');
     }
 }

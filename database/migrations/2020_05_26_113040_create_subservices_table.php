@@ -54,14 +54,15 @@ class CreateSubservicesTable extends Migration
      */
     public function down()
     {
-        Schema::disableForeignKeyConstraints();
+
         Schema::table('subservices', function(Blueprint $table){
-            $table->dropForeign(['service_id_foreign']);
+            $table->dropForeign(['service_id']);
+            $table->dropColumn('service_id');
+
         });
 
         Schema::dropIfExists('subservices');
-        Schema::dropIfExists('services');
-
-        Schema::dropIfExists('categories_services');
+        Schema::dropIfExists('sub_service_trip');
+        Schema::dropIfExists('service_trip');
     }
 }

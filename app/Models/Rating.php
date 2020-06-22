@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Rating extends Model
 {
     //
+
+
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->timestamp;

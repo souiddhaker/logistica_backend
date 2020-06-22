@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddSetting extends Migration
+class CreateUsersFcmTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,14 @@ class AddSetting extends Migration
      */
     public function up()
     {
-        Schema::create('settings', function (Blueprint $table) {
+        Schema::create('users_fcm', function (Blueprint $table) {
             $table->increments('id');
-            $table->float('company_percent')->nullable();
-            $table->string('abort_percent_client')->nullable();
-            $table->string('abort_percent_captain')->nullable();
-            $table->string('percent_from')->nullable();
+            $table->string('token');
+            $table->unsignedInteger('user_id');
+
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
@@ -31,7 +31,14 @@ class AddSetting extends Migration
      */
     public function down()
     {
+        Schema::table('users_fcm', function(Blueprint $table){
 
-        Schema::dropIfExists('settings');
+            $table->dropForeign('users_fcm_user_id_foreign');
+            $table->dropColumn('user_id');
+
+        });
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Schema::dropIfExists('users_fcm');
+
     }
 }

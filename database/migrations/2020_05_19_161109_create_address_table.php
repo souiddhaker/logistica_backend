@@ -49,6 +49,16 @@ class CreateAddressTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('address_trip');
+
+        Schema::table('address', function(Blueprint $table){
+
+            $table->dropForeign('address_user_id_foreign');
+            $table->dropColumn('user_id');
+
+        });
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::dropIfExists('address');
     }
 }

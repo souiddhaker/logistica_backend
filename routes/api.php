@@ -26,7 +26,8 @@ Route::prefix('user')->group(function () {
     Route::put('', 'Api\UserController@update')->middleware('auth:api');
     Route::post('/profileImage', 'Api\UserController@uploadImage')->middleware('auth:api');
     Route::get('', 'Api\UserController@getUser')->middleware('auth:api');
-
+    Route::put('/fcm', 'Api\UserController@userFcmToken')->middleware('auth:api');
+    Route::post('/notify', 'Api\UserController@notify');
 });
 
 Route::prefix('services')->group(function () {
@@ -65,12 +66,11 @@ Route::prefix('driver')->group(function(){
         Route::post('/login','Api\DriverController@register');
     });
     Route::prefix('trip')->group(function(){
-        Route::get('/list','Api\TripController@listTrips');
-        Route::post('/login','Api\DriverController@register');
+        Route::get('/list','Api\TripController@listTrips')->middleware('auth:api');
         Route::get('/search', 'Api\TripController@search')->middleware('auth:api');
     });
     Route::prefix('profile')->group(function(){
-        Route::put('/update','Api\UserController@update')->middleware('auth:api');;
+        Route::put('/update','Api\DriverController@updateDriver')->middleware('auth:api');;
         Route::get('','Api\DriverController@getProfile')->middleware('auth:api');;
     });
     Route::prefix('document')->group(function(){
@@ -124,7 +124,12 @@ Route::prefix('admin')->group(function(){
         Route::post('register', 'Api\AdminAuthController@register');
     });
 });
-
+Route::post('/test', 'Api\DriverController@getListDriverForTrip');
+Route::post('/driver/trip/receipt', 'Api\DriverController@addReceipt');
+Route::post('/driver/trip/accept', 'Api\DriverController@acceptTripFromDriver')->middleware('auth:api');
+Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser')->middleware('auth:api');
+Route::post('/user/trip/refuse', 'Api\DriverController@refuseDriverFromUser')->middleware('auth:api');
+Route::post('/driver/updateposition', 'Api\DriverController@updatePosition');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();

@@ -52,8 +52,24 @@ class CreateTripsTable extends Migration
      */
     public function down()
     {
+        Schema::table('trips', function(Blueprint $table){
+
+            $table->dropForeign('trips_user_id_foreign');
+            $table->dropForeign('trips_driver_id_foreign');
+            $table->dropForeign('trips_type_car_id_foreign');
+            $table->dropForeign('trips_promocode_id_foreign');
+            $table->dropForeign('trips_payment_method_foreign');
+
+            $table->dropColumn('user_id');
+            $table->dropColumn('driver_id');
+            $table->dropColumn('type_car_id');
+            $table->dropColumn('promocode_id');
+            $table->dropColumn('payment_method');
+
+        });
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::dropIfExists('trips');
-        Schema::dropIfExists('address_trip');
 
     }
 }

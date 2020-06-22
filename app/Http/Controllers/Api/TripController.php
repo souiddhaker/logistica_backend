@@ -8,7 +8,6 @@ use App\Models\CarCategory;
 use App\Models\Card;
 use App\Models\Document;
 use App\Models\Driver;
-use App\Models\Promocode;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\SubService;
@@ -18,7 +17,6 @@ use App\Models\Result;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Node\Expr\Cast\Object_;
 use Validator;
 class TripController extends Controller
 {
@@ -51,18 +49,9 @@ class TripController extends Controller
         return response()->json($res,200);
     }
 
-    public function tripDataFromArray(array $data)
-    {
-        $arrayModel = [];
-        foreach ($data as $elem)
-        {
-            array_push($arrayModel,$this->getById($elem['id']));
-        }
-        return $arrayModel;
-    }
-
     public function listTrips()
     {
+
         $res = new Result();
         $listTrips  = [];
         $currentTrip = Trip::select('id','total_price','driver_id')->where('status','=','1')->where('user_id',Auth::id())
@@ -124,16 +113,12 @@ class TripController extends Controller
         $data = $request->all();
         $trip = new Trip();
         $trip->save();
-
         // status 0 not confirmed by driver
         $trip->status = '0';
         $trip->total_price = $data['total_price'];
         $trip->nbr_luggage = $data['nbr_luggage'];
         $trip->driver_note = $data['note_driver'];
         $trip->route = $data['route'];
-
-//        $trip->payment_method = $data['payment_method'];
-
         $type_car = CarCategory::find($data['type_car_id']);
 
         if($type_car){
@@ -224,45 +209,9 @@ class TripController extends Controller
         //TODO : create trip with addresses
     }
 
-    public function getById(int $id)
+    public function tripAttachements(array $attachementsCollection)
     {
-        $trip = Trip::where('id',$id)->with('driver','addresses','type_car','cancelTrip')->first();
-        if ($trip)
-        {
-            $services=[];
-            $subservicesCollection = collect($trip->subservices)->toArray();
 
-            foreach($trip->services as $service){
-                $serviceModel = $service;
-
-                $id = $service->id;
-                $serviceModel['sub_services']= array_filter($subservicesCollection, function ($event) use ($id) {
-                    return $event['service_id'] === $id;
-                });
-
-                array_push($services,$serviceModel);
-
-            }
-        $addresses = [];
-
-        foreach ($trip->addresses as $address){
-            $tripAddress = Address::find($address->id);
-            if ($tripAddress->type == '1'){
-                $addresses['pickup'] = $tripAddress;
-            }
-
-            if ($tripAddress->type == '2'){
-                $addresses['destination'] = $tripAddress;
-            }
-        }
-
-
-        $trip->services = $services;
-
-        $trip->payement_method = "Cash payment";
-
-        $trip->rating = Rating::where('user_id',Auth::id())->first();
-        $attachementsCollection = collect($trip->attachements)->toArray();
         $documents = [];
         $documents['attachements']=[];
         $documents['reservation_hotel']=null;
@@ -278,17 +227,43 @@ class TripController extends Controller
                     break;
             }
         }
-        return array_merge($trip->toArray(),$documents);
+        return $documents;
+    }
 
+    public function listServicesWithSubServices(Trip $trip)
+    {
+
+        $services=[];
+        $subservicesCollection = collect($trip->subservices)->toArray();
+
+        foreach($trip->services as $service){
+            $serviceModel = $service;
+
+            $id = $service->id;
+            $serviceModel['sub_services']= array_filter($subservicesCollection, function ($event) use ($id) {
+                return $event['service_id'] === $id;
+            });
+            array_push($services,$serviceModel);
+        }
+        return $services;
+    }
+
+
+    public function getById(int $id)
+    {
+        $trip = Trip::where('id',$id)->with('driver','addresses','type_car','cancelTrip')->first();
+        if ($trip)
+        {
+            $trip->services = $this->listServicesWithSubServices($trip);
+            $trip->payement_method = "Cash payment";
+            $trip->rating = Rating::find($trip->rating_id);
+            $attachementsCollection = collect($trip->attachements)->toArray();
+            return array_merge($trip->toArray(),$this->tripAttachements($attachementsCollection));
         }else
             return null;
-
     }
 
-    public function tripAttachements(array $attachementsCollection)
-    {
-        return $attachementsCollection;
-    }
+
 
     public function getTrip(int $id)
     {
@@ -299,7 +274,6 @@ class TripController extends Controller
         else
             $res->fail(trans('message.trip_not_found'));
         return response()->json($res,200);
-
     }
 
     public function cancelTrip(Request $request)
@@ -337,18 +311,22 @@ class TripController extends Controller
         $data = $request->all();
 
         $rate = new Rating();
-        $userDriver = Driver::where('user_id',$data['driver_id']);
-            if ($userDriver){
-                $rate->value = $data['value'];
-                $rate->comment = $data['additionalComment'];
-                $rate->user_id = Auth::id();
-                $userDriver->ratings()->save($rate);
-                $rate['driver_id'] = $data['driver_id'];
-                $res->success($rate);
+        $trip = Trip::find($data['trip_id']);
+        if ($trip)
+        {
 
-            }else{
-                $res->fail('Trip not found');
-            }
+            $rate->value = $data['value'];
+            $rate->comment = $data['additionalComment'];
+            $rate->user_id = Auth::id();
+            $userDriver = Driver::where('user_id',$trip->driver_id)->first();
+            $userDriver->ratings()->save($rate);
+            $trip->rating_id = $rate->id;
+            $trip->save();
+            $res->success($rate);
+
+        }else{
+            $res->fail('Trip not found');
+        }
         return response()->json($res,200);
     }
 

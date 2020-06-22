@@ -85,7 +85,15 @@ class AuthController extends Controller
             if ($user) {
                 $input['email'] = $user->email;
                 $response = $this->issueToken($input, 'password');
-                $response['user'] = $user;
+                if ($user->getRoles() === json_encode(['captain']))
+                {
+                    Auth::login($user);
+                    $driverController = new DriverController();
+                    $response['user'] = $driverController->getProfile()->getData()->response[0];
+
+                }
+                else
+                    $response['user'] = $user;
                 $response['isAlreadyUser'] = true;
 
             }else {
@@ -167,7 +175,6 @@ class AuthController extends Controller
                 return response()->json($res, 200);
             }
         }
-
         $user = User::create([
             'firstName' => request('firstName'),
             'lastName' => request('lastName'),
@@ -175,6 +182,12 @@ class AuthController extends Controller
             'phone' => request('userPhone'),
             'password' => bcrypt("logistica")
         ]);
+        $user->addRole('captain');
+        $user->save();
+        //Create User Credit account
+        $userController = new UserController();
+        $userController->createAccount($user->id);
+
         $result = $this->issueToken($input, 'password');
         $result['user'] = $user;
         $result['isAlreadyUser'] = false;

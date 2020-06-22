@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Eloquent;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Spatie\Translatable\HasTranslations;
 
@@ -27,7 +26,7 @@ class CarCategory extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at'
+        'created_at', 'updated_at', 'price_100', 'price_101','price_1', 'type','deleted_at'
     ];
 
     static public function updateOne(Request $request, int $id): Result
