@@ -33,32 +33,4 @@ class AdminAuthController extends Controller
 
     }
 
-    public function register(Request $request)
-    {
-
-        $request->validate([
-            'firstName' => 'required|string',
-            'lastName' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string'
-        ]);
-        $input = $request->all();
-        $user = new User([
-            'firstName' => $request->firstName,
-            'lastName' => $request->lastName,
-            'email' => $request->email,
-            'phone' => $request->userPhone,
-            'password' => bcrypt($request->password),
-        ]);
-        $user->save();
-
-        $user->addRole('admin');
-        $user->save();
-        $input['isAdmin'] = true;
-        $result = $this->issueToken($input, 'password');
-        return response()->json([
-            'message' => $result
-        ], 201);
-    }
-
 }

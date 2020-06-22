@@ -42,7 +42,7 @@ trait IssueTokenTrait{
 
             return $result;
         }catch(BadResponseException $ex){
-            return null;
+            return $ex->getMessage();
         }
     }
 
