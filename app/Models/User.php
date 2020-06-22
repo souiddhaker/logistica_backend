@@ -31,6 +31,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Card::class);
     }
 
+
     /**
      * Get the promocodes for user.
      */
@@ -69,6 +70,10 @@ class User extends Authenticatable implements JWTSubject
     public function profileDriver()
     {
         return $this->hasOne(Driver::class);
+    }
+
+    public function fcmUser(){
+        return $this->hasOne(UserFcm::class);
     }
 
     /**

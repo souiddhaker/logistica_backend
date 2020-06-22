@@ -38,6 +38,9 @@ class AdminCrudController extends Controller
             case "carType":
                 $res = CarCategory::createOne($request);
                 break;
+            case "notif":
+                $res = Notif::createOne($request->all());
+                break;
             default:
                 $res->fail("incorrect name");
 
@@ -123,9 +126,9 @@ class AdminCrudController extends Controller
                     'finished' => Trip::where('driver_id', $id)->where('status', [3, 2])->count('id'),
                     'current' => Trip::where('driver_id', $id)->where('status', [1])->count('id'),
                 ];
-                $data['payment']=[
-                    'got'=>Trip::where('driver_id', $id)->sum('total_price'),
-                    'notPayed'=>Trip::where('driver_id', $id)->where('payment_method','=',null)->sum('total_price'),
+                $data['payment'] = [
+                    'got' => Trip::where('driver_id', $id)->sum('total_price'),
+                    'notPayed' => Trip::where('driver_id', $id)->where('payment_method', '=', null)->sum('total_price'),
                 ];
                 $res->success($data);
                 break;
@@ -138,7 +141,7 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "trip":
-                $data = Trip::with(['driver', 'user', 'promocode','canceltrip'])->where('id', $id)->limit(1)->get();
+                $data = Trip::with(['driver', 'user', 'promocode', 'canceltrip'])->where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             case "coupon":
@@ -163,27 +166,31 @@ class AdminCrudController extends Controller
         $res = response()->json($res, 200);
         return $res;
     }
-    public function filterDate(&$detailFilter,$key){
-        $sql=[];
-        if(isset($detailFilter['d_start_at'])){
-            $sql[]="$key >= '".addslashes($detailFilter['d_start_at'])."'";
+
+    public function filterDate(&$detailFilter, $key)
+    {
+        $sql = [];
+        if (isset($detailFilter['d_start_at'])) {
+            $sql[] = "$key >= '" . addslashes($detailFilter['d_start_at']) . "'";
         }
-        if(isset($detailFilter['d_end_at'])){
-            $sql[]="$key <= '".addslashes($detailFilter['d_end_at'])."'";
+        if (isset($detailFilter['d_end_at'])) {
+            $sql[] = "$key <= '" . addslashes($detailFilter['d_end_at']) . "'";
         }
         unset($detailFilter["d_start_at"]);
         unset($detailFilter["d_end_at"]);
         return $sql;
     }
-    public function toQuery(&$detailFilter,$sql,$like=true,$applyOnly=[]){
+
+    public function toQuery(&$detailFilter, $sql, $like = true, $applyOnly = [])
+    {
         foreach ($detailFilter as $key => $value) {
-            if((count($applyOnly)>0&&in_array($key,$applyOnly))
-            ||count($applyOnly)===0){
+            if ((count($applyOnly) > 0 && in_array($key, $applyOnly))
+                || count($applyOnly) === 0) {
 
                 $safeValue = addslashes($value);
-                if($like){
+                if ($like) {
                     $sql[] = "$key like '%$safeValue%'";
-                }else{
+                } else {
                     $sql[] = "$key = '$safeValue'";
                 }
                 unset($detailFilter[$key]);
@@ -191,6 +198,7 @@ class AdminCrudController extends Controller
         }
         return $sql;
     }
+
     public function filter(Request $request, string $name)
     {
 
@@ -207,34 +215,32 @@ class AdminCrudController extends Controller
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
                     return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
                 }, ARRAY_FILTER_USE_BOTH);
-                $sql = $this->toQuery($detailFilter,$sql,false,['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
-//                $sql[]="drivers.id = 3";
+                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
                 break;
             case "couponCaptain":
             case "couponClient":
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
                     return $value && in_array($key, ['id', 'status', 'd_start_at', 'd_end_at']);
                 }, ARRAY_FILTER_USE_BOTH);
-                $sql = $this->filterDate($detailFilter,"end_at");
-                $sql = $this->toQuery($detailFilter,$sql,false,["id","status"]);
+                $sql = $this->filterDate($detailFilter, "end_at");
+                $sql = $this->toQuery($detailFilter, $sql, false, ["id", "status"]);
                 break;
             case "claims":
 
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
-                    return $value && in_array($key, ['id', 'trip_id', 'by_user','status','d_start_at', 'd_end_at']);
+                    return $value!==null && in_array($key, ['id', 'trip_id', 'by_user', 'status', 'd_start_at', 'd_end_at']);
                 }, ARRAY_FILTER_USE_BOTH);
-                $sql = $this->filterDate($detailFilter,"created_at");
-                $sql = $this->toQuery($detailFilter,$sql,false,['id', 'trip_id', 'by_user','status']);
+                $sql = $this->filterDate($detailFilter, "created_at");
+                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'trip_id', 'by_user', 'status']);
                 break;
             default:
                 $detailFilter = [];
         }
-        $sql = $this->toQuery($detailFilter,$sql);
+        $sql = $this->toQuery($detailFilter, $sql);
         if (count($sql) === 0)
             return '1=1';
         return implode(" and ", $sql);
     }
-
     public function all(Request $request, string $name)
     {
 
@@ -245,13 +251,23 @@ class AdminCrudController extends Controller
         switch ($name) {
             case "client":
             case "admin":
-                $list = User::where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
+                $list = User::where("roles", json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
                 break;
             case "captain":
                 $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
                 break;
             case "trip":
-                $list = Trip::with(['driver', 'user'])->whereRaw($detailFilters)->paginate(10);
+                $list = Trip::whereHas('driver', function ($query) use ($request) {
+                    if ($request->get("d_user_fname")) {
+                        $userName= $request->get("d_user_fname");
+                        $query->where("firstName", 'like', "%$userName%");
+                    }
+                })->whereHas('user', function ($query) use ($request) {
+                    if ($request->get("c_user_fname")) {
+                        $userName= $request->get("c_user_fname");
+                        $query->where("firstName", 'like', "%$userName%");
+                    }
+                })->with(['user','driver'])->whereRaw($detailFilters)->paginate(10);
                 break;
             case "couponCaptain":
                 $list = Promocode::where('type', 1)->whereRaw($detailFilters)->paginate(10);
