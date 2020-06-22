@@ -12,6 +12,7 @@ class AdminAuthController extends Controller
 {
     use IssueTokenTrait;
 
+
     public function __construct()
     {
         $this->client = \Laravel\Passport\Client::where('password_client', 1)->first();
