@@ -210,7 +210,7 @@ class DriverController extends Controller
         $listRatings = Rating::select('ratings.*','users.firstName', 'users.lastName', 'users.image_url')
             ->where('ratings.driver_id','=',$user->profileDriver->id)
             ->join('users', 'ratings.user_id', '=', 'users.id')
-            ->paginate(2);
+            ->paginate(50);
         $res->success($listRatings);
         return response()->json($res,200);
     }
@@ -358,6 +358,7 @@ class DriverController extends Controller
                 $pickupAddress['lattitude'],$pickupAddress['longitude'],
                 $driverposition->lattitude,$driverposition->longitude);
             $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
+            $this->notifyDriver($driver->user_id);
             array_push($listDriverFiltered,$modelDriver);
 
         }
@@ -389,5 +390,16 @@ class DriverController extends Controller
         return $angle * $earthRadius;
     }
 
+    public function notifyDriver(int $id)
+    {
 
+        $userController = new UserController();
+        $request = new Request();
+        $request['user_id'] = $id;
+        $request['payload'] = "";
+        $request['title'] = "notif";
+        $request['message'] =  "notif message";
+        $notify = $userController->notify($request);
+        return $notify;
+    }
 }
