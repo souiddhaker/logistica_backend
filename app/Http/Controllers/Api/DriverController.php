@@ -207,7 +207,10 @@ class DriverController extends Controller
     {
         $res = new Result();
         $user = User::find(Auth::id());
-        $listRatings = Rating::where('driver_id','=',$user->profileDriver->id)->paginate(2);
+        $listRatings = Rating::select('ratings.*','users.firstName', 'users.lastName', 'users.image_url')
+            ->where('ratings.driver_id','=',$user->profileDriver->id)
+            ->join('users', 'ratings.user_id', '=', 'users.id')
+            ->paginate(2);
         $res->success($listRatings);
         return response()->json($res,200);
     }
@@ -332,11 +335,58 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function getListDriverForTrip()
+    public function getListDriverForTrip(Request $request)
     {
         $res = new Result();
 
-        return response()->json($res, 200);
+        $trip = Trip::find($request['trip_id']);
+        $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
+           return $address['type'] === "1";
+        })[0];
+
+        $listDriver  = User::with('profileDriver')
+            ->join('address', 'address.user_id', '=', 'users.id')
+            ->join('drivers', 'drivers.user_id', '=', 'users.id')
+            ->where('address.type' , '=', '4')
+            ->where('users.roles',"=", json_encode(['captain']))->where('drivers.status', '=', '0')->get();
+        $listDriverFiltered= [];
+        foreach ($listDriver as $driver){
+            $driverposition  = Address::where('user_id', $driver->user_id)->where('type', '=', '4')->first();
+            $modelDriver = $driver;
+            $modelDriver['addressPickup'] = $driverposition;
+            $modelDriver['position'] = $this->haversineGreatCircleDistance(
+                $pickupAddress['lattitude'],$pickupAddress['longitude'],
+                $driverposition->lattitude,$driverposition->longitude);
+            $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
+            array_push($listDriverFiltered,$modelDriver);
+
+        }
+        $listDriverFiltered = collect($listDriverFiltered);
+        $listDriverFiltered->sortBy('position')->sortBy('average_rating');
+        $res->success($listDriverFiltered);
+        return response()->json($listDriverFiltered, 200);
+    }
+
+
+    public function getDriverRating(int $id)
+    {
+        return Rating::where('driver_id', '=', $id)->avg('value') ? null : 0;
+    }
+    function haversineGreatCircleDistance(
+        $latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
+    {
+        // convert from degrees to radians
+        $latFrom = deg2rad($latitudeFrom);
+        $lonFrom = deg2rad($longitudeFrom);
+        $latTo = deg2rad($latitudeTo);
+        $lonTo = deg2rad($longitudeTo);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+                cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        return $angle * $earthRadius;
     }
 
 

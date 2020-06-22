@@ -124,7 +124,7 @@ Route::prefix('admin')->group(function(){
         Route::post('register', 'Api\AdminAuthController@register');
     });
 });
-Route::post('/test', 'Api\DriverController@test');
+Route::post('/test', 'Api\DriverController@getListDriverForTrip');
 Route::post('/driver/trip/receipt', 'Api\DriverController@addReceipt');
 Route::post('/driver/trip/accept', 'Api\DriverController@acceptTripFromDriver')->middleware('auth:api');
 Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser')->middleware('auth:api');

@@ -130,8 +130,13 @@ class UserController extends Controller
 
         if (isset($request['user_id']))
             $receiver_id = [UserFcm::where('user_id',$request['user_id'])->first()];
-        else
+        else if (isset($request['drivers']))
         {
+            foreach ($request['drivers'] as $driver){
+                $userFcm = UserFcm::where('user_id','=',$driver)->first();
+                array_push($receiver_id,$userFcm['token']);
+            }
+        }else{
             $users = UserFcm::select('token')->where('id','>',0)->get()->toArray();
             foreach($users as $user){
                 array_push($receiver_id,$user['token']);
