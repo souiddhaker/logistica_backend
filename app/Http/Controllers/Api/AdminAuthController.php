@@ -24,8 +24,10 @@ class AdminAuthController extends Controller
 
         if ($user && $user->getRoles() === json_encode(['admin']))
         {
-            $response = $this->issueToken($credentials, 'admin');
-            return response()->json($response, 401);
+            $credentials['isAdmin'] = true;
+
+            $response = $this->issueToken($credentials, 'password');
+            return response()->json($response, 200);
 
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
