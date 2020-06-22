@@ -223,6 +223,8 @@ class DriverController extends Controller
         $driver = Driver::where('user_id', Auth::id())->first();
         if ($driver){
             $user->update($request->only(['firstName', 'lastName']));
+
+            if (isset($request['car_type']))
             $driver->cartype_id = CarCategory::find($request->car_type)->id;
             $driver->save();
             $res->response = [$this->getProfile()->getData()->response[0]];
