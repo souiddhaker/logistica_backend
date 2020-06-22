@@ -291,7 +291,7 @@ class DriverController extends Controller
             return response()->json($res, 200);
         }
 
-        $trip = Trip::where('id',$request['trip_id'])->with('driver')->first();
+        $trip = Trip::where('id',$request['trip_id'])->first();
         $driver = User::find($request['driver_id']);
         if ($trip and $driver)
         {
@@ -300,9 +300,11 @@ class DriverController extends Controller
                 $trip->status = "1";
                 $trip->driver_id = $driver->id;
                 $trip->save();
+                $trip['driver'] = $driver;
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
+                $trip['driver'] = null;
             }
             $res->success($trip);
         }else{
@@ -365,14 +367,18 @@ class DriverController extends Controller
                 $pickupAddress['lattitude'],$pickupAddress['longitude'],
                 $driverposition->lattitude,$driverposition->longitude);
             $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
-            return response()->json($this->notifyDriver($driver->user_id));
             array_push($listDriverFiltered,$modelDriver);
 
         }
         $listDriverFiltered = collect($listDriverFiltered);
-       $list =  $listDriverFiltered->sortBy('position');
+
+       $list =  $listDriverFiltered->sortBy('position')->take(2);
+       foreach ($list as $driverToNotify){
+
+           $this->notifyDriver($driverToNotify->user_id);
+       }
         $res->success($list);
-        return response()->json($listDriver, 200);
+        return response()->json($list, 200);
     }
 
 

@@ -70,20 +70,20 @@ Route::prefix('driver')->group(function(){
         Route::get('/search', 'Api\TripController@search')->middleware('auth:api');
     });
     Route::prefix('profile')->group(function(){
-        Route::put('/update','Api\DriverController@updateDriver')->middleware('auth:api');;
-        Route::get('','Api\DriverController@getProfile')->middleware('auth:api');;
+        Route::put('/update','Api\DriverController@updateDriver')->middleware('auth:api');
+        Route::get('','Api\DriverController@getProfile')->middleware('auth:api');
     });
     Route::prefix('document')->group(function(){
-        Route::post('/upload','Api\DriverController@profileDocument')->middleware('auth:api');;
+        Route::post('/upload','Api\DriverController@profileDocument')->middleware('auth:api');
         Route::delete('/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
     });
     Route::prefix('reviews')->group(function(){
-        Route::get('/','Api\DriverController@reviews')->middleware('auth:api');;
+        Route::get('/','Api\DriverController@reviews')->middleware('auth:api');
     });
 
     Route::prefix('account')->group(function(){
-        Route::post('/addcredit','Api\AccountController@addCredit')->middleware('auth:api');;
-        Route::get('/','Api\AccountController@getCredit')->middleware('auth:api');;
+        Route::post('/addcredit','Api\AccountController@addCredit')->middleware('auth:api');
+        Route::get('/','Api\AccountController@getCredit')->middleware('auth:api');
     });
 
 });
@@ -127,7 +127,7 @@ Route::post('/test', 'Api\DriverController@getListDriverForTrip');
 Route::post('/driver/trip/receipt', 'Api\DriverController@addReceipt');
 Route::post('/driver/trip/accept', 'Api\DriverController@acceptTripFromDriver')->middleware('auth:api');
 Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser')->middleware('auth:api');
-Route::post('/user/trip/refuse', 'Api\DriverController@refuseDriverFromUser')->middleware('auth:api');
+//Route::post('/user/trip/refuse', 'Api\DriverController@refuseDriverFromUser')->middleware('auth:api');
 Route::post('/driver/updateposition', 'Api\DriverController@updatePosition');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
