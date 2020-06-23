@@ -138,6 +138,10 @@ Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFrom
 Route::post('/driver/updateposition', 'Api\DriverController@updatePosition');
 Route::post('/veriffffff/{id}', 'Api\Usercontroller@createAccount');
 
+Route::prefix('help')->group(function(){
+    Route::get('/list', 'Api\HelpController@getAllQuestions')->middleware('auth:api');
+});
+
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
 });
