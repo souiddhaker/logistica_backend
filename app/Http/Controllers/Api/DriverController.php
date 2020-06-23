@@ -210,7 +210,7 @@ class DriverController extends Controller
         $listRatings = Rating::select('ratings.*','users.firstName', 'users.lastName', 'users.image_url')
             ->where('ratings.driver_id','=',$user->profileDriver->id)
             ->join('users', 'ratings.user_id', '=', 'users.id')
-            ->paginate(5);
+            ->paginate(10);
         $res->success($listRatings);
         return response()->json($res,200);
     }

@@ -22,8 +22,7 @@ class NotifController extends Controller
             ->paginate(10)
             ->toArray();
 
-        $res->response = $notifs;
-        $res->success = true;
+        $res->success($notifs);
         return response()->json($res,200);
     }
 
