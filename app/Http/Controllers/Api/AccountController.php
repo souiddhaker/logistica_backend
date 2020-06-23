@@ -17,13 +17,14 @@ class AccountController extends Controller
         $res = new Result();
         $user = User::find(Auth::id());
         $account = Account::where('user_id',Auth::id())->first();
-        $balance = $account->balance + $request->credit;
+        $balance = $account->balance + $request->balance;
         if (isset($request->coupon) or $request->coupon === "")
         {
             $requestVerif = new Request();
             $requestVerif['promocode'] = $request->coupon;
             $promocodeController = new PromocodeController();
-            $isActif = $promocodeController->verify($requestVerif)->getData();
+            $promocodeController->verify($requestVerif)->getData();
+            $isActif = $this->verifyPromocode($request->coupon);
             if (!$isActif->success)
                 return response()->json($isActif,200);
             else
@@ -31,7 +32,7 @@ class AccountController extends Controller
                 if ($promocodeController->usePromocode($isActif->response[0]->id))
                 {
                     if ($user->getRoles() === json_encode(['captain']))
-                        $balance = (($isActif->response[0]->pourcentage * $request->credit)/100) + $balance;
+                        $balance = (($isActif->response[0]->pourcentage * $request->balance)/100) + $balance;
                     else
                         $balance = $isActif->response[0]->pourcentage + $balance;
                 }else{
