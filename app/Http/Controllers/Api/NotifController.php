@@ -18,7 +18,9 @@ class NotifController extends Controller
 
         $userId = Auth::id();
 
-        $notifs = Notif::where('user_id', '=', $userId)->get();
+        $notifs = Notif::where('user_id', '=', $userId)
+            ->paginate(10)
+            ->toArray();
 
         $res->response = $notifs;
         $res->success = true;
