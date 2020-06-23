@@ -6,7 +6,7 @@ use App\Models\Trip;
 use App\Models\Address;
 use App\Models\Service;
 use App\Models\SubService;
-
+use App\Models\Notif;
 class OneUserSeeder extends Seeder
 {
 
@@ -53,6 +53,28 @@ class OneUserSeeder extends Seeder
         $trip1->subservices()->attach($subService);
 
     }
+
+    public function createNotif(int $id)
+    {
+        Notif::create(['title'=>['en'=>'Your booking #1205 has been can...','ar'=>'دعوة الأصدقاء - احصل على 3 كوبونات لكل منهم!'],
+            'type'=>['en'=>'System','ar'=>'النظام'],
+            'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
+            'description' => ['en'=>'details','ar'=>'تفاصيل'],
+            'user_id' => $id
+        ]);
+        Notif::create(['title'=>['en'=>'Your booking #1205 has been can...','ar'=>'دعوة الأصدقاء - احصل على 3 كوبونات لكل منهم!'],
+            'type'=>['en'=>'System','ar'=>'النظام'],
+            'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
+            'description' => ['en'=>'details','ar'=>'تفاصيل'],
+            'user_id' => $id
+        ]);
+        Notif::create(['title'=>['en'=>'Invite friends - Get 3 coupons each!','ar'=>'دعوة الأصدقاء - احصل على 3 كوبونات لكل منهم!'],
+            'type'=>['en'=>'Promotion','ar'=>'النظام'],
+            'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
+            'description' => ['en'=>'details','ar'=>'تفاصيل'],
+            'user_id' => $id
+        ]);
+    }
     /**
      * Run the database seeds.
      *
@@ -63,9 +85,10 @@ class OneUserSeeder extends Seeder
         $user = User::find(5);
         $driver = User::find(2);
         foreach (range(1, 15) as $i) {
-            $this->createTrip($user->id,$driver->id,"1");
-            $this->createTrip($user->id,$driver->id,"2");
-            $this->createTrip($user->id,$driver->id,"3");
+//            $this->createTrip($user->id,$driver->id,"1");
+//            $this->createTrip($user->id,$driver->id,"2");
+//            $this->createTrip($user->id,$driver->id,"3");
+            $this->createNotif($driver->id);
         }
     }
 }
