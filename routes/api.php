@@ -91,6 +91,9 @@ Route::prefix('driver')->group(function(){
         Route::post('/addcredit','Api\AccountController@addCredit')->middleware('auth:api');
         Route::get('/','Api\AccountController@getCredit')->middleware('auth:api');
     });
+    Route::prefix('payment')->group(function(){
+        Route::get('/resume','Api\PaymentController@resume')->middleware('auth:api');
+    });
 
 });
 Route::get('/listcar','Api\ServiceController@listCar');
