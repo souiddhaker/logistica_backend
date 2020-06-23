@@ -2,6 +2,11 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Trip;
+use App\Models\Address;
+use App\Models\Service;
+use App\Models\SubService;
+
 class OneUserSeeder extends Seeder
 {
 
