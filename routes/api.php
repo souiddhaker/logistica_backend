@@ -76,6 +76,7 @@ Route::prefix('driver')->group(function(){
     Route::prefix('document')->group(function(){
         Route::post('/upload','Api\DriverController@profileDocument')->middleware('auth:api');
         Route::delete('/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
+        Route::put('/update', 'Api\DocumentController@updateDocument')->middleware('auth:api');
     });
     Route::prefix('reviews')->group(function(){
         Route::get('/','Api\DriverController@reviews')->middleware('auth:api');
@@ -130,6 +131,7 @@ Route::post('/driver/trip/accept', 'Api\DriverController@acceptTripFromDriver')-
 Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser')->middleware('auth:api');
 //Route::post('/user/trip/refuse', 'Api\DriverController@refuseDriverFromUser')->middleware('auth:api');
 Route::post('/driver/updateposition', 'Api\DriverController@updatePosition');
+Route::post('/veriffffff/{id}', 'Api\Usercontroller@createAccount');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
