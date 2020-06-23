@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\Validator;
  */
 class Trip extends Model
 {
-    //
-
     /**
      * Trip Status :
      *
@@ -49,7 +47,7 @@ class Trip extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements' ,'rating_id'
+        'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements' ,'rating_id'
     ];
     public static function updateOneTransaction($request,$id){
         $res = new Result();
