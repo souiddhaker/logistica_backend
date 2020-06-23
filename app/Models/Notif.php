@@ -5,6 +5,7 @@ namespace App\Models;
 use Eloquent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Post
@@ -13,7 +14,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Notif extends Model
 {
-    //
+    use HasTranslations;
+
+    public $translatable = ['title', 'type' , 'description'];
+
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->timestamp;
