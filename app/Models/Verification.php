@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Verification extends Model
 {
+    protected $guarded = [];
+
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->timestamp;

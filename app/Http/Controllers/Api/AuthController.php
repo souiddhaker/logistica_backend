@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
 use App\Models\User;
-
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,29 +23,21 @@ class AuthController extends Controller
         $this->client = \Laravel\Passport\Client::where('password_client', 1)->first();
     }
 
-    public function verify(Request $request){
+    public function verify(Request $request)
+    {
         $res  = new Result();
 
-        $validator = Validator::make($request->all(),
-            [
-                'userPhone' => 'required|min:6'
-            ]);
+        $validator = Validator::make($request->all(), ['userPhone' => 'required|min:6']);
         if ($validator->fails()) {
             $res->fail(trans('messages.user_phone_invalid'));
             return response()->json($res, 200);
         }
         $phone = $request['userPhone'];
 
-        $verifCode = mt_rand(1000, 9999);
+        $verifyCode = mt_rand(1000, 9999);
 
-        $verification = new Verification();
-
-        $verification->verification_code = $verifCode;
-        $verification->phone = $phone;
-        $verification->code_expiry_minute =15;
-        $verification->save();
-
-
+        Verification::create(['verification_code'=> $verifyCode,
+            'phone'=>$phone, 'code_expiry_minute'=>15]);
         $res->success([]);
         $res->message =trans('messages.verif_code_send');
         return response()->json($res, 200);
@@ -182,7 +173,7 @@ class AuthController extends Controller
             'phone' => request('userPhone'),
             'password' => bcrypt("logistica")
         ]);
-        $user->addRole('captain');
+        $user->addRole('client');
         $user->save();
         //Create User Credit account
         $userController = new UserController();

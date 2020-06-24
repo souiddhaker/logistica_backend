@@ -88,6 +88,8 @@ class PaymentController extends Controller
         $response['cash'] = $this->countAmount($listTripCash->toArray());
 
         $response['payment'] = $this->countAmount($listOnLine->toArray());
+        $response['payment']['claim'] = 0;
+        $response['payment']['debt'] = 0;
         $res->success($response);
         return response()->json($res,200);
     }
