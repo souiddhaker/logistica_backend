@@ -21,102 +21,103 @@ Route::prefix('auth')->group(function () {
     Route::post('logout', 'Api\AuthController@logout')->middleware('auth:api');
 
 });
-
-Route::prefix('user')->group(function () {
-    Route::put('', 'Api\UserController@update')->middleware('auth:api');
-    Route::post('/profileImage', 'Api\UserController@uploadImage')->middleware('auth:api');
-    Route::get('', 'Api\UserController@getUser')->middleware('auth:api');
-    Route::put('/fcm', 'Api\UserController@userFcmToken')->middleware('auth:api');
-    Route::post('/notify', 'Api\UserController@notify');
-});
-
-Route::prefix('services')->group(function () {
-    Route::post('/car_categories', 'Api\ServiceController@getListCarCategories')->middleware('auth:api');
-    Route::post('/list_services', 'Api\ServiceController@getListServices')->middleware('auth:api');
-});
-
-
-Route::prefix('promocode')->group(function () {
-    Route::post('/verify', 'Api\PromocodeController@verify')->middleware('auth:api');
-});
-
-
-Route::prefix('payment')->group(function () {
-    Route::post('/add_card', 'Api\PaymentController@addCard')->middleware('auth:api');
-    Route::get('/get_cards', 'Api\PaymentController@getCardsByUser')->middleware('auth:api');
-
-});
-
-Route::prefix('address')->group(function () {
-    Route::get('/list', 'Api\AddressController@getAllFavoritesAddress')->middleware('auth:api');
-    Route::delete('/remove/{id}', 'Api\AddressController@remove')->middleware('auth:api');
-    Route::post('/add', 'Api\AddressController@store')->middleware('auth:api');
-
-
-});
-
-Route::prefix('notifs')->group(function () {
-    Route::get('/list', 'Api\NotifController@getAllNotifs')->middleware('auth:api');
-    Route::get('/{id}', 'Api\NotifController@getDetails')->middleware('auth:api');
-
-});
-Route::prefix('driver')->group(function(){
-    Route::prefix('auth')->group(function(){
-        Route::post('/register','Api\DriverController@register');
-        Route::post('/login','Api\DriverController@register');
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::prefix('user')->group(function () {
+        Route::put('', 'Api\UserController@update');
+        Route::post('/profileImage', 'Api\UserController@uploadImage');
+        Route::get('', 'Api\UserController@getUser');
+        Route::put('/fcm', 'Api\UserController@userFcmToken');
+        Route::post('/notify', 'Api\UserController@notify');
     });
-    Route::prefix('trip')->group(function(){
-        Route::get('/list','Api\TripController@listTrips')->middleware('auth:api');
-        Route::get('/search', 'Api\TripController@search')->middleware('auth:api');
+    Route::prefix('services')->group(function () {
+        Route::post('/car_categories', 'Api\ServiceController@getListCarCategories');
+        Route::post('/list_services', 'Api\ServiceController@getListServices');
     });
-    Route::prefix('profile')->group(function(){
-        Route::put('/update','Api\DriverController@updateDriver')->middleware('auth:api');
-        Route::get('','Api\DriverController@getProfile')->middleware('auth:api');
+    Route::prefix('promocode')->group(function () {
+        Route::post('/verify', 'Api\PromocodeController@verify');
+    });
+    Route::prefix('payment')->group(function () {
+        Route::post('/add_card', 'Api\PaymentController@addCard');
+        Route::get('/get_cards', 'Api\PaymentController@getCardsByUser');
+
+    });
+    Route::prefix('address')->group(function () {
+        Route::get('/list', 'Api\AddressController@getAllFavoritesAddress');
+        Route::delete('/remove/{id}', 'Api\AddressController@remove');
+        Route::post('/add', 'Api\AddressController@store');
+    });
+    Route::prefix('notifs')->group(function () {
+        Route::get('/list', 'Api\NotifController@getAllNotifs');
+        Route::get('/{id}', 'Api\NotifController@getDetails');
+
     });
     Route::prefix('document')->group(function(){
-        Route::post('/upload','Api\DriverController@profileDocument')->middleware('auth:api');
-        Route::delete('/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
-        Route::put('/update', 'Api\DocumentController@updateDocument')->middleware('auth:api');
+        Route::post('/upload', 'Api\DocumentController@store');
+        Route::delete('/{id}', 'Api\DocumentController@remove');
+    });
+    Route::prefix('trip')->group(function(){
+        Route::get('/list', 'Api\TripController@listTrips');
+        Route::get('/search', 'Api\TripController@search');
+
+        Route::get('/{id}', 'Api\TripController@getTrip');
+
+        Route::post('/changeStatus', 'Api\TripController@changeStatus');
+        Route::post('/create', 'Api\TripController@createTrip');
+        Route::post('/cancel', 'Api\TripController@cancelTrip');
+        Route::get('/document/{id}', 'Api\DocumentController@getAttachement');
+        Route::post('/note', 'Api\TripController@noteDriver');
+        Route::post('/rate', 'Api\TripController@rateTrip');
+        Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser');
+
+    });
+});
+
+Route::prefix('/driver/auth')->group(function(){
+    Route::post('/register','Api\DriverController@register');
+    Route::post('/login','Api\DriverController@register');
+});
+Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
+
+    Route::prefix('trip')->group(function(){
+        Route::get('/list','Api\TripController@listTrips');
+        Route::get('/search', 'Api\TripController@search');
+        Route::post('/accept', 'Api\DriverController@acceptTripFromDriver');
+
+    });
+    Route::prefix('profile')->group(function(){
+        Route::put('/update','Api\DriverController@updateDriver');
+        Route::get('','Api\DriverController@getProfile');
+    });
+    Route::prefix('document')->group(function(){
+        Route::post('/upload','Api\DriverController@profileDocument');
+        Route::delete('/{id}', 'Api\DocumentController@remove');
+        Route::put('/update', 'Api\DocumentController@updateDocument');
     });
     Route::prefix('reviews')->group(function(){
-        Route::get('/','Api\DriverController@reviews')->middleware('auth:api');
+        Route::get('/','Api\DriverController@reviews');
     });
 
     Route::prefix('notifs')->group(function(){
-        Route::get('/list', 'Api\NotifController@getAllNotifs')->middleware('auth:api');
-        Route::get('/{id}', 'Api\NotifController@getDetails')->middleware('auth:api');
+        Route::get('/list', 'Api\NotifController@getAllNotifs');
+        Route::get('/{id}', 'Api\NotifController@getDetails');
     });
 
     Route::prefix('account')->group(function(){
-        Route::post('/addcredit','Api\AccountController@addCredit')->middleware('auth:api');
-        Route::get('/','Api\AccountController@getCredit')->middleware('auth:api');
+        Route::post('/addcredit','Api\AccountController@addCredit');
+        Route::get('/','Api\AccountController@getCredit');
     });
     Route::prefix('payment')->group(function(){
-        Route::get('/resume','Api\PaymentController@resume')->middleware('auth:api');
+        Route::get('/resume','Api\PaymentController@resume');
+    });
+    Route::post('/updateposition', 'Api\DriverController@updatePosition');
+    Route::post('/receipt', 'Api\TripController@uploadReceipt');
+
+    Route::prefix('help')->group(function(){
+        Route::get('/list', 'Api\HelpController@getAllQuestions');
     });
 
 });
 Route::get('/listcar','Api\ServiceController@listCar');
-
-Route::prefix('document')->group(function(){
-    Route::post('/upload', 'Api\DocumentController@store')->middleware('auth:api');
-    Route::delete('/{id}', 'Api\DocumentController@remove')->middleware('auth:api');
-});
-
-Route::prefix('trip')->group(function () {
-    Route::get('/list', 'Api\TripController@listTrips')->middleware('auth:api');
-    Route::get('/search', 'Api\TripController@search')->middleware('auth:api');
-
-    Route::get('/{id}', 'Api\TripController@getTrip')->middleware('auth:api');
-
-    Route::post('/changeStatus', 'Api\TripController@changeStatus')->middleware('auth:api');
-    Route::post('/create', 'Api\TripController@createTrip')->middleware('auth:api');
-    Route::post('/cancel', 'Api\TripController@cancelTrip')->middleware('auth:api');
-    Route::get('/document/{id}', 'Api\DocumentController@getAttachement')->middleware('auth:api');
-    Route::post('/note', 'Api\TripController@noteDriver')->middleware('auth:api');
-    Route::post('/rate', 'Api\TripController@rateTrip')->middleware('auth:api');
-    Route::post('/receipt', 'Api\TripController@uploadReceipt')->middleware('auth:api');
-});
 
 Route::prefix('admin')->group(function(){
     Route::post('/create/{name}','Api\AdminCrudController@create');
@@ -134,16 +135,6 @@ Route::prefix('admin')->group(function(){
     });
 });
 Route::post('/test', 'Api\DriverController@getListDriverForTrip');
-Route::post('/driver/trip/receipt', 'Api\DriverController@addReceipt');
-Route::post('/driver/trip/accept', 'Api\DriverController@acceptTripFromDriver')->middleware('auth:api');
-Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser')->middleware('auth:api');
-//Route::post('/user/trip/refuse', 'Api\DriverController@refuseDriverFromUser')->middleware('auth:api');
-Route::post('/driver/updateposition', 'Api\DriverController@updatePosition');
-Route::post('/veriffffff/{id}', 'Api\Usercontroller@createAccount');
-
-Route::prefix('help')->group(function(){
-    Route::get('/list', 'Api\HelpController@getAllQuestions')->middleware('auth:api');
-});
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();

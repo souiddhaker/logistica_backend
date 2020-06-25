@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 class TripController extends Controller
 {
-    //
 
     public function noteDriver(Request $request)
     {
@@ -233,6 +232,8 @@ class TripController extends Controller
         $trip->addresses()->attach($pickup_address);
         $trip->addresses()->attach($destination_address);
         $reslut = $this->getById($trip->id);
+        $driverController = new DriverController();
+        $driverController->getListDriverForTrip($trip->id);
         $res->success($reslut);
         return response()->json($res,200);
     }
@@ -359,7 +360,7 @@ class TripController extends Controller
             $res->success($rate);
 
         }else{
-            $res->fail('Trip not found');
+            $res->fail(trans('message.trip_not_found'));
         }
         return response()->json($res,200);
     }
@@ -376,7 +377,7 @@ class TripController extends Controller
             $trip->save();
             $res->success($this->getById($trip->id));
         }else{
-            $res->fail('trip not found');
+            $res->fail(trans('message.trip_not_found'));
         }
         return response()->json($res,200);
     }
