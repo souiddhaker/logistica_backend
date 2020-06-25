@@ -201,8 +201,8 @@ class TripController extends Controller
             }
         }
 
-        $pickup_address = Address::where('place_id','=',request('place_idPickup'))->where('user_id','=',Auth::id())->first();
-        $destination_address = Address::where('place_id','=',request('place_idDestination'))->where('user_id','=',Auth::id())->first();
+        $pickup_address = Address::where('place_id','=',request('place_idPickup'))->where('type','=', '1')->where('user_id','=',Auth::id())->first();
+        $destination_address = Address::where('place_id','=',request('place_idDestination'))->where('type','=', '2')->where('user_id','=',Auth::id())->first();
 
         if(!$pickup_address or (request('place_idPickup')== ""))
         {
