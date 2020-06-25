@@ -16,7 +16,7 @@ class Notif extends Model
 {
     use HasTranslations;
 
-    public $translatable = ['title', 'type' , 'description'];
+    public $translatable = ['Title', 'type' , 'description'];
 
     public function getCreatedAtAttribute($value)
     {
