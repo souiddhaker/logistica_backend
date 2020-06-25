@@ -17,8 +17,8 @@ class Trip extends Model
     /**
      * Trip Status :
      *
-     * -1 : not confirmed by user
-     * 0 : not confirmed by driver
+     * -1 : waiting for pickup
+     * 0 : no matching
      * 1 : current
      * 2 : finished
      * 3 : canceled

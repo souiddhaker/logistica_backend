@@ -58,18 +58,31 @@ class TripController extends Controller
 
         $listTrips  = [];
         $currentTrip = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
+            ->where(function($q) use($user,$statusCurrent) {
+                if ($user->getRoles() === json_encode(['client'])){
+                    $q->where('user_id', $user->id)
+                    ->whereIn('status', $statusCurrent);
+                }else{
+                    $q->where('driver_id', $user->id)
+                    ->whereIn('status', ['-1','1']);
+                }
+            })
+            ->with('driver','user','addresses')
+            ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $finishedTrip = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')->where('status','=','2')
             ->where(function($q) use($user) {
                 if ($user->getRoles() === json_encode(['client']))
                     $q->where('user_id', $user->id);
-
-            })
-            ->whereIn('status', $statusCurrent)
-            ->with('driver','user','addresses')
-            ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $finishedTrip = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')->where('status','=','2')->where('user_id',Auth::id())
-            ->orWhere('driver_id',Auth::id())->with('driver','user','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
-        $canceledTrip = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')->where('status','=','3')->where('user_id',Auth::id())
-            ->orWhere('driver_id',Auth::id())->with('driver','user','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+                else
+                    $q->where('driver_id', $user->id);
+            })->with('driver','user','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+        $canceledTrip = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')->where('status','=','3')
+            ->where(function($q) use($user) {
+                if ($user->getRoles() === json_encode(['client']))
+                    $q->where('user_id', $user->id);
+                else
+                    $q->where('driver_id', $user->id);
+            })->with('driver','user','addresses')->orderBy('updated_at', 'desc')->paginate(10)->toArray();
 
         $listTrips['current'] = $currentTrip['data'];
         $listTrips['finished'] = $finishedTrip['data'];
@@ -83,26 +96,31 @@ class TripController extends Controller
     {
         $res = new Result();
         $user = User::find(Auth::id());
-        $statusCurrent =['0','1','-1'];
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
         switch ($key) {
-            case "0":
+            case 0:
                 $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
-                    ->where(function($q) use($user,$statusCurrent) {
+                    ->where(function($q) use($user) {
                         if ($user->getRoles() === json_encode(['client']))
                             $q->where('user_id', $user->id);
                     })
-                    ->whereIn('status', $statusCurrent)
-                    ->with('driver','user','addresses')->orderBy('updated_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
+                    ->where('status','=',$key)
+                    ->with('driver','user','addresses')
+                    ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
                 break;
             default:
-                $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')->where('status', '=', $key)->where('user_id',Auth::id())
-                    ->orWhere('driver_id',Auth::id())->with('driver','user','addresses')->orderBy('updated_at', 'desc')
-                    ->paginate(10)
-                    ->toArray();
+                $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
+                    ->where(function($q) use($user) {
+                        if ($user->getRoles() === json_encode(['client'])){
+                            $q->where('user_id', $user->id);
+                        }else{
+                            $q->where('driver_id', $user->id);
+                        }
+                    })
+                    ->where('status','=',$key)
+                    ->with('driver','user','addresses')
+                    ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
         }
 
         foreach ($trips['data']  as &$elem)
