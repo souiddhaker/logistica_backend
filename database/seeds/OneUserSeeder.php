@@ -62,12 +62,6 @@ class OneUserSeeder extends Seeder
             'description' => ['en'=>'details','ar'=>'تفاصيل'],
             'user_id' => $id
         ]);
-        Notif::create(['title'=>['en'=>'Your booking #1205 has been can...','ar'=>'دعوة الأصدقاء - احصل على 3 كوبونات لكل منهم!'],
-            'type'=>['en'=>'System','ar'=>'النظام'],
-            'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
-            'description' => ['en'=>'details','ar'=>'تفاصيل'],
-            'user_id' => $id
-        ]);
         Notif::create(['title'=>['en'=>'Invite friends - Get 3 coupons each!','ar'=>'دعوة الأصدقاء - احصل على 3 كوبونات لكل منهم!'],
             'type'=>['en'=>'Promotion','ar'=>'النظام'],
             'icon'=>'https://logistica.wi-mobi.com/img/icon/icon.png',
@@ -83,11 +77,13 @@ class OneUserSeeder extends Seeder
     public function run()
     {
         $user = User::find(5);
-        $driver = User::find(2);
+        $driver = User::find(8);
         foreach (range(1, 15) as $i) {
-//            $this->createTrip($user->id,$driver->id,"1");
-//            $this->createTrip($user->id,$driver->id,"2");
-//            $this->createTrip($user->id,$driver->id,"3");
+            $this->createTrip($user->id,$driver->id,"-1");
+            $this->createTrip($user->id,null,"0");
+            $this->createTrip($user->id,$driver->id,"1");
+            $this->createTrip($user->id,$driver->id,"2");
+            $this->createTrip($user->id,$driver->id,"3");
             $this->createNotif($driver->id);
         }
     }
