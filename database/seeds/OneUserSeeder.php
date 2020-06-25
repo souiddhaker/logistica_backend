@@ -84,7 +84,7 @@ class OneUserSeeder extends Seeder
             $this->createTrip($user->id,$driver->id,"1");
             $this->createTrip($user->id,$driver->id,"2");
             $this->createTrip($user->id,$driver->id,"3");
-            $this->createNotif($driver->id);
+//            $this->createNotif($driver->id);
         }
     }
 }
