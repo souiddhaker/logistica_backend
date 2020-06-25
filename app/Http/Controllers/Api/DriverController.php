@@ -346,8 +346,6 @@ class DriverController extends Controller
 
     public function getListDriverForTrip(int $trip_id)
     {
-        $res = new Result();
-
         $trip = Trip::find($trip_id);
         $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
            return $address['type'] === "1";
@@ -377,8 +375,6 @@ class DriverController extends Controller
 
            $this->notifyDriver($driverToNotify->user_id);
        }
-//        $res->success($list);
-//        return response()->json($list, 200);
     }
 
 
