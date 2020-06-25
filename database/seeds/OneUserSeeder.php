@@ -10,7 +10,7 @@ use App\Models\Notif;
 class OneUserSeeder extends Seeder
 {
 
-    public function createTrip(int $userID,int $driverID,string $status)
+    public function createTrip(int $userID,int $driverID = null,string $status)
     {
         $trip1 = Trip::create([
             'status'=>$status,
