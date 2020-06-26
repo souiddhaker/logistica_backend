@@ -19,7 +19,7 @@ class Notif extends Model
     public $translatable = ['Title', 'type' , 'description'];
     protected $guarded = [];
 
-//    protected $hidden = ['trip_id'];
+    protected $hidden = ['seen'];
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->timestamp;
