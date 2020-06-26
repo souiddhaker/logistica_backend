@@ -17,7 +17,9 @@ class Notif extends Model
     use HasTranslations;
 
     public $translatable = ['Title', 'type' , 'description'];
+    protected $guarded = [];
 
+//    protected $hidden = ['trip_id'];
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->timestamp;
@@ -25,5 +27,10 @@ class Notif extends Model
     public function getUpdatedAtAttribute($value)
     {
         return Carbon::parse($value)->timestamp;
+    }
+
+    public function trip()
+    {
+        return $this->hasOne(Trip::class);
     }
 }

@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
     Route::prefix('notifs')->group(function () {
         Route::get('/list', 'Api\NotifController@getAllNotifs');
+        Route::get('/unread', 'Api\NotifController@getUnread');
         Route::get('/{id}', 'Api\NotifController@getDetails');
 
     });
@@ -99,6 +100,7 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
 
     Route::prefix('notifs')->group(function(){
         Route::get('/list', 'Api\NotifController@getAllNotifs');
+        Route::get('/unread', 'Api\NotifController@getUnread');
         Route::get('/{id}', 'Api\NotifController@getDetails');
     });
 

@@ -21,7 +21,10 @@ class NotifController extends Controller
         $notifs = Notif::where('user_id', '=', $userId)
             ->paginate(10)
             ->toArray();
-
+        foreach ($notifs['data'] as $notif)
+        {
+            Notif::find($notif['id'])->update(['seen'=>true]);
+        }
         $res->success($notifs);
         return response()->json($res,200);
     }
@@ -47,5 +50,14 @@ class NotifController extends Controller
         return response()->json($res,200);
     }
 
+    public function getUnread()
+    {
+        $res = new Result();
+        $userId = Auth::id();
+        $countUnRead = Notif::where('user_id', '=', $userId)
+            ->where('seen','=',null)->count('id');
+        $res->success(['unread'=>$countUnRead]);
+        return response()->json($res,200);
+    }
 
 }
