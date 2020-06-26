@@ -282,7 +282,17 @@ class AdminCrudController extends Controller
                 $list = CarCategory::paginate(10);
                 break;
             case "claims":
-                $list = CancelTrip::with(['trip', 'trip.driver', 'trip.user'])->whereRaw($detailFilters)->paginate(10);
+                $list = CancelTrip::whereHas('trip.driver', function ($query) use ($request) {
+                    if ($request->get("driver_id")) {
+                        $user_id= $request->get("driver_id");
+                        $query->where("id", $user_id);
+                    }
+                })->whereHas('trip.user', function ($query) use ($request) {
+                    if ($request->get("user_id")) {
+                        $user_id= $request->get("user_id");
+                        $query->where("id", $user_id);
+                    }
+                })->with(['trip', 'trip.driver', 'trip.user'])->whereRaw($detailFilters)->paginate(10);
                 break;
             default:
                 $success = false;
