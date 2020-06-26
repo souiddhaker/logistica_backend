@@ -76,8 +76,8 @@ class OneUserSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::find(5);
-        $driver = User::find(8);
+        $user = User::find(4);
+        $driver = User::find(3);
         foreach (range(1, 15) as $i) {
             $this->createTrip($user->id,$driver->id,"-1");
             $this->createTrip($user->id,null,"0");

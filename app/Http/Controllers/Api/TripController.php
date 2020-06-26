@@ -98,13 +98,27 @@ class TripController extends Controller
         $key = $request->input('key', "");
         $page = $request->input('page', 1);
         switch ($key) {
-            case 0:
+            case "0":
                 $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
                     ->where(function($q) use($user) {
                         if ($user->getRoles() === json_encode(['client']))
                             $q->where('user_id', $user->id);
                     })
                     ->where('status','=',$key)
+                    ->with('driver','user','addresses')
+                    ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
+                break;
+            case "4":
+                $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
+                    ->where(function($q) use($user) {
+                        if ($user->getRoles() === json_encode(['client'])){
+                            $q->where('user_id', $user->id)
+                                ->whereIn('status', ['-1','1','0']);
+                        }else{
+                            $q->where('driver_id', $user->id)
+                                ->whereIn('status', ['-1','1']);
+                        }
+                    })
                     ->with('driver','user','addresses')
                     ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
                 break;

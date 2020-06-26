@@ -22,7 +22,7 @@ class Trip extends Model
      * 1 : current
      * 2 : finished
      * 3 : canceled
-     *
+     * 4 : current history
      */
     protected $guarded = [];
 
