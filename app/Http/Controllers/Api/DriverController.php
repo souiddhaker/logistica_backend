@@ -319,17 +319,7 @@ class DriverController extends Controller
         $res = new Result();
         $data = $request->all();
         $data['user_id'] = Auth::id();
-        $validator = Validator::make($request->all(),
-            [
-                'longitude' => 'double|nullable',
-                'lattitude' => 'double|nullable'
-            ]);
-
-        if ($validator->fails()) {
-            $res->fail(trans('messages.address_exists'));
-            return response()->json($res, 400);
-        }
-
+        
         $driverposition  = Address::where('user_id', Auth::id())->where('type', '=', '4')->first();
         $data['type'] = "4";
         if ($driverposition)
