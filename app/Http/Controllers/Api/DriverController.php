@@ -321,11 +321,8 @@ class DriverController extends Controller
         $data['user_id'] = Auth::id();
         $validator = Validator::make($request->all(),
             [
-                'primaryName' => 'string|nullable',
-                'secondaryName' => 'string|nullable',
                 'longitude' => 'double|nullable',
-                'lattitude' => 'double|nullable',
-                'place_id' => 'required',
+                'lattitude' => 'double|nullable'
             ]);
 
         if ($validator->fails()) {
