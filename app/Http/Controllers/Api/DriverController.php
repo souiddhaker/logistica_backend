@@ -331,7 +331,7 @@ class DriverController extends Controller
         }
 
         $driverposition  = Address::where('user_id', Auth::id())->where('type', '=', '4')->first();
-
+        $data['type'] = "4";
         if ($driverposition)
             $driverposition->update($data);
         else
