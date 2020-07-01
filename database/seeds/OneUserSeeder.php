@@ -20,7 +20,8 @@ class OneUserSeeder extends Seeder
             'driver_note'=>'driver note',
             'user_id'=>$userID,
             'pickup_at'=>'2020-06-12 08:00:00',
-            'driver_id'=>$driverID]);
+            'driver_id'=>$driverID,
+            'route'=>"yehyEiq~`AlAhBk@lAvAlE~AfFoAtA~ElOp@vBSNgAz@AAAAA?CAIBGHDT~Sto@tKv]Bz@InAY|@oAdBsAfAUDQ\B\PRT@JGpBd@tKvGzA|@pBn@r@P~BNlDGdCk@xAm@~AaAxCeDzEyGd@MTQDa@@UvAwBnJiMrDoDxD{CpJqFzMaHvDcAjEWlHl@rLpBlCRdCEvP}BzNsBvDs@`FcBrDmBxKaIvHkFrEoBbD{@tDg@|Qc@fEo@rEkADB\GDKbDqB`KkI~JuIxBuA`@@f@PbC`BrA`BlBvDfA|BfC`EbBpCjClGjExIdCzDvDvH^x@Tf@n@tAl@rAt@lB`BdGj@fAbACdBS`C@nEpCfHfD|F`CrHxBhCr@p@ZJL^ALo@AEzBqD~BgDpCwDrFoIhHgP|GyOvGqN`@}ALsB\cG~@eFhD{JpH_W|EiOpBmOv@uJpDkXt@_DrByJ`AoGXoD?gDJgEd@kDtByK`@uDD}BJu@n@oAHQxA{Bz@cBfBoIx@kE|@uI^}I@yDWaHCgDNyDBADCBG@C|F_BhEgBhJsDfHkC~t@mW`RyGnGqB|De@nDV|MhCjCd@rAV`DDhD@tL?dCCzFGzFGtEa@nCeArAw@lAeApBmC|@mBn@uBv@_GHiFj@_NnBkRVyAd@eB`ByDfBkCzCsCdAm@p@]lBq@fC_@jABjCOtJm@|BWDBLBLEFIzGqAjHw@t@StEa@`[iCbn@yExPqArHo@dCk@~BgA~@e@|BuB|@{@hBgClBsEf@cB`AmGhBmh@nAaO~@eFD?JEDK?]AEAAjBeKnCeMfAeJIuEa@qEBIhAe@jLmDnNiCnPoCnUgDzNaCvLaCrBk@pKcFnFiChNwGnMyFbKuDnO{EzCYrEMrKu@bD]pFqA|Bc@vH_BxW{F~OyBlBk@zF}AjF_AfJkAvIgBhK_CxRgC`Nm@vHm@bIw@dAE~BP~NrCpE~@bEx@tHx@tC`@DJLFVGF]CMAEZcBnDcJtFmRhEaMtFsRtMo[vK__@dAkDb@eCbBgPtAqLvCgRfByH`BkGn@cF\aIbAmI`@}EVaNd@yJXkJNsf@n@uJf@}F`@_LZiINeAPoA^}Cl@wHLkD?cDSeHNmKp@_P\}FjBcQ|AiLxGmb@~GyZrCuN|DcQtAuF`EoJhCgNj@yEVgGh@cGhBeQxBsTfAoWnA}Mn@}DdA}Dp@gC^{BJoDhBaMNo@dBcLBcCGcFlBwX@MfCPl@@A}BImCC_@|@a@Lm@V}AT}@n@DpACx@KN?"]);
         $pickUp = Address::create([
             'primaryName'=>'King Abdulaziz International Airport',
             'secondaryName'=>'Airport In Riyadh, Saudi Arabia',
