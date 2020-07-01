@@ -61,8 +61,8 @@ class AdminCrudController extends Controller
                 $res->success("deleted successfully");
                 break;
             case "coupon":
-                Promocode::destroy($id);
-                $res->success("deleted successfully");
+                Promocode::Cancel($id);
+                $res->success("disabled successfully");
                 break;
             case "carType":
                 CarCategory::destroy($id);
@@ -191,7 +191,18 @@ class AdminCrudController extends Controller
                 if ($like) {
                     $sql[] = "$key like '%$safeValue%'";
                 } else {
-                    $sql[] = "$key = '$safeValue'";
+                    if($key=='transaction_status') {
+                        if($safeValue==="0"){
+
+                            $sql[] = "$key = null";
+                        }else{
+
+                            $sql[] = "$key != null";
+                        }
+                    }
+                    else{
+                        $sql[] = "$key = '$safeValue'";
+                    }
                 }
                 unset($detailFilter[$key]);
             }
@@ -213,9 +224,9 @@ class AdminCrudController extends Controller
                 break;
             case "trip":
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
-                    return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+                    return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id','transaction_status']);
                 }, ARRAY_FILTER_USE_BOTH);
-                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id']);
+                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id','transaction_status']);
                 break;
             case "couponCaptain":
             case "couponClient":
@@ -251,10 +262,10 @@ class AdminCrudController extends Controller
         switch ($name) {
             case "client":
             case "admin":
-                $list = User::where("roles", json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
+                $list = User::where("roles", json_encode([$name]))->whereRaw($detailFilters);
                 break;
             case "captain":
-                $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->whereRaw($detailFilters)->paginate(10);
+                $list = User::with(['profiledriver'])->where('roles', json_encode([$name]))->whereRaw($detailFilters);
                 break;
             case "trip":
                 $list = Trip::whereHas('driver', function ($query) use ($request) {
@@ -267,19 +278,19 @@ class AdminCrudController extends Controller
                         $userName= $request->get("c_user_fname");
                         $query->where("firstName", 'like', "%$userName%");
                     }
-                })->with(['user','driver'])->whereRaw($detailFilters)->paginate(10);
+                })->with(['user','driver'])->whereRaw($detailFilters);
                 break;
             case "couponCaptain":
-                $list = Promocode::where('type', 1)->whereRaw($detailFilters)->paginate(10);
+                $list = Promocode::where('type', 1)->whereRaw($detailFilters);
                 break;
             case "couponClient":
-                $list = Promocode::where('type', 0)->whereRaw($detailFilters)->paginate(10);
+                $list = Promocode::where('type', 0)->whereRaw($detailFilters);
                 break;
             case "notif":
-                $list = Notif::paginate(10);
+                $list = new Notif();
                 break;
             case "carType":
-                $list = CarCategory::paginate(10);
+                $list = new CarCategory();
                 break;
             case "claims":
                 $list = CancelTrip::whereHas('trip.driver', function ($query) use ($request) {
@@ -292,15 +303,20 @@ class AdminCrudController extends Controller
                         $user_id= $request->get("user_id");
                         $query->where("id", $user_id);
                     }
-                })->with(['trip', 'trip.driver', 'trip.user'])->whereRaw($detailFilters)->paginate(10);
+                })->with(['trip', 'trip.driver', 'trip.user'])->whereRaw($detailFilters);
                 break;
             default:
                 $success = false;
                 $res->fail("incorrect name");
         }
         if ($success) {
-            $data = ["data" => $list->items(), "total" => $list->total()];
-            $res->success($data);
+            if($request->get("page")==="0"){
+                $res->success(["data" =>$list->get(), "total" => $list->count()]);
+            }else{
+                $list=$list->paginate(10);
+                $data = ["data" => $list->items(), "total" => $list->total()];
+                $res->success($data);
+            }
         }
 
         return response()->json($res, 200);

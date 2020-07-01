@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Libs\Firebase;
 use App\Models\Account;
+use App\Models\AdminRoles;
 use App\Models\Result;
 use App\Models\UserFcm;
 use Illuminate\Http\Request;
@@ -76,7 +77,16 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-        $res->success($user);
+        $data = User::where('id', $user['id'])->limit(1)->get();
+        $dataRoles = AdminRoles::where('user_id', $user['id'])->first()->get('roles');
+        if (count($dataRoles) > 0) {
+            $data[0]['adminRoles'] = $dataRoles[0]['roles'];
+        }
+        if($data[0]['roles']===json_encode(['admin'])){
+            $res->success($data);
+        }else{
+            $res->success($user);
+        }
         $res->message= trans('messages.user_details');
 
         return response()->json($res,200);

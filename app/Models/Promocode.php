@@ -59,6 +59,16 @@ class Promocode extends Model
     }
 
 
+    static public function Cancel(int $id): Result
+    {
+
+        $res = new Result();
+            $id = Promocode::where('id', $id)->update(['status'=>0]);
+        $res->success([
+                "coupon" => $id
+            ]);
+        return $res;
+    }
     static public function updateOne(Request $request, int $id): Result
     {
 
