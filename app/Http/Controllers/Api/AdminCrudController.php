@@ -134,6 +134,16 @@ class AdminCrudController extends Controller
                 break;
             case "admin":
                 $data = User::where('id', $id)->limit(1)->get();
+                $dataRolesCount = AdminRoles::where('user_id', $id)->count();
+                if ($dataRolesCount > 0) {
+                    $dataRoles = AdminRoles::where('user_id',$id)->first();
+                    if ($dataRoles) {
+                        $dataRoles = $dataRoles->get('roles');
+                        $user['adminRoles'] = $dataRoles[0]['roles'];
+                    } else {
+                        $user['adminRoles'] = [];
+                    }
+                }
                 $dataRoles = AdminRoles::where('user_id', $id)->first()->get('roles');
                 if (count($dataRoles) > 0) {
                     $data[0]['adminRoles'] = $dataRoles[0]['roles'];

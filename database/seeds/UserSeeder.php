@@ -176,7 +176,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('logistica'),
                 'roles' => json_encode(['admin'])
             ]);
-            AdminRoles::updateOne(["roles" => []], $admin['id']);
+            AdminRoles::updateOne(["roles" => ['test'=>123456]], $admin['id']);
             \App\Models\Settings::updateOne(
                 [
                     'company_percent' => '15',
