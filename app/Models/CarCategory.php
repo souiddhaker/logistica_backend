@@ -27,7 +27,7 @@ class CarCategory extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at', 'price_100', 'price_101','price_1', 'type','deleted_at'
+        'created_at', 'updated_at','deleted_at'
     ];
 
     static public function updateOne(Request $request, int $id): Result
