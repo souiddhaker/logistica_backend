@@ -77,8 +77,8 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-        $data = User::where('id', $user['id'])->limit(1)->get();
-        $dataRoles = AdminRoles::where('user_id', $user['id'])->first()->get('roles');
+        $data = User::where('id', $user[0]['id'])->limit(1)->get();
+        $dataRoles = AdminRoles::where('user_id',$user[0]['id'])->first()->get('roles');
         if (count($dataRoles) > 0) {
             $data[0]['adminRoles'] = $dataRoles[0]['roles'];
         }
