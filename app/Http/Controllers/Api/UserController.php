@@ -75,14 +75,18 @@ class UserController extends Controller
             $res->fail("FCM token not valid");
             return response()->json($res, 200);
         }
-        $user = Auth::user();
-        if ($user)
+        $userFCM = UserFcm::where('user_id', '=', Auth::id())->first();
+        if (!$userFCM)
         {
-            $fcm = UserFcm::create(['token'=> $request['fcm'],'user_id'=>Auth::id()]);
-            $res->success($fcm);
+            $userFCM = new UserFcm();
+            $userFCM->user_id = Auth::id();
+            $userFCM->token = $request['fcm'];
+            $userFCM->save();
         }else{
-            $res->fail('User Not Found');
+            $userFCM->update(['token'=>$request['fcm']]);
         }
+        $res->success($userFCM);
+
         return response()->json($res, 200);
 
     }
@@ -93,14 +97,12 @@ class UserController extends Controller
         $notification_title     = $request['title'];
         $notification_message   = $request['message'];
         $receiver_id =[];
-        $users = [UserFcm::where('user_id',$request['user_id'])->first()];
-        foreach ($users as $user){
-            array_push($receiver_id,$user['token']);
-        }
+        $user = UserFcm::where('user_id',$request['user_id'])->first();
+
         try {
             $firebase = new Firebase();
             $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload);
-            return $firebase->sendMultiple(  $receiver_id,  $message );
+            return $firebase->sendMultiple(  [$user['token']],  $message );
         } catch ( Exception $ex ) {
             return false;
         }

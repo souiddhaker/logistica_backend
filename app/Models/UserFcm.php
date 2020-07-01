@@ -14,6 +14,7 @@ use Eloquent;
 class UserFcm extends Model
 {
     protected $table = 'users_fcm';
+    protected $fillable=['token'];
 
     public function user()
     {
