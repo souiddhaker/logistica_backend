@@ -76,17 +76,17 @@ class UserController extends Controller
         $res = new Result();
 
         $user = Auth::user();
-//        dd($user);
-//        $data = User::where('id', $user[0]['id'])->limit(1)->get();
-//        $dataRoles = AdminRoles::where('user_id',$user[0]['id'])->first()->get('roles');
-//        if (count($dataRoles) > 0) {
-//            $data[0]['adminRoles'] = $dataRoles[0]['roles'];
-//        }
-//        if($data[0]['roles']===json_encode(['admin'])){
-//            $res->success($data);
-//        }else{
+        dd($user[0]['id']);
+        $data = User::where('id', $user[0]['id'])->limit(1)->get();
+        $dataRoles = AdminRoles::where('user_id',$user[0]['id'])->first()->get('roles');
+        if (count($dataRoles) > 0) {
+            $data[0]['adminRoles'] = $dataRoles[0]['roles'];
+        }
+        if($data[0]['roles']===json_encode(['admin'])){
+            $res->success($data);
+        }else{
             $res->success($user);
-//        }
+        }
         $res->message= trans('messages.user_details');
 
         return response()->json($res,200);
