@@ -20,7 +20,12 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 class TripController extends Controller
 {
+    public $driverController;
 
+    public function __construct()
+    {
+        $this->driverController = new DriverController();
+    }
     public function noteDriver(Request $request)
     {
         $res  =  new Result();
@@ -158,22 +163,14 @@ class TripController extends Controller
         $res = new Result();
 
         $data = $request->all();
-        $trip = new Trip();
-        $trip->save();
-        // status 0 not confirmed by driver
-        $trip->status = '0';
-        $trip->total_price = $data['total_price'];
-        $trip->nbr_luggage = $data['nbr_luggage'];
-        $trip->driver_note = $data['note_driver'];
-        $trip->route = $data['route'];
+        $trip = Trip::create(['status'=>'0', 'total_price'=>$data['total_price'],'nbr_luggage'=>$data['nbr_luggage'],
+        'driver_note'=>$data['note_driver'],'route'=>$data['route'],'user_id'=>Auth::id(),'pickup_at'=>$data['pickup_at']]);
+
         $type_car = CarCategory::find($data['type_car_id']);
 
         if($type_car){
             $trip->type_car()->associate($type_car)->save();
         }
-
-        $trip->pickup_at = $data['pickup_at'];
-
 
         $payment_method = Card::find($data['payment_method']);
 
@@ -181,12 +178,33 @@ class TripController extends Controller
         {
             $trip->payment_method = $payment_method->id;
         }
-
-        $trip->user_id = Auth::id();
-        $trip->driver_id = null;
-
         $trip->save();
 
+
+        $this->addAttachementsToTrip($data,$trip);
+        $this->attachServices($data,$trip);
+        $this->attachAddresses($request,$trip);
+
+        $reslut = $this->getById($trip->id);
+        $this->driverController->getListDriverForTrip($trip->id);
+        $res->success($reslut);
+        return response()->json($res,200);
+    }
+
+    public function addAttachementsToTrip(array $data, Trip $trip)
+    {
+        $listAttachements = $data['attachements'];
+        if($listAttachements){
+            foreach ($listAttachements as $attachementId){
+                $attachement = Document::find($attachementId);
+                if($attachement)
+                    $trip->attachements()->attach($attachement);
+            }
+        }
+    }
+
+    public function attachServices(array $data,Trip $trip)
+    {
         $listServices = $data['services'];
         foreach ($listServices as $serviceId){
             $service = Service::find($serviceId);
@@ -205,57 +223,31 @@ class TripController extends Controller
                 $trip->subservices()->attach($subService);
             }
         }
+    }
+    public function attachAddresses(Request $request,$trip)
+    {
+        $pickup_address = Address::create([
+            'primaryName' => request('primaryNamePickup'),
+            'secondaryName' => request('secondaryPickup'),
+            'place_id' => request('place_idPickup'),
+            'longitude' => request('longitudePickup'),
+            'lattitude' => request('lattitudePickup'),
+            'type' => '1',
+            'user_id' => Auth::id()
+        ]);
 
-        $listAttachements = $data['attachements'];
-        if($listAttachements){
-            foreach ($listAttachements as $attachementId){
-                $attachement = Document::find($attachementId);
-                if($attachement)
-                $trip->attachements()->attach($attachement);
-            }
-        }
-
-        $pickup_address = Address::where('place_id','=',request('place_idPickup'))->where('type','=', '1')->where('user_id','=',Auth::id())->first();
-        $destination_address = Address::where('place_id','=',request('place_idDestination'))->where('type','=', '2')->where('user_id','=',Auth::id())->first();
-
-        if(!$pickup_address or (request('place_idPickup')== ""))
-        {
-            $pickup_address = Address::create([
-                'primaryName' => request('primaryNamePickup'),
-                'secondaryName' => request('secondaryPickup'),
-                'place_id' => request('place_idPickup'),
-                'longitude' => request('longitudePickup'),
-                'lattitude' => request('lattitudePickup'),
-                'type' => '1',
-                'user_id' => Auth::id()
-            ]);
-        }
-        if (!$destination_address or (request('place_idDestination')== ""))
-        {
-            $destination_address = Address::create([
-                'primaryName' => request('primaryNameDestination'),
-                'secondaryName' => request('secondaryDestination'),
-                'place_id' => request('place_idDestination'),
-                'longitude' => request('longitudeDestination'),
-                'lattitude' => request('lattitudeDestination'),
-                'type' => '2',
-                'user_id' => Auth::id()
-            ]);
-        }
+        $destination_address = Address::create([
+            'primaryName' => request('primaryNameDestination'),
+            'secondaryName' => request('secondaryDestination'),
+            'place_id' => request('place_idDestination'),
+            'longitude' => request('longitudeDestination'),
+            'lattitude' => request('lattitudeDestination'),
+            'type' => '2',
+            'user_id' => Auth::id()
+        ]);
 
         $trip->addresses()->attach($pickup_address);
         $trip->addresses()->attach($destination_address);
-        $reslut = $this->getById($trip->id);
-        $driverController = new DriverController();
-        $driverController->getListDriverForTrip($trip->id);
-        $res->success($reslut);
-        return response()->json($res,200);
-    }
-
-
-    public function attachAddressse()
-    {
-        //TODO : create trip with addresses
     }
 
     public function tripAttachements(array $attachementsCollection)
@@ -307,51 +299,66 @@ class TripController extends Controller
             $trip->payement_method = "Cash payment";
             $trip->rating = Rating::find($trip->rating_id);
             $attachementsCollection = collect($trip->attachements)->toArray();
+
             return array_merge($trip->toArray(),$this->tripAttachements($attachementsCollection));
         }else
             return null;
     }
 
 
-
     public function getTrip(int $id)
     {
         $res = new Result();
         $trip = $this->getById($id);
-        if ($trip)
+        $user = User::find(Auth::id());
+        if ($trip){
+            if($trip['status'] == '0' && $user->getRoles() === json_encode(['captain']) )
+            {
+                $driverTrip = \DB::table('trip_user')->where('user_id', '=', $user->id)
+                    ->where('trip_id', '=',$trip['id'])->first();
+
+                $trip['alreadyApplied'] = $driverTrip ? true : false;
+            }
             $res->success($trip);
+        }
         else
-            $res->fail(trans('message.trip_not_found'));
+            $res->fail(trans('messages.trip_not_found'));
         return response()->json($res,200);
     }
 
     public function cancelTrip(Request $request)
     {
-
         $res = new Result();
         $data = $request->all();
-
         $trip = Trip::find($data['trip_id']);
-
+        $user = User::find(Auth::id());
         if ($trip)
         {
-            $cancelTrip = new CancelTrip();
-            $cancelTrip->raison = $data['raison'];
-            $cancelTrip->by_user = $data['canceledByUser'];
-            $trip->status = '3';
-            $trip->cancelTrip()->save($cancelTrip);
-            $trip->save();
-
+            $cancelTrip = CancelTrip::create(['raison'=>$data['raison'],'by_user'=>$data['canceledByUser']]);
+            if (in_array($trip->status, ['-1','1'])){
+                $trip->status = '3';
+                $trip->cancelTrip()->save($cancelTrip);
+                $trip->save();
+                $res->success($cancelTrip);
+                $res->message = trans('message.cancel_trip');
+                if ($user->getRoles() === json_encode(['client']))
+                    $this->driverController->notifyUser($user->id,5,$trip->id);
+                else
+                    $this->driverController->notifyUser($user->id,6,$trip->id);
+            }else {
+                if ($user->getRoles() === json_encode(['client'])) {
+                    $nextDriver = $this->driverController->filterAndGetFirstDriver($trip->candidates);
+                    $this->driverController->notifyUser($nextDriver->id, 6, $trip->id);
+                }
+            }
         }else{
             $res->fail(trans('message.trip_not_found'));
-            return response()->json($res,200);
         }
-        $res->success($cancelTrip);
-        $res->message = trans('message.cancel_trip');
-
+        // TODO cancel trip by connected user
         return response()->json($res,200);
-
     }
+
+
 
     public function rateTrip(Request $request)
     {
@@ -379,6 +386,53 @@ class TripController extends Controller
         return response()->json($res,200);
     }
 
+
+    public function confirmTripFromUser(Request $request)
+    {
+        $res = new Result();
+
+        $validator = Validator::make($request->all(),
+            [
+                'trip_id' => 'required',
+                'driver_id' => 'required',
+                'accept' => 'required'
+            ]);
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.trip_not_found'));
+            return response()->json($res, 200);
+        }
+
+        $trip = Trip::where('id',$request['trip_id'])
+            ->where('status','=','0')->first();
+        $driver = User::find($request['driver_id']);
+        if ($trip and $driver)
+        {
+            if ($request['accept'])
+            {
+                $trip->status = "-1";
+                $trip->driver_id = $driver->id;
+                $trip->save();
+                $trip['driver'] = $driver;
+                $this->notifyUser($driver->id,-1,$trip->id);
+            }
+            else{
+                $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
+
+                $trip['driver'] = null;
+                $this->notifyUser($driver->id,1,$trip->id);
+                $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver();
+                if ($nextDriverToNotify)
+                    $this->driverController->notifyUser($nextDriverToNotify->id, 2,$trip->id);
+
+            }
+            $res->success($trip);
+        }else{
+            $res->fail(trans('messages.trip_not_found'));
+        }
+        //TODO notify driver with two status
+        return response()->json($res,200);
+    }
 
     public function changeStatus(Request $request)
     {

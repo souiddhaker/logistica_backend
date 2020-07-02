@@ -39,5 +39,22 @@ return [
 
     'trip_not_found' => 'Trip not found',
     'cancel_trip' => 'The trip is canceled',
-
+    'notif_new_trip_inform_captain' => 'A new trip waiting for a driver',
+    'notif_new_trip_inform_captain_title'=> 'New trip',
+    'notif_user_when_driver_confirm' => 'A driver confirmed your trip',
+    'notif_user_when_driver_confirm_title' => 'A driver accepted your trip',
+    'notif_driver_when_user_accept' => 'The trip request was confirmed by the user',
+    'notif_driver_when_user_accept_title' => 'Confirmed Trip',
+    'notif_driver_when_user_refuse' => 'The trip request was refused by the user',
+    'notif_driver_when_user_refuse_title' => 'Refused Trip',
+    'notif_user_when_trip_started' => 'The trip started and picked up by the driver',
+    'notif_user_when_trip_started_title' => 'Trip started',
+    'notif_user_when_driver_cancel_trip' => 'Your trip has been canceled by the driver',
+    'notif_user_when_driver_cancel_trip_title' => 'Trip canceled',
+    'notif_driver_when_user_cancel_trip' => 'The trip has been canceled by the user',
+    'notif_driver_when_user_cancel_trip_title' => 'Trip canceled',
+    'notif_user_when_driver_finish_trip' => 'The trip is finished. Do you want to create another one ?',
+    'notif_user_when_driver_finish_trip_title' => 'Trip finished',
+    'notif_user_when_requested_driver' => 'Logistica suggest for your a driver ',
+    'notif_user_when_requested_driver_title' => 'Driver request'
 ];

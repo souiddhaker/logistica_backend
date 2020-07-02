@@ -43,4 +43,22 @@ return [
 
     'cancel_trip' => 'تم إلغاء الرحلة',
 
+    'notif_new_trip_inform_captain' => 'رحلة جديدة في انتظار سائق',
+    'notif_new_trip_inform_captain_title'=> 'رحلة جديدة',
+    'notif_user_when_driver_confirm' => 'أكد سائق رحلتك',
+    'notif_user_when_driver_confirm_title' => 'قبل السائق رحلتك',
+    'notif_driver_when_user_accept' => 'تم تأكيد طلب الرحلة من قبل المستخدم',
+    'notif_driver_when_user_accept_title' => 'أكدت الرحلة',
+    'notif_driver_when_user_refuse' => 'تم رفض طلب الرحلة من قبل المستخدم',
+    'notif_driver_when_user_refuse_title' => 'تم رفض الرحلة',
+    'notif_user_when_trip_started' => 'بدأت الرحلة واستلم السائق الحقائب',
+    'notif_user_when_trip_started_title' => 'بدأت الرحلة',
+    'notif_user_when_driver_cancel_trip' => 'تم إلغاء رحلتك من قبل السائق',
+    'notif_user_when_driver_cancel_trip_title' => 'تم إلغاء الرحلة',
+    'notif_driver_when_user_cancel_trip' => 'تم إلغاء الرحلة من قبل المستخدم',
+    'notif_driver_when_user_cancel_trip_title' => 'تم إلغاء الرحلة',
+    'notif_user_when_driver_finish_trip' => 'الرحلة انتهت. هل تريد إنشاء واحدة أخرى ؟',
+    'notif_user_when_driver_finish_trip_title' => 'انتهت الرحلة',
+    'notif_user_when_requested_driver' => 'نقترح سائق لرحلتك',
+    'notif_user_when_requested_driver_title' => 'طلب سائق'
 ];

@@ -68,7 +68,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/document/{id}', 'Api\DocumentController@getAttachement');
         Route::post('/note', 'Api\TripController@noteDriver');
         Route::post('/rate', 'Api\TripController@rateTrip');
-        Route::post('/user/trip/responseToDriver', 'Api\DriverController@confirmTripFromUser');
+        Route::post('/responseToDriver', 'Api\TripController@confirmTripFromUser');
 
     });
 });
@@ -83,6 +83,8 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
         Route::get('/list','Api\TripController@listTrips');
         Route::get('/search', 'Api\TripController@search');
         Route::post('/accept', 'Api\DriverController@acceptTripFromDriver');
+        Route::post('/pickup', 'Api\DriverController@pickupTrip');
+        Route::post('/finished', 'Api\DriverController@finishedTrip');
 
     });
     Route::prefix('profile')->group(function(){
@@ -136,7 +138,7 @@ Route::prefix('admin')->group(function(){
         Route::post('register', 'Api\AdminAuthController@register');
     });
 });
-Route::post('/test', 'Api\DriverController@getListDriverForTrip');
+Route::post('/test/{id}', 'Api\DriverController@getListDriverForTrip');
 
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();

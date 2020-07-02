@@ -18,6 +18,7 @@ class Notif extends Model
 
     public $translatable = ['Title', 'type' , 'description'];
     protected $guarded = [];
+    protected $fillable = ['user_id'];
 
     protected $hidden = ['seen'];
     public function getCreatedAtAttribute($value)
@@ -29,6 +30,10 @@ class Notif extends Model
         return Carbon::parse($value)->timestamp;
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function trip()
     {
         return $this->hasOne(Trip::class);

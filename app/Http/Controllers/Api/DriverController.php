@@ -8,16 +8,22 @@ use App\Models\Address;
 use App\Models\CarCategory;
 use App\Models\Document;
 use App\Models\Driver;
+use App\Models\Notif;
 use App\Models\Rating;
 use App\Models\Result;
 use App\Models\Trip;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Mockery\Matcher\Not;
+use PhpParser\Node\Expr\Cast\Object_;
 use Validator;
 
 class DriverController extends Controller
 {
+
     public function addAttachements(array $attachements)
     {
         $request = new Request();
@@ -265,61 +271,26 @@ class DriverController extends Controller
 
         if ($trip)
         {
+            if (count($trip->candidates)>0){
+                $this->notifyUser($trip->user_id,9,$trip->id,$this->getProfile(Auth::id()));
+            }
             $trip->candidates()->attach(User::find( Auth::id()));
             $trip->save();
-            $res->success($trip->candidates);
-        }else{
-            $res->fail(trans('messages.trip_not_found'));
-        }
-
-        return response()->json($res,200);
-    }
-
-    public function confirmTripFromUser(Request $request)
-    {
-        $res = new Result();
-
-        $validator = Validator::make($request->all(),
-            [
-                'trip_id' => 'required',
-                'driver_id' => 'required',
-                'accept' => 'required'
-            ]);
-        if ($validator->fails())
-        {
-            $res->fail(trans('messages.trip_not_found'));
-            return response()->json($res, 200);
-        }
-
-        $trip = Trip::where('id',$request['trip_id'])->first();
-        $driver = User::find($request['driver_id']);
-        if ($trip and $driver)
-        {
-            if ($request['accept'])
-            {
-                $trip->status = "1";
-                $trip->driver_id = $driver->id;
-                $trip->save();
-                $trip['driver'] = $driver;
-            }
-            else{
-                $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
-                $trip['driver'] = null;
-            }
             $res->success($trip);
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }
-
+        //TODO notify user
         return response()->json($res,200);
     }
+
 
     public function updatePosition(Request $request)
     {
         $res = new Result();
         $data = $request->all();
         $data['user_id'] = Auth::id();
-        
+
         $driverposition  = Address::where('user_id', Auth::id())->where('type', '=', '4')->first();
         $data['type'] = "4";
         if ($driverposition)
@@ -331,39 +302,70 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function getListDriverForTrip(int $trip_id)
+    public function modelListDrivers(Collection $listDriver,array $pickupAddress)
     {
-        $trip = Trip::find($trip_id);
-        $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
-           return $address['type'] === "1";
-        })[0];
-
-        $listDriver  = User::with('profileDriver')
-            ->join('address', 'address.user_id', '=', 'users.id')
-            ->join('drivers', 'drivers.user_id', '=', 'users.id')
-            ->where('address.type' , '=', '4')
-            ->where('users.roles',"=", json_encode(['captain']))->where('drivers.status', '=', '0')->get();
         $listDriverFiltered= [];
         foreach ($listDriver as $driver){
             $driverposition  = Address::where('user_id', $driver->user_id)->where('type', '=', '4')->first();
-            $modelDriver = $driver;
-            $modelDriver['addressPickup'] = $driverposition;
-            $modelDriver['position'] = $this->haversineGreatCircleDistance(
-                $pickupAddress['lattitude'],$pickupAddress['longitude'],
-                $driverposition->lattitude,$driverposition->longitude);
-            $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
-            array_push($listDriverFiltered,$modelDriver);
-
+            if ($driverposition)
+            {
+                $modelDriver = $driver;
+                $modelDriver['addressDriver'] = $driverposition;
+                $modelDriver['distance'] = $this->haversineGreatCircleDistance(
+                    $pickupAddress['lattitude'],$pickupAddress['longitude'],
+                    $driverposition->lattitude,$driverposition->longitude);
+                $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
+                array_push($listDriverFiltered,$modelDriver);
+            }
         }
-        $listDriverFiltered = collect($listDriverFiltered);
 
-       $list =  $listDriverFiltered->sortBy('position')->take(2);
-       foreach ($list as $driverToNotify){
+        return $listDriverFiltered;
+    }
+    public function getListDriverForTrip(int $trip_id)
+    {
 
-           $this->notifyDriver($driverToNotify->user_id);
-       }
+        $trip = Trip::where('id','=',$trip_id)
+        ->where('status', '=','0')->first();
+        if ($trip)
+        {
+            $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
+                return $address['type'] === "1";
+            })[0];
+
+            $listDriver  = User::with('profileDriver')
+                ->join('address', 'address.user_id', '=', 'users.id')
+                ->join('drivers', 'drivers.user_id', '=', 'users.id')
+                ->where('address.type' , '=', '4')
+                ->where('users.roles',"=", json_encode(['captain']))
+                ->where('drivers.status', '=', '0')
+                ->select(['users.*','drivers.*'])
+                ->get();
+            $listDriverFiltered = collect($this->modelListDrivers($listDriver,$pickupAddress));
+            $list =  $listDriverFiltered->sortBy('distance')->sortBy('average_rating')->take(10);
+            foreach ($list as $driverToNotify){
+                $this->notifyUser($driverToNotify->user_id,1 ,$trip_id);
+            }
+            $this->notifyUser($trip->user_id,9,$trip_id,$list[0]->id);
+
+            return $list;
+        }else{
+            return null;
+        }
+
+
     }
 
+    public function filterAndGetFirstDriver(array $listCandidates)
+    {
+        $arrayListDriver = [];
+        foreach ($listCandidates as $candidate){
+            $candidate['user_id'] = $candidate->id;
+            array_push($arrayListDriver,$candidate);
+        }
+        $arrayListDriver = $this->modelListDrivers($arrayListDriver);
+        $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
+        return $driver;
+    }
 
     public function getDriverRating(int $id)
     {
@@ -386,15 +388,168 @@ class DriverController extends Controller
         return $angle * $earthRadius;
     }
 
-    public function notifyDriver(int $id)
+    public function pickupTrip(Request $request)
     {
+        //TODO pickup trip
+        $res = new Result();
+        $trip = Trip::where('id', '=',$request['trip_id'])
+            ->where('status','=' ,'-1')
+            ->where('driver_id','=',Auth::id())->first();
+        if($trip)
+        {
+            $trip->update(['status'=>'1']);
+            $this->notifyUser($trip->user_id,-1,$trip->id);
+            $res->success($trip);
+        }else{
+            $res->fail(trans('messages.trip_not_found'));
+        }
+        return response()->json($res,200);
+    }
 
-        $userController = new UserController();
+    public function finishedTrip(Request $request)
+    {
+        //TODO finishedTrip by driver notify user
+        $res = new Result();
+        $trip = Trip::where('id', '=',$request['trip_id'])
+            ->where('status','=' ,'1')->first();
+        if($trip)
+        {
+            $trip->update(['status'=>'2']);
+            $res->success($trip);
+            $this->notifyUser($trip->user_id,2,$trip->id);
+        }else{
+            $res->fail(trans('messages.trip_not_found'));
+        }
+        return response()->json($res,200);
+    }
+
+    public function notifyUser(int $id, int $step,int $trip_id,int $driver =null)
+    {
+        $msgAr = "";
+        $msgEn = "";
+        $titleAr = "";
+        $titleEn = "";
         $request = new Request();
+        switch ($step){
+            case 1 :
+                $request['title'] = trans('messages.notif_new_trip_inform_captain_title');
+                $request['message'] =  trans('messages.notif_new_trip_inform_captain');
+                App::setLocale('en');
+                $msgEn = trans('messages.notif_new_trip_inform_captain');
+                $titleEn = trans('messages.notif_new_trip_inform_captain_title');
+                App::setLocale('ar');
+                $msgAr = trans('messages.notif_new_trip_inform_captain');
+                $titleAr = trans('messages.notif_new_trip_inform_captain_title');
+                break;
+            case 2 :
+                $request['title'] = trans('messages.notif_user_when_driver_confirm_title');
+                $request['message'] =  trans('messages.notif_user_when_driver_confirm');
+                App::setLocale('en');
+                $msgEn = trans('messages.notif_user_when_driver_confirm');
+                $titleEn = trans('messages.notif_user_when_driver_confirm_title');
+                App::setLocale('ar');
+                $msgAr = trans('messages.notif_user_when_driver_confirm');
+                $titleAr = trans('messages.notif_user_when_driver_confirm_title');
+                break;
+            case 3 :
+                $request['title'] = trans('messages.notif_driver_when_user_accept_title');
+                $request['message'] =  trans('messages.notif_driver_when_user_accept');
+                App::setLocale('en');
+                $msgEn =  trans('messages.notif_driver_when_user_accept');
+                $titleEn = trans('messages.notif_driver_when_user_accept_title');
+                App::setLocale('ar');
+                $msgAr =  trans('messages.notif_driver_when_user_accept');
+                $titleAr = trans('messages.notif_driver_when_user_accept_title');
+                break;
+            case 4 :
+                $request['title'] = trans('messages.notif_driver_when_user_refuse_title');
+                $request['message'] =  trans('messages.notif_driver_when_user_refuse');
+                App::setLocale('en');
+                $msgEn =  trans('messages.notif_driver_when_user_refuse');
+                $titleEn = trans('messages.notif_driver_when_user_refuse_title');
+                App::setLocale('ar');
+                $msgAr =  trans('messages.notif_driver_when_user_refuse');
+                $titleAr = trans('messages.notif_driver_when_user_refuse_title');
+                break;
+            case 5 :
+                $request['title'] = trans('messages.notif_user_when_trip_started_title');
+                $request['message'] =  trans('messages.notif_user_when_trip_started');
+                App::setLocale('en');
+                $msgEn =  trans('messages.notif_user_when_trip_started');
+                $titleEn = trans('messages.notif_user_when_trip_started_title');
+                App::setLocale('ar');
+                $msgAr =  trans('messages.notif_user_when_trip_started');
+                $titleAr = trans('messages.notif_user_when_trip_started_title');
+                break;
+            case 6 :
+                $request['title'] = trans('messages.notif_user_when_driver_cancel_trip_title');
+                $request['message'] =  trans('messages.notif_user_when_driver_cancel_trip');
+                App::setLocale('en');
+                $msgEn =  trans('messages.notif_user_when_driver_cancel_trip');
+                $titleEn = trans('messages.notif_user_when_driver_cancel_trip_title');
+                App::setLocale('ar');
+                $msgAr =  trans('messages.notif_user_when_driver_cancel_trip');
+                $titleAr = trans('messages.notif_user_when_driver_cancel_trip_title');
+                break;
+            case 7 :
+                $request['title'] = trans('messages.notif_driver_when_user_cancel_trip_title');
+                $request['message'] =  trans('messages.notif_driver_when_user_cancel_trip');
+                App::setLocale('en');
+                $msgEn =   trans('messages.notif_driver_when_user_cancel_trip');
+                $titleEn = trans('messages.notif_driver_when_user_cancel_trip_title');
+                App::setLocale('ar');
+                $msgAr =   trans('messages.notif_driver_when_user_cancel_trip');
+                $titleAr = trans('messages.notif_driver_when_user_cancel_trip_title');
+                break;
+            case 8 :
+                $request['title'] = trans('messages.notif_user_when_driver_finish_trip_title');
+                $request['message'] =  trans('messages.notif_user_when_driver_finish_trip');
+                App::setLocale('en');
+                $msgEn =   trans('messages.notif_user_when_driver_finish_trip');
+                $titleEn = trans('messages.notif_user_when_driver_finish_trip_title');
+                App::setLocale('ar');
+                $msgAr =   trans('messages.notif_user_when_driver_finish_trip');
+                $titleAr = trans('messages.notif_user_when_driver_finish_trip_title');
+                break;
+
+            case 9 :
+                $request['title'] = trans('messages.notif_user_when_requested_driver_title');
+                $request['message'] =  trans('messages.notif_user_when_requested_driver');
+                App::setLocale('en');
+                $msgEn =   trans('messages.notif_user_when_requested_driver');
+                $titleEn = trans('messages.notif_user_when_requested_driver_title');
+                App::setLocale('ar');
+                $msgAr =   trans('messages.notif_user_when_requested_driver');
+                $titleAr = trans('messages.notif_user_when_requested_driver_title');
+                break;
+            default :
+                break;
+        }
+        $translationsTitle = [
+            'en' => $titleEn,
+            'ar' => $titleAr
+        ];
+        $translationsDiscription = [
+            'en' => $msgEn,
+            'ar' => $msgAr
+        ];
+        $translationsType = [
+            'en' => "Trip",
+            'ar' => "توصيلة"
+        ];
+
+        $notif = new Notif();
+
+        $notif->Title = $translationsTitle;
+        $notif->description = $translationsDiscription;
+        $notif->type = $translationsType;
+        $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
+
+        $user = User::find($id);
+        $user->notifs()->save($notif);
+        $userController = new UserController();
+        $request['payload'] = '{"trip_id": '.$trip_id.'"driver":'.$driver.'}';
         $request['user_id'] = $id;
-        $request['payload'] = "";
-        $request['title'] = "notif";
-        $request['message'] =  "notif message";
         $notify = $userController->notify($request);
         return $notify;
     }
