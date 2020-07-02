@@ -98,7 +98,7 @@ class UserController extends Controller
         $notification_message   = $request['message'];
         $receiver_id =[];
         $user = UserFcm::where('user_id',$request['user_id'])->first();
-
+        return $user;
         try {
             $firebase = new Firebase();
             $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload);
