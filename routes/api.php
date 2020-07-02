@@ -139,7 +139,7 @@ Route::prefix('admin')->group(function(){
     });
 });
 Route::post('/test/{id}', 'Api\DriverController@getListDriverForTrip');
-Route::post('/notifyme','Api\DriverController@notifyMe');
+Route::post('/notifyme/{id}','Api\DriverController@notifyMe');
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
 });

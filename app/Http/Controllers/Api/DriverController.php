@@ -554,7 +554,7 @@ class DriverController extends Controller
         return $notify;
     }
 
-    public function notifyMe(){
-        return response()->json($this->notifyUser(5,2,513,4),200);
+    public function notifyMe(int $id){
+        return response()->json($this->notifyUser($id,2,513,4),200);
     }
 }
