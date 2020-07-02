@@ -355,8 +355,9 @@ class DriverController extends Controller
 
     }
 
-    public function filterAndGetFirstDriver(array $listCandidates)
+    public function filterAndGetFirstDriver(Trip $trip)
     {
+        $listCandidates = $trip->candidates;
         $arrayListDriver = [];
         foreach ($listCandidates as $candidate){
             $candidate['user_id'] = $candidate->id;
