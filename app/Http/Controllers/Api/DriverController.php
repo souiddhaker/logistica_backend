@@ -369,7 +369,7 @@ class DriverController extends Controller
         $arrayListDriver = collect($this->modelListDrivers($arrayListDriver,$pickupAddress));
 
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
-        return $driver[0];
+        return $driver["0"];
     }
 
     public function getDriverRating(int $id)
