@@ -357,13 +357,16 @@ class DriverController extends Controller
 
     public function filterAndGetFirstDriver(Trip $trip)
     {
+        $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
+            return $address['type'] === "1";
+        })[0];
         $listCandidates = $trip->candidates;
         $arrayListDriver = [];
         foreach ($listCandidates as $candidate){
             $candidate['user_id'] = $candidate->id;
             array_push($arrayListDriver,$candidate);
         }
-        $arrayListDriver = $this->modelListDrivers($arrayListDriver);
+        $arrayListDriver = $this->modelListDrivers($arrayListDriver,$pickupAddress);
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
         return $driver;
     }
