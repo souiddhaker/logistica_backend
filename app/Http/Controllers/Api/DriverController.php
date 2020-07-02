@@ -553,4 +553,8 @@ class DriverController extends Controller
         $notify = $userController->notify($request);
         return $notify;
     }
+
+    public function notifMe(){
+        $this->notifyUser(5,2,513,4);
+    }
 }
