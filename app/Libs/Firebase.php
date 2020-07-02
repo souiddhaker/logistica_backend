@@ -12,7 +12,6 @@ class Firebase {
      * @return bool|string
      */
     public function send( $to, $message ) {
-
         $fields = array(
             'to'   => $to,
             'data' => $message,
@@ -64,7 +63,6 @@ class Firebase {
 
         // Set POST variables
         $url = 'https://fcm.googleapis.com/fcm/send';
-        return json_decode( $fields, true );
 
         $client = new Client();
         $result = $client->post( $url, [
