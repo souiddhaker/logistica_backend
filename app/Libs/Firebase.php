@@ -51,8 +51,6 @@ class Firebase {
             'registration_ids' =>$registration_ids,
             'notification' =>  $message
         );
-
-        return $fields;
         return $this->sendPushNotification( $fields );
     }
 
