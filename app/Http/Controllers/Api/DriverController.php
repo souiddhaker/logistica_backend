@@ -542,7 +542,7 @@ class DriverController extends Controller
         $notif->Title = $translationsTitle;
         $notif->description = $translationsDiscription;
         $notif->type = $translationsType;
-        $notif->trip()->save(Trip::find($trip_id));
+        $notif->trip_id = $trip_id;
         $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
 
         $user = User::find($id);
