@@ -52,7 +52,7 @@ class Firebase {
             'notification' =>  $message
         );
 
-
+        return $fields;
         return $this->sendPushNotification( $fields );
     }
 
