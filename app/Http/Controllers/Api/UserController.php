@@ -102,7 +102,7 @@ class UserController extends Controller
         try {
             $firebase = new Firebase();
             $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload);
-            return $firebase->sendMultiple(  [$user['token']],  $message );
+            return $firebase->send(  $user['token'],  $message );
         } catch ( Exception $ex ) {
             return false;
         }
