@@ -166,8 +166,32 @@ class UserSeeder extends Seeder
             $user->fcmUser()->create([
                 'token' => 'f_lxoOcE-AI:APA91bGAI74QC0z3_LamCa-8dEyey27KdwoYCC0Xue8HcvstEkYpDzo4BvIdJ8Otno1qlymsjsSSH7XBD9-viDgBy-kEozIHk5_kBgOAZ8mfZKGkQfG107-ILz9upgkxmUK2ugPxoyAh'
             ]);
-            $user->profileDriver()->create(['status' => 0, 'cartype_id' => 1, 'is_active' => 0]);
 
+            $user->profileDriver()->create(['status' => 0, 'cartype_id' => 1, 'is_active' => 0]);
+            $user->profileDriver()->first()->documents()->create([
+                "type"=>'4',
+                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592904799.jpeg",
+            ]);
+            $user->profileDriver()->first()->documents()->create([
+                "type"=>'4',
+                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925935.jpeg",
+            ]);
+            $user->profileDriver()->first()->documents()->create([
+                "type"=>'5',
+                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925949.jpeg",
+            ]);
+            $user->profileDriver()->first()->documents()->create([
+                "type"=>'5',
+                "path"=>"https://logistica.wi-mobi.com/img/attachement/1593081387.jpeg",
+            ]);
+            $user->profileDriver()->first()->documents()->create([
+                "type"=>'6',
+                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925961.jpeg",
+            ]);
+            $user->profileDriver()->first()->documents()->create([
+                "type"=>'6',
+                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925970.jpeg",
+            ]);
             $admin = User::create([
                 'firstName' => 'admin firstName',
                 'lastName' => 'lastName',

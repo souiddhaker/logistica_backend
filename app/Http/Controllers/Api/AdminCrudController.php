@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminRoles;
 use App\Models\CancelTrip;
 use App\Models\CarCategory;
+use App\Models\Document;
+use App\Models\Driver;
 use App\Models\Notif;
 use App\Models\Promocode;
 use App\Models\Result;
@@ -121,7 +123,7 @@ class AdminCrudController extends Controller
                 $res->success($data);
                 break;
             case "captain":
-                $data = User::where('id', $id)->with(['profiledriver'])->limit(1)->get();
+                $data = User::where('id', $id)->with(['profiledriver','profiledriver.documents'])->limit(1)->get();
                 $data['tripStats'] = [
                     'finished' => Trip::where('driver_id', $id)->where('status', [3, 2])->count('id'),
                     'current' => Trip::where('driver_id', $id)->where('status', [1])->count('id'),

@@ -3,7 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Eloquent;
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ */
 class Document extends Model
 {
     //
