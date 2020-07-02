@@ -366,7 +366,8 @@ class DriverController extends Controller
             $candidate['user_id'] = $candidate->id;
             array_push($arrayListDriver,$candidate);
         }
-        $arrayListDriver = $this->modelListDrivers($arrayListDriver,$pickupAddress);
+        $arrayListDriver = collect($this->modelListDrivers($arrayListDriver,$pickupAddress));
+
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
         return $driver;
     }
