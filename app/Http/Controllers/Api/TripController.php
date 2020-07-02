@@ -421,7 +421,7 @@ class TripController extends Controller
 
                 $trip['driver'] = null;
                 $this->driverController->notifyUser($driver->id,1,$trip->id);
-                $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver();
+                $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver($trip->candidates);
                 if ($nextDriverToNotify)
                     $this->driverController->notifyUser($nextDriverToNotify->id, 2,$trip->id);
 
