@@ -302,7 +302,7 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function modelListDrivers(Collection $listDriver,array $pickupAddress)
+    public function modelListDrivers(array $listDriver,array $pickupAddress)
     {
         $listDriverFiltered= [];
         foreach ($listDriver as $driver){
@@ -340,7 +340,7 @@ class DriverController extends Controller
                 ->where('drivers.status', '=', '0')
                 ->select(['users.*','drivers.*'])
                 ->get();
-            $listDriverFiltered = collect($this->modelListDrivers($listDriver,$pickupAddress));
+            $listDriverFiltered = collect($this->modelListDrivers($listDriver->toArray(),$pickupAddress));
             $list =  $listDriverFiltered->sortBy('distance')->sortBy('average_rating')->take(10);
             foreach ($list as $driverToNotify){
                 $this->notifyUser($driverToNotify->user_id,1 ,$trip_id);
@@ -363,7 +363,7 @@ class DriverController extends Controller
             $candidate['user_id'] = $candidate->id;
             array_push($arrayListDriver,$candidate);
         }
-        $arrayListDriver = $this->modelListDrivers(collect($arrayListDriver));
+        $arrayListDriver = $this->modelListDrivers($arrayListDriver);
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
         return $driver;
     }
