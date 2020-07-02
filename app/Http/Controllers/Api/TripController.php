@@ -420,7 +420,7 @@ class TripController extends Controller
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
 
                 $trip['driver'] = null;
-                $this->notifyUser($driver->id,1,$trip->id);
+                $this->driverController->notifyUser($driver->id,1,$trip->id);
                 $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver();
                 if ($nextDriverToNotify)
                     $this->driverController->notifyUser($nextDriverToNotify->id, 2,$trip->id);
