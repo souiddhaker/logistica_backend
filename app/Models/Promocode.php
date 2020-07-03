@@ -63,7 +63,7 @@ class Promocode extends Model
     {
 
         $res = new Result();
-            $id = Promocode::where('id', $id)->update(['status'=>0]);
+            $id = Promocode::where('id', $id)->update(['status'=>"inactive"]);
         $res->success([
                 "coupon" => $id
             ]);
