@@ -174,7 +174,9 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Sentry\Laravel\ServiceProvider::class
+        Sentry\Laravel\ServiceProvider::class,
+        GoogleMaps\ServiceProvider\GoogleMapsServiceProvider::class
+
     ],
 
     /*
@@ -227,6 +229,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Sentry' => Sentry\Laravel\Facade::class,
+        'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
     ],
 
 ];

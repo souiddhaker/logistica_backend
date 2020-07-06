@@ -141,6 +141,7 @@ class DriverController extends Controller
             $this->saveProfileDocuments($request,$driverProfile);
             $userController->createAccount($driver->id);
             $response->response[0]->user = $this->getProfile()->getData()->response[0];
+            $response->response[0]->isUser = false;
         }
         return response()->json($response,200);
     }
@@ -289,6 +290,16 @@ class DriverController extends Controller
     {
         $res = new Result();
         $data = $request->all();
+        $validator = Validator::make($request->all(),
+            [
+                'longitude' => 'required',
+                'lattitude' => 'required'
+            ]);
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.address_update_error'));
+            return response()->json($res, 200);
+        }
         $data['user_id'] = Auth::id();
 
         $driverposition  = Address::where('user_id', Auth::id())->where('type', '=', '4')->first();
@@ -304,9 +315,15 @@ class DriverController extends Controller
 
     public function modelListDrivers(array $listDriver,array $pickupAddress)
     {
+
+        $query = "SELECT *, ( 6371 * acos ( cos ( radians(35.23519136853935) )
+                    * cos( radians( `lattitude` ) ) * cos( radians( `longitude` ) - radians(11.152210805748016) )
+                    + sin ( radians(35.23519136853935) ) * sin( radians( `lattitude` ) ) ) )
+                    AS distance FROM `address` WHERE `type` = '4' ORDER BY distance";
+
         $listDriverFiltered= [];
         foreach ($listDriver as $driver){
-            $driverposition  = Address::where('user_id', $driver->user_id)->where('type', '=', '4')->first();
+            $driverposition  = Address::where('user_id', $driver['user_id'])->where('type', '=', '4')->first();
             if ($driverposition)
             {
                 $modelDriver = $driver;
@@ -332,44 +349,48 @@ class DriverController extends Controller
                 return $address['type'] === "1";
             })[0];
 
-            $listDriver  = User::with('profileDriver')
-                ->join('address', 'address.user_id', '=', 'users.id')
-                ->join('drivers', 'drivers.user_id', '=', 'users.id')
-                ->where('address.type' , '=', '4')
-                ->where('users.roles',"=", json_encode(['captain']))
-                ->where('drivers.status', '=', '0')
-                ->select(['users.*','drivers.*'])
-                ->get();
-            $listDriverFiltered = collect($this->modelListDrivers($listDriver->toArray(),$pickupAddress));
-            $list =  $listDriverFiltered->sortBy('distance')->sortBy('average_rating')->take(10);
-            foreach ($list as $driverToNotify){
-                $this->notifyUser($driverToNotify->user_id,1 ,$trip_id);
-            }
-            $this->notifyUser($trip->user_id,9,$trip_id,$list[0]->id);
-
-            return $list;
+            $listDriver = \DB::select('SELECT users.id, ( 6371 * acos ( cos ( radians(?) ) * cos( radians( address.lattitude ) )
+                * cos( radians( address.longitude ) - radians(?) ) + sin ( radians(?) )
+                * sin( radians( address.lattitude ) ) ) ) AS distance
+                FROM `users` JOIN `address` ON address.user_id = users.id
+                JOIN drivers ON drivers.user_id = users.id
+                WHERE `address`.`type` = 4 AND users.roles LIKE "%captain%" AND drivers.status = 0 ORDER BY distance',
+                [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
+            foreach ($listDriver as $driver)
+                $this->notifyUser($driver->id,1,$trip_id);
+            $this->notifyUser(Auth::id(),9,$trip_id,$listDriver[0]->id);
+            return $listDriver;
         }else{
+
             return null;
         }
 
 
     }
 
-    public function filterAndGetFirstDriver(Trip $trip)
+
+    public function getRouteFromApi()
     {
+
+    }
+    public function filterAndGetFirstDriver(int $trip_id)
+    {
+        $trip =Trip::find($trip_id);
         $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
             return $address['type'] === "1";
         })[0];
         $listCandidates = $trip->candidates;
-        $arrayListDriver = [];
-        foreach ($listCandidates as $candidate){
-            $candidate['user_id'] = $candidate->id;
-            array_push($arrayListDriver,$candidate);
-        }
-        $arrayListDriver = collect($this->modelListDrivers($arrayListDriver,$pickupAddress));
+//        $arrayListDriver = [];
+//        foreach ($listCandidates as $candidate){
+//            $candidate['user_id'] = $candidate->id;
+//            array_push($arrayListDriver,$candidate);
+//        }
+        $arrayListDriver = collect($trip->candidates);
 
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
-        return $driver["0"];
+        $driver['average_rating'] = $this->getDriverRating($driver->id);
+
+        return $driver;
     }
 
     public function getDriverRating(int $id)
@@ -393,17 +414,16 @@ class DriverController extends Controller
         return $angle * $earthRadius;
     }
 
-    public function pickupTrip(Request $request)
+    public function pickupTrip(int $trip_id)
     {
-        //TODO pickup trip
         $res = new Result();
-        $trip = Trip::where('id', '=',$request['trip_id'])
+        $trip = Trip::where('id', '=',$trip_id)
             ->where('status','=' ,'-1')
             ->where('driver_id','=',Auth::id())->first();
         if($trip)
         {
             $trip->update(['status'=>'1']);
-            $this->notifyUser($trip->user_id,-1,$trip->id);
+            $this->notifyUser($trip->user_id,5,$trip->id);
             $res->success($trip);
         }else{
             $res->fail(trans('messages.trip_not_found'));
@@ -411,17 +431,16 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function finishedTrip(Request $request)
+    public function finishedTrip(int $trip_id)
     {
-        //TODO finishedTrip by driver notify user
         $res = new Result();
-        $trip = Trip::where('id', '=',$request['trip_id'])
+        $trip = Trip::where('id', '=',$trip_id)
             ->where('status','=' ,'1')->first();
         if($trip)
         {
             $trip->update(['status'=>'2']);
             $res->success($trip);
-            $this->notifyUser($trip->user_id,2,$trip->id);
+            $this->notifyUser($trip->user_id,8,$trip->id);
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }
@@ -549,7 +568,7 @@ class DriverController extends Controller
         $notif->type = $translationsType;
         $notif->trip_id = $trip_id;
         $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
-
+        $notif->driver_id = $driver;
         $user = User::find($id);
         $user->notifs()->save($notif);
         $userController = new UserController();

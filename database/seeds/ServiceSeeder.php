@@ -17,8 +17,8 @@ class ServiceSeeder extends Seeder
     {
         //
 
-        $service = CategoryServices::create(['title' => ['en' => 'Service' , 'ar' => 'الخدمات']]);
-        $packaging = CategoryServices::create(['title' => ['en' => 'Packaging' , 'ar' => 'التعبئة والتغليف']]);
+        $service = CategoryServices::create(['title' => 'Service']);
+        $packaging = CategoryServices::create(['title' => 'Packaging']);
 
         Service::create(['label' => ['en' => 'Delivery' , 'ar' => 'توصيل'], 'price' => 15 ,'category_id' => $service->id]);
         Service::create(['label' => ['en' => 'Boarding' , 'ar' => 'التحميل و التنزيل'], 'price' => 2 ,'category_id' => $service->id]);

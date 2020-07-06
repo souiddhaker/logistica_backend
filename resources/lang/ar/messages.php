@@ -36,6 +36,7 @@ return [
     'services_list' => 'قائمة الخدمات',
     'addresses_list' => 'قائمة العناوين المخزنة',
     'address_exists' => 'العنوان موجود سابق',
+    'address_update_error' => 'لا يمكن تحديث الموقع',
 
     'note_error' => ' يرجى إدخال ملاحظة للسائق',
 

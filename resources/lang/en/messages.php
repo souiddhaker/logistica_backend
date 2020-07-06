@@ -35,6 +35,7 @@ return [
     'services_list' => 'List services',
     'addresses_list' => 'List address stored',
     'address_exists' => 'Address already exists',
+    'address_update_error' => 'Cannot update position',
     'note_error' => 'Please enter a driver note',
 
     'trip_not_found' => 'Trip not found',

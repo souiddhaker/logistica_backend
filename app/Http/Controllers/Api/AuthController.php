@@ -80,11 +80,13 @@ class AuthController extends Controller
                 {
                     Auth::login($user);
                     $driverController = new DriverController();
-                    $response['user'] = $driverController->getProfile()->getData()->response[0];
-
+                    $response['user'] = $user->profileDriver ?$driverController->getProfile()->getData()->response[0] : $user;
+                    $response['isUser'] = false;
                 }
-                else
+                else{
                     $response['user'] = $user;
+                    $response['isUser'] = true;
+                }
                 $response['isAlreadyUser'] = true;
 
             }else {
@@ -95,7 +97,6 @@ class AuthController extends Controller
             $res->message = trans('messages.verif_code_correct');
             return response()->json($res, 200);
         }
-
         if ($verifCode === "0002")
         {
             $res->fail(trans('messages.verif_code_expired'));
@@ -181,6 +182,7 @@ class AuthController extends Controller
 
         $result = $this->issueToken($input, 'password');
         $result['user'] = $user;
+        $result['isUser'] = true;
         $result['isAlreadyUser'] = false;
         $res->success($result);
         return response()->json($res, 200);

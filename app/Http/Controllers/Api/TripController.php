@@ -335,6 +335,7 @@ class TripController extends Controller
         if ($trip)
         {
             $cancelTrip = CancelTrip::create(['raison'=>$data['raison'],'by_user'=>$data['canceledByUser']]);
+
             if (in_array($trip->status, ['-1','1'])){
                 $trip->status = '3';
                 $trip->cancelTrip()->save($cancelTrip);
@@ -347,14 +348,15 @@ class TripController extends Controller
                     $this->driverController->notifyUser($user->id,6,$trip->id);
             }else {
                 if ($user->getRoles() === json_encode(['client'])) {
-                    $nextDriver = $this->driverController->filterAndGetFirstDriver($trip->candidates);
-                    $this->driverController->notifyUser($nextDriver->id, 6, $trip->id);
+                    $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
+                    $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
+                    var_dump($nextDriver);
                 }
             }
+            $res->success($trip);
         }else{
             $res->fail(trans('message.trip_not_found'));
         }
-        // TODO cancel trip by connected user
         return response()->json($res,200);
     }
 
@@ -414,23 +416,22 @@ class TripController extends Controller
                 $trip->driver_id = $driver->id;
                 $trip->save();
                 $trip['driver'] = $driver;
-                $this->notifyUser($driver->id,-1,$trip->id);
+                $this->driverController->notifyUser($driver->id,3,$trip->id);
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
 
                 $trip['driver'] = null;
-                $this->driverController->notifyUser($driver->id,1,$trip->id);
-                $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver($trip);
+                $this->driverController->notifyUser($driver->id,4,$trip->id);
+                $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver($trip->id);
                 if ($nextDriverToNotify)
-                    $this->driverController->notifyUser($nextDriverToNotify->id, 2,$trip->id);
+                    $this->driverController->notifyUser($nextDriverToNotify->id, 1,$trip->id);
 
             }
             $res->success($trip);
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }
-        //TODO notify driver with two status
         return response()->json($res,200);
     }
 
@@ -467,6 +468,46 @@ class TripController extends Controller
         }else{
             $res->fail('Fail to upload');
         }
+        return response()->json($res,200);
+    }
+
+    public function driverRequest(Request $request ,int $trip_id)
+    {
+        $res = new Result();
+        $data = $request->all();
+        $validator = Validator::make($data, ['driver_id' => 'required']);
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.trip_not_found'));
+            return response()->json($res, 200);
+        }
+        $trip = Trip::with('addresses','type_car')
+            ->where('id','=',$trip_id)
+            ->where('status','=','0')
+            ->first();
+        $response = [];
+        $driver = User::find($data['driver_id']);
+        if ($trip && $driver)
+        {
+            $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
+                return $address['type'] === "1";
+            })[0];
+            $destinationAddress = array_filter($trip->addresses->toArray(), function($address){
+                return $address['type'] === "2";
+            })[1];
+            $distanceMatrixApi = json_decode( \GoogleMaps::load('distancematrix')
+                ->setParamByKey ('origins' ,$pickupAddress['lattitude'].','.$pickupAddress['longitude'])
+                ->setParamByKey ('destinations' ,$destinationAddress['lattitude'].','.$destinationAddress['longitude'])
+                ->get());
+            $response['driver'] = $driver;
+            $response['driver_rating'] = $this->driverController->getDriverRating($driver->id);
+            $response['distance'] = $distanceMatrixApi->rows[0]->elements[0]->distance->text;
+            $response['time'] = $distanceMatrixApi->rows[0]->elements[0]->duration->text;
+
+
+            $res->success(array_merge($response,$trip->toArray()));
+        }else
+            $res->fail(trans('message.trip_not_found'));
         return response()->json($res,200);
     }
 }

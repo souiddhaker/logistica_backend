@@ -69,6 +69,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/note', 'Api\TripController@noteDriver');
         Route::post('/rate', 'Api\TripController@rateTrip');
         Route::post('/responseToDriver', 'Api\TripController@confirmTripFromUser');
+        Route::get('/request/{id}','Api\TripController@driverRequest');
 
     });
 });
@@ -83,8 +84,8 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
         Route::get('/list','Api\TripController@listTrips');
         Route::get('/search', 'Api\TripController@search');
         Route::post('/accept', 'Api\DriverController@acceptTripFromDriver');
-        Route::post('/pickup', 'Api\DriverController@pickupTrip');
-        Route::post('/finished', 'Api\DriverController@finishedTrip');
+        Route::post('/pickup/{id}', 'Api\DriverController@pickupTrip');
+        Route::post('/finished/{id}', 'Api\DriverController@finishedTrip');
 
     });
     Route::prefix('profile')->group(function(){

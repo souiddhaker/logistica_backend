@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class NotifController extends Controller
 {
-    //
+
 
     public function getAllNotifs()
     {
@@ -19,12 +19,8 @@ class NotifController extends Controller
         $userId = Auth::id();
 
         $notifs = Notif::where('user_id', '=', $userId)
-            ->paginate(10)
-            ->toArray();
-        foreach ($notifs['data'] as $notif)
-        {
-            Notif::find($notif['id'])->update(['seen'=>true]);
-        }
+            ->paginate(10)->toArray();
+        Notif::where('user_id', '=', $userId)->update(['seen'=>true]);
         $res->success($notifs);
         return response()->json($res,200);
     }
