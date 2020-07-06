@@ -272,8 +272,8 @@ class DriverController extends Controller
 
         if ($trip)
         {
-            if (count($trip->candidates)>0){
-                $this->notifyUser($trip->user_id,9,$trip->id,$this->getProfile(Auth::id()));
+            if (count($trip->candidates)==0){
+                $this->notifyUser($trip->user_id,9,$trip->id,Auth::id());
             }
             $trip->candidates()->attach(User::find( Auth::id()));
             $trip->save();
@@ -281,11 +281,36 @@ class DriverController extends Controller
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }
-        //TODO notify user
         return response()->json($res,200);
     }
 
+    public function refuseTripFromDriver(Request $request)
+    {
+        $res = new Result();
 
+        $validator = Validator::make($request->all(),
+            [
+                'trip_id' => 'required'
+            ]);
+        if ($validator->fails())
+        {
+            $res->fail(trans('messages.trip_not_found'));
+            return response()->json($res, 200);
+        }
+
+        $trip = Trip::where('id',$request['trip_id'])
+            ->where('status',"=", "0")->first();
+
+        if ($trip)
+        {
+            $trip->candidates()->wherePivot('user_id',Auth::id())->detach();
+            $trip->save();
+            $res->success($trip);
+        }else{
+            $res->fail(trans('messages.trip_not_found'));
+        }
+        return response()->json($res,200);
+    }
     public function updatePosition(Request $request)
     {
         $res = new Result();
@@ -313,31 +338,6 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function modelListDrivers(array $listDriver,array $pickupAddress)
-    {
-
-        $query = "SELECT *, ( 6371 * acos ( cos ( radians(35.23519136853935) )
-                    * cos( radians( `lattitude` ) ) * cos( radians( `longitude` ) - radians(11.152210805748016) )
-                    + sin ( radians(35.23519136853935) ) * sin( radians( `lattitude` ) ) ) )
-                    AS distance FROM `address` WHERE `type` = '4' ORDER BY distance";
-
-        $listDriverFiltered= [];
-        foreach ($listDriver as $driver){
-            $driverposition  = Address::where('user_id', $driver['user_id'])->where('type', '=', '4')->first();
-            if ($driverposition)
-            {
-                $modelDriver = $driver;
-                $modelDriver['addressDriver'] = $driverposition;
-                $modelDriver['distance'] = $this->haversineGreatCircleDistance(
-                    $pickupAddress['lattitude'],$pickupAddress['longitude'],
-                    $driverposition->lattitude,$driverposition->longitude);
-                $modelDriver['average_rating'] = $this->getDriverRating($driver->id);
-                array_push($listDriverFiltered,$modelDriver);
-            }
-        }
-
-        return $listDriverFiltered;
-    }
     public function getListDriverForTrip(int $trip_id)
     {
 
@@ -369,22 +369,13 @@ class DriverController extends Controller
     }
 
 
-    public function getRouteFromApi()
-    {
-
-    }
     public function filterAndGetFirstDriver(int $trip_id)
     {
         $trip =Trip::find($trip_id);
         $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
             return $address['type'] === "1";
         })[0];
-        $listCandidates = $trip->candidates;
-//        $arrayListDriver = [];
-//        foreach ($listCandidates as $candidate){
-//            $candidate['user_id'] = $candidate->id;
-//            array_push($arrayListDriver,$candidate);
-//        }
+
         $arrayListDriver = collect($trip->candidates);
 
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
@@ -397,22 +388,7 @@ class DriverController extends Controller
     {
         return Rating::where('driver_id', '=', $id)->avg('value') ? null : 0;
     }
-    function haversineGreatCircleDistance(
-        $latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
-    {
-        // convert from degrees to radians
-        $latFrom = deg2rad($latitudeFrom);
-        $lonFrom = deg2rad($longitudeFrom);
-        $latTo = deg2rad($latitudeTo);
-        $lonTo = deg2rad($longitudeTo);
 
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
-
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-                cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-        return $angle * $earthRadius;
-    }
 
     public function pickupTrip(int $trip_id)
     {
@@ -441,6 +417,7 @@ class DriverController extends Controller
             $trip->update(['status'=>'2']);
             $res->success($trip);
             $this->notifyUser($trip->user_id,8,$trip->id);
+            Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }

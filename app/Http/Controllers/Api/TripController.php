@@ -341,7 +341,7 @@ class TripController extends Controller
                 $trip->cancelTrip()->save($cancelTrip);
                 $trip->save();
                 $res->success($cancelTrip);
-                $res->message = trans('message.cancel_trip');
+                $res->message = trans('messages.cancel_trip');
                 if ($user->getRoles() === json_encode(['client']))
                     $this->driverController->notifyUser($user->id,5,$trip->id);
                 else
@@ -350,12 +350,11 @@ class TripController extends Controller
                 if ($user->getRoles() === json_encode(['client'])) {
                     $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
                     $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
-                    var_dump($nextDriver);
                 }
             }
             $res->success($trip);
         }else{
-            $res->fail(trans('message.trip_not_found'));
+            $res->fail(trans('messages.trip_not_found'));
         }
         return response()->json($res,200);
     }
@@ -383,7 +382,7 @@ class TripController extends Controller
             $res->success($rate);
 
         }else{
-            $res->fail(trans('message.trip_not_found'));
+            $res->fail(trans('messages.trip_not_found'));
         }
         return response()->json($res,200);
     }
@@ -417,6 +416,7 @@ class TripController extends Controller
                 $trip->save();
                 $trip['driver'] = $driver;
                 $this->driverController->notifyUser($driver->id,3,$trip->id);
+                Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
@@ -446,7 +446,7 @@ class TripController extends Controller
             $trip->save();
             $res->success($this->getById($trip->id));
         }else{
-            $res->fail(trans('message.trip_not_found'));
+            $res->fail(trans('messages.trip_not_found'));
         }
         return response()->json($res,200);
     }
@@ -471,20 +471,20 @@ class TripController extends Controller
         return response()->json($res,200);
     }
 
-    public function driverRequest(Request $request ,int $trip_id)
+    public function driverRequest(Request $request)
     {
         $res = new Result();
         $data = $request->all();
-        $validator = Validator::make($data, ['driver_id' => 'required']);
+        $validator = Validator::make($data, [
+            'driver_id' => 'required',
+            'trip_id' => 'required'
+        ]);
         if ($validator->fails())
         {
             $res->fail(trans('messages.trip_not_found'));
             return response()->json($res, 200);
         }
-        $trip = Trip::with('addresses','type_car')
-            ->where('id','=',$trip_id)
-            ->where('status','=','0')
-            ->first();
+        $trip =Trip::find($data['trip_id']);
         $response = [];
         $driver = User::find($data['driver_id']);
         if ($trip && $driver)
@@ -499,15 +499,16 @@ class TripController extends Controller
                 ->setParamByKey ('origins' ,$pickupAddress['lattitude'].','.$pickupAddress['longitude'])
                 ->setParamByKey ('destinations' ,$destinationAddress['lattitude'].','.$destinationAddress['longitude'])
                 ->get());
+            $response['trip'] = $this->getById($data['trip_id']);
             $response['driver'] = $driver;
             $response['driver_rating'] = $this->driverController->getDriverRating($driver->id);
             $response['distance'] = $distanceMatrixApi->rows[0]->elements[0]->distance->text;
             $response['time'] = $distanceMatrixApi->rows[0]->elements[0]->duration->text;
 
 
-            $res->success(array_merge($response,$trip->toArray()));
+            $res->success($response);
         }else
-            $res->fail(trans('message.trip_not_found'));
+            $res->fail(trans('messages.trip_not_found'));
         return response()->json($res,200);
     }
 }
