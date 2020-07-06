@@ -425,7 +425,7 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function notifyUser(int $id, int $step,int $trip_id,int $driver =null)
+    public function notifyUser(int $id, int $step,int $trip_id = null,int $driver =null)
     {
         $msgAr = "";
         $msgEn = "";
