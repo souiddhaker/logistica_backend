@@ -350,6 +350,9 @@ class TripController extends Controller
                 if ($user->getRoles() === json_encode(['client'])) {
                     $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
                     $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
+                }else{
+                    $trip->candidates()->wherePivot('user_id',Auth::id())->detach();
+                    $trip->save();
                 }
             }
             $res->success($trip);
