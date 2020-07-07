@@ -557,6 +557,7 @@ class DriverController extends Controller
     }
 
     public function notifyMe(int $id){
+        // TODO description colomun and route colomun database
         return response()->json($this->notifyUser($id,2,60,4),200);
     }
 }
