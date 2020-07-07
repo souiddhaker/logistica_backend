@@ -19,6 +19,7 @@ class NotifController extends Controller
         $userId = Auth::id();
 
         $notifs = Notif::where('user_id', '=', $userId)
+            ->orderByDesc('created_at')
             ->paginate(10)->toArray();
         Notif::where('user_id', '=', $userId)->update(['seen'=>true]);
         $res->success($notifs);
