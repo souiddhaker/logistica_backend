@@ -59,7 +59,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::prefix('trip')->group(function(){
         Route::get('/list', 'Api\TripController@listTrips');
         Route::get('/search', 'Api\TripController@search');
-        Route::get('/request','Api\TripController@driverRequest');
+        Route::post('/request','Api\TripController@driverRequest');
 
         Route::get('/{id}', 'Api\TripController@getTrip');
 
