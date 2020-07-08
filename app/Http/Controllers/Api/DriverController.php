@@ -380,6 +380,7 @@ class DriverController extends Controller
         $arrayListDriver = collect($trip->candidates);
 
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
+        var_dump($driver);
         if ($driver)
         $driver['average_rating'] = $this->getDriverRating($driver['id']);
 
