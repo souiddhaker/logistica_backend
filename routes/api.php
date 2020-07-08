@@ -87,7 +87,7 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
         Route::post('/refuse', 'Api\DriverController@refuseTripFromDriver');
         Route::post('/pickup/{id}', 'Api\DriverController@pickupTrip');
         Route::post('/finished/{id}', 'Api\DriverController@finishedTrip');
-
+        Route::post('/receipt', 'Api\TripController@uploadReceipt');
     });
     Route::prefix('profile')->group(function(){
         Route::put('/update','Api\DriverController@updateDriver');
@@ -116,7 +116,6 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
         Route::get('/resume','Api\PaymentController@resume');
     });
     Route::post('/updateposition', 'Api\DriverController@updatePosition');
-    Route::post('/receipt', 'Api\TripController@uploadReceipt');
 
     Route::prefix('help')->group(function(){
         Route::get('/list', 'Api\HelpController@getAllQuestions');
