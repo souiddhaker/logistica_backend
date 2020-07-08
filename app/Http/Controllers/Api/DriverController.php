@@ -381,10 +381,14 @@ class DriverController extends Controller
 
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
         var_dump($driver);
-        if (count($driver)>0)
-        $driver['average_rating'] = $this->getDriverRating($driver[0]['id']);
+        if (count($driver)>0){
+            $driver['average_rating'] = $this->getDriverRating($driver[0]['id']);
 
-        return $driver;
+            return $driver;
+        }else{
+            return null;
+        }
+
     }
 
     public function getDriverRating(int $id)
