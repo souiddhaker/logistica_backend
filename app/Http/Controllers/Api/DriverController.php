@@ -358,8 +358,8 @@ class DriverController extends Controller
                 [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
             foreach ($listDriver as $driver)
                 $this->notifyUser($driver->id,1,$trip_id,$driver->id);
-            if (count($listDriver)>0)
-            $this->notifyUser(Auth::id(),9,$trip_id,$listDriver[0]->id);
+//            if (count($listDriver)>0)
+//            $this->notifyUser(Auth::id(),9,$trip_id,$listDriver[0]->id);
             return $listDriver;
         }else{
 
