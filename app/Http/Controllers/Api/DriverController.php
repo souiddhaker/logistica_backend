@@ -357,7 +357,7 @@ class DriverController extends Controller
                 WHERE `address`.`type` = 4 AND users.roles LIKE "%captain%" AND drivers.status = 0 ORDER BY distance',
                 [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
             foreach ($listDriver as $driver)
-                $this->notifyUser($driver->id,1,$trip_id);
+                $this->notifyUser($driver->id,1,$trip_id,$driver->id);
             if (count($listDriver)>0)
             $this->notifyUser(Auth::id(),9,$trip_id,$listDriver[0]->id);
             return $listDriver;
