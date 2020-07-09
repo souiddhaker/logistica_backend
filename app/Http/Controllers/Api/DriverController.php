@@ -405,7 +405,7 @@ class DriverController extends Controller
         if($trip)
         {
             $trip->update(['status'=>'1']);
-            $this->notifyUser($trip->user_id,5,$trip->id);
+            $this->notifyUser($trip->user_id,5,$trip->id,Auth::id());
             $res->success($trip);
         }else{
             $res->fail(trans('messages.trip_not_found'));
@@ -422,7 +422,7 @@ class DriverController extends Controller
         {
             $trip->update(['status'=>'2']);
             $res->success($trip);
-            $this->notifyUser($trip->user_id,8,$trip->id);
+            $this->notifyUser($trip->user_id,8,$trip->id,Auth::id());
             Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
         }else{
             $res->fail(trans('messages.trip_not_found'));
