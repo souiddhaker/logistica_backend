@@ -418,14 +418,14 @@ class TripController extends Controller
                 $trip->driver_id = $driver->id;
                 $trip->save();
                 $trip['driver'] = $driver;
-                $this->driverController->notifyUser($driver->id,3,$trip->id);
+                $this->driverController->notifyUser($driver->id,3,$trip->id,$driver->id);
                 Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
 
                 $trip['driver'] = null;
-                $this->driverController->notifyUser($driver->id,4,$trip->id);
+                $this->driverController->notifyUser($driver->id,4,$trip->id,$driver->id);
                 $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver($trip->id);
                 if ($nextDriverToNotify)
                     $this->driverController->notifyUser($nextDriverToNotify->id, 1,$trip->id);
