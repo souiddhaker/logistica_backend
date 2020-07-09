@@ -343,9 +343,9 @@ class TripController extends Controller
                 $res->success($cancelTrip);
                 $res->message = trans('messages.cancel_trip');
                 if ($user->getRoles() === json_encode(['client']))
-                    $this->driverController->notifyUser($user->id,5,$trip->id);
+                    $this->driverController->notifyUser($user->id,5,$trip->id,$trip->driver_id);
                 else
-                    $this->driverController->notifyUser($user->id,6,$trip->id);
+                    $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
             }else {
                 if ($user->getRoles() === json_encode(['client'])) {
                     $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
