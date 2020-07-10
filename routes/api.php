@@ -82,6 +82,7 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
 
     Route::prefix('trip')->group(function(){
         Route::get('/list','Api\TripController@listTrips');
+        Route::get('/list_request','Api\TripController@listOfRequest');
         Route::get('/search', 'Api\TripController@search');
         Route::post('/accept', 'Api\DriverController@acceptTripFromDriver');
         Route::post('/refuse', 'Api\DriverController@refuseTripFromDriver');

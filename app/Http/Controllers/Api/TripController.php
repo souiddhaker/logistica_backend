@@ -8,6 +8,7 @@ use App\Models\CarCategory;
 use App\Models\Card;
 use App\Models\Document;
 use App\Models\Driver;
+use App\Models\Notif;
 use App\Models\Rating;
 use App\Models\Service;
 use App\Models\SubService;
@@ -15,6 +16,7 @@ use App\Models\Trip;
 use App\Http\Controllers\Controller;
 use App\Models\Result;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -53,6 +55,20 @@ class TripController extends Controller
         return response()->json($res,200);
     }
 
+    public function listOfRequest()
+    {
+        $res = new Result();
+        $today = Carbon::now();
+        $listRequestTrip = Trip::select('trips.id','status','pickup_at','total_price','trips.driver_id','trips.user_id','trips.created_at')
+            ->where('status','=','0')
+            ->leftJoin('notifs','notifs.trip_id','=','trips.id')
+            ->where('notifs.driver_id','=',Auth::id())
+            ->whereDate('trips.pickup_at', '>', $today->format('Y-m-d'))
+            ->with('driver','user','addresses')
+            ->orderBy('trips.updated_at', 'desc')->paginate(10)->toArray();
+        $res->success($listRequestTrip);
+        return response()->json($res, 200);
+    }
     public function listTrips()
     {
 
@@ -343,7 +359,7 @@ class TripController extends Controller
                 $res->success($cancelTrip);
                 $res->message = trans('messages.cancel_trip');
                 if ($user->getRoles() === json_encode(['client']))
-                    $this->driverController->notifyUser($user->id,5,$trip->id,$trip->driver_id);
+                    $this->driverController->notifyUser($trip->driver_id,5,$trip->id,$trip->driver_id);
                 else
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
             }else {
@@ -351,6 +367,8 @@ class TripController extends Controller
                     $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
                     $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
                 }else{
+                    $removeNotif = Notif::where('trip_id','=',$trip->id)
+                        ->where('driver_id','=',Auth::id())->update(['driver_id'=>null]);
                     $trip->candidates()->wherePivot('user_id',Auth::id())->detach();
                     $trip->save();
                 }
@@ -420,15 +438,20 @@ class TripController extends Controller
                 $trip['driver'] = $driver;
                 $this->driverController->notifyUser($driver->id,3,$trip->id,$driver->id);
                 Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
+                $trip->candidates()->detach();
+                $removeNotif = Notif::where('trip_id','=',$trip->id)
+                    ->where('driver_id','!=',$driver->id)->update(['driver_id'=>null]);
+                //TODO here
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
-
+                $removeNotif = Notif::where('trip_id','=',$trip->id)
+                    ->where('driver_id','=',$driver->id)->update(['driver_id'=>null]);
                 $trip['driver'] = null;
                 $this->driverController->notifyUser($driver->id,4,$trip->id,$driver->id);
                 $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver($trip->id);
                 if ($nextDriverToNotify)
-                    $this->driverController->notifyUser($nextDriverToNotify->id, 1,$trip->id);
+                    $this->driverController->notifyUser(Auth::id(),1,$trip->id,$nextDriverToNotify->id);
 
             }
             $res->success($trip);
@@ -507,7 +530,6 @@ class TripController extends Controller
             $response['driver_rating'] = $this->driverController->getDriverRating($driver->id);
             $response['distance'] = $distanceMatrixApi->rows[0]->elements[0]->distance->text;
             $response['time'] = $distanceMatrixApi->rows[0]->elements[0]->duration->text;
-
 
             $res->success($response);
         }else
