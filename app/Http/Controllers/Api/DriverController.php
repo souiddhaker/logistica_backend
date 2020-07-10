@@ -300,7 +300,8 @@ class DriverController extends Controller
 
         $trip = Trip::where('id',$request['trip_id'])
             ->where('status',"=", "0")->first();
-
+        $removeNotif = Notif::where('trip_id','=',$trip?$trip->id:null)
+            ->where('driver_id','=',Auth::id())->update(['driver_id'=>null]);
         if ($trip)
         {
             $trip->candidates()->wherePivot('user_id',Auth::id())->detach();
