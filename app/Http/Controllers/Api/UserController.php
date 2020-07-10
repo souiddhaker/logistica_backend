@@ -79,16 +79,7 @@ class UserController extends Controller
         $userFCM->user_id = Auth::id();
         $userFCM->token = $request['fcm'];
         $userFCM->save();
-//        $userFCM = UserFcm::where('user_id', '=', Auth::id())->first();
-//        if (!$userFCM)
-//        {
-//            $userFCM = new UserFcm();
-//            $userFCM->user_id = Auth::id();
-//            $userFCM->token = $request['fcm'];
-//            $userFCM->save();
-//        }else{
-//            $userFCM->update(['token'=>$request['fcm']]);
-//        }
+
         $res->success($userFCM);
 
         return response()->json($res, 200);

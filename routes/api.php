@@ -26,7 +26,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::put('', 'Api\UserController@update');
         Route::post('/profileImage', 'Api\UserController@uploadImage');
         Route::get('', 'Api\UserController@getUser');
-        Route::put('/fcm', 'Api\UserController@userFcmToken');
+        Route::post('/fcm', 'Api\UserController@userFcmToken');
         Route::post('/notify', 'Api\UserController@notify');
     });
     Route::prefix('services')->group(function () {
