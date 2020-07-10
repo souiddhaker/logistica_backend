@@ -63,7 +63,7 @@ class TripController extends Controller
             ->where('status','=','0')
             ->leftJoin('notifs','notifs.trip_id','=','trips.id')
             ->where('notifs.driver_id','=',Auth::id())
-            ->whereDate('trips.pickup_at', '>', $today->format('Y-m-d'))
+            ->whereDate('trips.pickup_at', '>', $today->format('Y-m-d H:i:s'))
             ->with('driver','user','addresses')
             ->orderBy('trips.updated_at', 'desc')->paginate(10)->toArray();
         $res->success($listRequestTrip);
