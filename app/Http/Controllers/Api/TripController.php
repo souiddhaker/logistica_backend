@@ -351,9 +351,8 @@ class TripController extends Controller
         if ($trip)
         {
             $cancelTrip = CancelTrip::create(['raison'=>$data['raison'],'by_user'=>$data['canceledByUser']]);
-
+            $trip->status = '3';
             if (in_array($trip->status, ['-1','1'])){
-                $trip->status = '3';
                 $trip->cancelTrip()->save($cancelTrip);
                 $trip->save();
                 $res->success($cancelTrip);
@@ -364,12 +363,12 @@ class TripController extends Controller
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
             }else {
                 if ($user->getRoles() === json_encode(['client'])) {
-                    $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
-                    $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
-                }else{
+//                    $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
+//                    $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
+//                }else{
                     $removeNotif = Notif::where('trip_id','=',$trip->id)
-                        ->where('driver_id','=',Auth::id())->update(['driver_id'=>null]);
-                    $trip->candidates()->wherePivot('user_id',Auth::id())->detach();
+                        ->where('driver_id','!=',null)->update(['driver_id'=>null]);
+                    $trip->candidates()->detach();
                     $trip->save();
                 }
             }
