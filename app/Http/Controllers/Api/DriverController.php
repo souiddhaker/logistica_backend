@@ -356,19 +356,15 @@ class DriverController extends Controller
                 JOIN drivers ON drivers.user_id = users.id
                 WHERE `address`.`type` = 4 AND users.roles LIKE "%captain%" AND drivers.status = 0 ORDER BY distance',
                 [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
-            foreach ($listDriver as $driver)
+            foreach ($listDriver as $driver){
                 $this->notifyUser($driver->id,1,$trip_id,$driver->id);
-//            if (count($listDriver)>0)
-//            $this->notifyUser(Auth::id(),9,$trip_id,$listDriver[0]->id);
+            }
+            return response()->json($listDriver,200);
             return $listDriver;
         }else{
-
             return null;
         }
-
-
     }
-
 
     public function filterAndGetFirstDriver(int $trip_id)
     {
@@ -376,13 +372,10 @@ class DriverController extends Controller
         $pickupAddress = array_filter($trip->addresses->toArray(), function($address){
             return $address['type'] === "1";
         })[0];
-
         $arrayListDriver = collect($trip->candidates);
-
         $driver =  $arrayListDriver->sortBy('distance')->sortBy('average_rating')->take(1);
         if (count($driver)>0){
             $driver['average_rating'] = $this->getDriverRating($driver[0]['id']);
-
             return $driver;
         }else{
             return null;
@@ -551,8 +544,8 @@ class DriverController extends Controller
         $notif->type = $translationsType;
         $notif->trip_id = $trip_id;
         $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
-        $notif->driver_id = $driver;
         $user = User::find($id);
+        $notif->driver_id = $driver;
         $user->notifs()->save($notif);
         $userController = new UserController();
         $request['payload'] = \GuzzleHttp\json_encode(["trip_id"=> $trip_id,"driver"=>$driver,"step"=>$step]);
@@ -563,6 +556,6 @@ class DriverController extends Controller
 
     public function notifyMe(int $id){
         // TODO description colomun and route colomun database
-        return response()->json($this->notifyUser($id,2,60,4),200);
+        return response()->json($this->notifyUser($id,2,134,4),200);
     }
 }
