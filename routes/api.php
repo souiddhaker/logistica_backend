@@ -33,6 +33,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/car_categories', 'Api\ServiceController@getListCarCategories');
         Route::post('/list_services', 'Api\ServiceController@getListServices');
     });
+    Route::prefix('account')->group(function () {
+        Route::post('/', 'Api\ServiceController@getListCarCategories');
+        Route::post('/list_services', 'Api\ServiceController@getListServices');
+    });
     Route::prefix('promocode')->group(function () {
         Route::post('/verify', 'Api\PromocodeController@verify');
     });
