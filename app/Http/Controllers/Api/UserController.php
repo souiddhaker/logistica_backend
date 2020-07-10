@@ -75,16 +75,20 @@ class UserController extends Controller
             $res->fail("FCM token not valid");
             return response()->json($res, 200);
         }
-        $userFCM = UserFcm::where('user_id', '=', Auth::id())->first();
-        if (!$userFCM)
-        {
-            $userFCM = new UserFcm();
-            $userFCM->user_id = Auth::id();
-            $userFCM->token = $request['fcm'];
-            $userFCM->save();
-        }else{
-            $userFCM->update(['token'=>$request['fcm']]);
-        }
+        $userFCM = new UserFcm();
+        $userFCM->user_id = Auth::id();
+        $userFCM->token = $request['fcm'];
+        $userFCM->save();
+//        $userFCM = UserFcm::where('user_id', '=', Auth::id())->first();
+//        if (!$userFCM)
+//        {
+//            $userFCM = new UserFcm();
+//            $userFCM->user_id = Auth::id();
+//            $userFCM->token = $request['fcm'];
+//            $userFCM->save();
+//        }else{
+//            $userFCM->update(['token'=>$request['fcm']]);
+//        }
         $res->success($userFCM);
 
         return response()->json($res, 200);
@@ -97,12 +101,15 @@ class UserController extends Controller
         $notification_title     = $request['title'];
         $notification_message   = $request['message'];
         $receiver_id =[];
-        $user = UserFcm::where('user_id',$request['user_id'])->first();
+        $users = UserFcm::where('user_id',$request['user_id'])->get();
 
+        foreach($users as $user){
+            array_push($receiver_id,$user['token']);
+        }
         try {
             $firebase = new Firebase();
             $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload);
-            return $firebase->sendMultiple(  [$user['token']],  $message );
+            return $firebase->sendMultiple(  $receiver_id,  $message );
         } catch ( Exception $ex ) {
             return false;
         }
