@@ -360,7 +360,6 @@ class DriverController extends Controller
             foreach ($listDriver as $driver){
                 $this->notifyUser($driver->id,1,$trip_id,$driver->id);
             }
-            return response()->json($listDriver,200);
             return $listDriver;
         }else{
             return null;
