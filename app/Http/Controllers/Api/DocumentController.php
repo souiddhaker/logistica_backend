@@ -74,12 +74,13 @@ class DocumentController extends Controller
         if ($document)
         {
             try {
-                $imageFolder =  '/img/attachement/';
+                $imageFolder =  '/img/profile/';
                 $position  = stripos($document->path,$imageFolder);
                 $image_path = public_path($imageFolder).substr($document->path,$position+strlen($imageFolder),strlen($document->path));
                 unlink($image_path);
                 $res->success();
                 $document->delete();
+
             }catch (\ErrorException $e){
                 $res->fail(trans('messages.document_remove_fail'));
 
