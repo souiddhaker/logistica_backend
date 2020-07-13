@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Mockery\Matcher\Not;
 use PhpParser\Node\Expr\Cast\Object_;
+use PHPUnit\Util\Exception;
 use Validator;
 
 class DriverController extends Controller
@@ -35,7 +36,7 @@ class DriverController extends Controller
         }
     }
 
-    public function saveProfileDocuments(Request $request,Driver $user)
+    public function saveProfileDocuments(Request $request)
     {
         /**
          * id 2
@@ -49,6 +50,9 @@ class DriverController extends Controller
         $car3 = new Document();
         $licence1 = new Document();
         $licence2 = new Document();
+        $listDocument = [];
+        try {
+
 
         if ($request->file('identity1')){
             $file = $request->file('identity1');
@@ -57,8 +61,7 @@ class DriverController extends Controller
             $identity1->path = $name;
             $identity1->type = 4;
             $identity1->save();
-            $user->documents()->attach($identity1);
-
+            array_push($listDocument,$identity1->id);
         }
         if ($request->file('identity2')){
             $file = $request->file('identity2');
@@ -67,7 +70,7 @@ class DriverController extends Controller
             $identity2->path = $name;
             $identity2->type = 4;
             $identity2->save();
-            $user->documents()->attach($identity2);
+            array_push($listDocument,$identity2->id);
 
         }
         if ($request->file('car1')){
@@ -77,7 +80,7 @@ class DriverController extends Controller
             $car1->path = $name;
             $car1->type = 5;
             $car1->save();
-            $user->documents()->attach($car1);
+            array_push($listDocument,$car1->id);
 
         }
         if ($request->file('car2')){
@@ -87,7 +90,7 @@ class DriverController extends Controller
             $car2->path = $name;
             $car2->type = 5;
             $car2->save();
-            $user->documents()->attach($car2);
+            array_push($listDocument,$car2->id);
 
         }
         if ($request->file('car3')){
@@ -97,7 +100,7 @@ class DriverController extends Controller
             $car3->path = $name;
             $car3->type = 5;
             $car3->save();
-            $user->documents()->attach($car3);
+            array_push($listDocument,$car3->id);
 
         }
         if ($request->file('licence1')){
@@ -107,7 +110,7 @@ class DriverController extends Controller
             $licence1->path = $name;
             $licence1->type = 6;
             $licence1->save();
-            $user->documents()->attach($licence1);
+            array_push($listDocument,$licence1->id);
 
         }
         if ($request->file('licence2')){
@@ -117,17 +120,31 @@ class DriverController extends Controller
             $licence2->path = $name;
             $licence2->type = 6;
             $licence2->save();
-            $user->documents()->attach($licence2);
+            array_push($listDocument,$licence2->id);
 
+        }}catch (Exception $exception){
+            return $listDocument;
         }
-        return $user->documents;
+        return $listDocument;
+    }
+
+    public function removeDocumentWhenregister(Array $listDocumentId)
+    {
+        foreach ($listDocumentId as $id){
+            Document::find($id)->delete();
+        }
     }
     public function register(Request $request)
     {
-
-
+        $res = new Result();
+        $listDocumentsDriverID = $this->saveProfileDocuments($request);
+        if (count($listDocumentsDriverID)<7)
+        {
+            $this->removeDocumentWhenregister($listDocumentsDriverID);
+            $res->fail(trans('messages.driver_details_fail'));
+            return response()->json($res,200);
+        }
         $authController = new AuthController();
-        $userController = new UserController();
         $response = $authController->register($request)->getData();
 
         if ($response->success){
@@ -138,10 +155,13 @@ class DriverController extends Controller
             $driverProfile->cartype_id = CarCategory::find($request->car_type)->id;
             $driver->profileDriver()->save($driverProfile);
             Auth::login($driver);
-            $this->saveProfileDocuments($request,$driverProfile);
-            $userController->createAccount($driver->id);
+            foreach ($listDocumentsDriverID as $idDoc){
+                $driverProfile->documents()->attach(Document::find($idDoc));
+            }
             $response->response[0]->user = $this->getProfile()->getData()->response[0];
             $response->response[0]->isUser = false;
+        }else{
+            $this->removeDocumentWhenregister($listDocumentsDriverID);
         }
         return response()->json($response,200);
     }
@@ -543,6 +563,7 @@ class DriverController extends Controller
         $notif->description = $translationsDiscription;
         $notif->type = $translationsType;
         $notif->trip_id = $trip_id;
+        $notif->trip_step = $step;
         $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
         $user = User::find($id);
         $notif->driver_id = $driver;
@@ -555,7 +576,8 @@ class DriverController extends Controller
     }
 
     public function notifyMe(int $id){
+        $trip = Trip::first();
         // TODO description colomun and route colomun database
-        return response()->json($this->notifyUser($id,2,134,$id),200);
+        return response()->json($this->notifyUser($id,2,$trip->id,$id),200);
     }
 }

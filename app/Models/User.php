@@ -46,6 +46,13 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Address::class);
     }
+    /**
+     * Get the account for user.
+     */
+    public function account()
+    {
+        return $this->hasOne(Account::class);
+    }
 
     /**
      * Get the documents for user.
@@ -91,7 +98,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver','deleted_at'
+        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver','deleted_at','account'
     ];
 
     /**

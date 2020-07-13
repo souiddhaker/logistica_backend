@@ -44,7 +44,8 @@ class PromocodeController extends Controller
     {
         $promocode = Promocode::find($promocodeId);
         $user = User::find(Auth::id());
-        if (count($user->promocodes)==$promocode->nbr_uses)
+        if ($user->promocodes()->wherePivot(
+                'promocode_id','=' ,$promocode->id)->count()>=$promocode->nbr_uses)
         {
             return false;
         }else{

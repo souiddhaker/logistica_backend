@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Result;
 use App\Models\User;
 use App\Models\Verification;
@@ -177,8 +178,7 @@ class AuthController extends Controller
         $user->addRole('client');
         $user->save();
         //Create User Credit account
-        $userController = new UserController();
-        $userController->createAccount($user->id);
+        $user->account()->save(Account::create(['balance'=>0]));
 
         $result = $this->issueToken($input, 'password');
         $result['user'] = $user;

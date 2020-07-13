@@ -77,7 +77,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     });
 });
-
+Route::group(['prefix' => 'account','middleware' => ['auth:api']],function(){
+    Route::post('/addcredit','Api\AccountController@addCredit');
+    Route::get('/','Api\AccountController@getCredit');
+});
 Route::prefix('/driver/auth')->group(function(){
     Route::post('/register','Api\DriverController@register');
     Route::post('/login','Api\DriverController@register');
@@ -113,10 +116,7 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
         Route::get('/{id}', 'Api\NotifController@getDetails');
     });
 
-    Route::prefix('account')->group(function(){
-        Route::post('/addcredit','Api\AccountController@addCredit');
-        Route::get('/','Api\AccountController@getCredit');
-    });
+
     Route::prefix('payment')->group(function(){
         Route::get('/resume','Api\PaymentController@resume');
     });

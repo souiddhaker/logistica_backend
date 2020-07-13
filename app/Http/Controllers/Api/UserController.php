@@ -62,7 +62,7 @@ class UserController extends Controller
 
     public function createAccount(int $id)
     {
-        return Account::create(['balance'=>0,'user_id'=>$id]);
+        return Account::create(['balance'=>0]);
     }
 
     public function userFcmToken(Request $request)

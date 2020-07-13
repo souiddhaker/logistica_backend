@@ -12,6 +12,7 @@ return [
     'user_email_exists' => 'This email already exists',
     'user_phone_invalid' => 'User phone not valid',
     'user_details' => 'User details',
+    'driver_details_fail' => 'Check your account details',
 
     'document_empty' => 'Format document incorrect',
     'document_remove_fail' => 'Fail to remove document',

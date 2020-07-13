@@ -8,7 +8,7 @@ use App\Models\Result;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Validator;
 class AccountController extends Controller
 {
 
@@ -17,12 +17,11 @@ class AccountController extends Controller
         $res = new Result();
         $validator = Validator::make($request->all(),
             [
-                'user_id' => 'required',
                 'balance' => 'required'
             ]);
 
         if ($validator->fails()) {
-            $res->fail($validator->errors());
+            $res->fail(trans('messages.'));
             return response()->json($res, 400);
         }
         $user = User::find(Auth::id());
@@ -33,8 +32,7 @@ class AccountController extends Controller
             $requestVerif = new Request();
             $requestVerif['promocode'] = $request->coupon;
             $promocodeController = new PromocodeController();
-            $promocodeController->verify($requestVerif)->getData();
-            $isActif = $this->verifyPromocode($request->coupon);
+            $isActif =$promocodeController->verify($requestVerif)->getData();
             if (!$isActif->success)
                 return response()->json($isActif,200);
             else

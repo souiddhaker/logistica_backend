@@ -63,6 +63,7 @@ class TripController extends Controller
             ->where('status','=','0')
             ->leftJoin('notifs','notifs.trip_id','=','trips.id')
             ->where('notifs.driver_id','=',Auth::id())
+            ->where('notifs.trip_step','=',1)
             ->whereDate('trips.pickup_at', '>', $today->format('Y-m-d H:i:s'))
             ->with('driver','user','addresses')
             ->orderBy('trips.updated_at', 'desc')->paginate(10)->toArray();
@@ -177,10 +178,9 @@ class TripController extends Controller
     public function createTrip(Request $request)
     {
         $res = new Result();
-
         $data = $request->all();
         $trip = Trip::create(['status'=>'0', 'total_price'=>$data['total_price'],'nbr_luggage'=>$data['nbr_luggage'],
-        'driver_note'=>$data['note_driver'],'route'=>$data['route'],'user_id'=>Auth::id(),'pickup_at'=>$data['pickup_at']]);
+        'driver_note'=>$data['note_driver'],'route'=>$data['route'],'trip_duration'=>$data['trip_duration'],'user_id'=>Auth::id(),'pickup_at'=>$data['pickup_at']]);
 
         $type_car = CarCategory::find($data['type_car_id']);
 
