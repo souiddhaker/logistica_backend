@@ -15,17 +15,11 @@ class AccountController extends Controller
     public function addCredit(Request $request)
     {
         $res = new Result();
-        $validator = Validator::make($request->all(),
-            [
-                'balance' => 'required'
-            ]);
 
-        if ($validator->fails()) {
-            $res->fail(trans('messages.'));
-            return response()->json($res, 400);
-        }
         $user = User::find(Auth::id());
         $account = Account::where('user_id',Auth::id())->first();
+        $balance = $account->balance;
+        if (isset($request->balance))
         $balance = $account->balance + $request->balance;
         if (isset($request->coupon) or $request->coupon === "")
         {
