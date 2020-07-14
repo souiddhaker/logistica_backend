@@ -74,7 +74,7 @@ class DocumentController extends Controller
         if ($document)
         {
             try {
-                $imageFolder =  '/img/profile/';
+                $imageFolder =  '/img/attachement/';
                 $position  = stripos($document->path,$imageFolder);
                 $image_path = public_path($imageFolder).substr($document->path,$position+strlen($imageFolder),strlen($document->path));
                 unlink($image_path);
