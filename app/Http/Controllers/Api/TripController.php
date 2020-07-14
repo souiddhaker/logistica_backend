@@ -481,7 +481,7 @@ class TripController extends Controller
     {
         $res = new Result();
         $trip = Trip::find($request['trip_id']);
-        if ($trip && $trip->status == 2) {
+        if ($trip && in_array($trip->status, ['2','1'])) {
             $documentController = new DocumentController();
             $response = $documentController->store($request)->getData();
 
@@ -491,7 +491,7 @@ class TripController extends Controller
                 $res->success($attachement);
             }
         }else{
-            $res->fail('messages.document_fail_upload');
+            $res->fail(trans('messages.document_fail_upload'));
         }
         return response()->json($res,200);
     }
