@@ -63,7 +63,7 @@ class TripController extends Controller
         $listRequestTrip = Trip::select('trips.id','status','pickup_at','total_price','trips.driver_id','trips.user_id','trips.created_at')
             ->where('status','=','0')
             ->leftJoin('notifs','notifs.trip_id','=','trips.id')
-            ->where('notifs.driver_id','=',Auth::id())
+            ->where('notifs.user_id','=',Auth::id())
             ->where('notifs.trip_step','=',1)
             ->whereDate('trips.pickup_at', '>', $today)
             ->with('driver','user','addresses')
