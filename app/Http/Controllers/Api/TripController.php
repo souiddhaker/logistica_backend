@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Result;
 use App\Models\User;
 use Carbon\Carbon;
+use GoogleMaps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -58,13 +59,13 @@ class TripController extends Controller
     public function listOfRequest()
     {
         $res = new Result();
-        $today = Carbon::now();
+        $today = Carbon::parse(Carbon::now())->timestamp;
         $listRequestTrip = Trip::select('trips.id','status','pickup_at','total_price','trips.driver_id','trips.user_id','trips.created_at')
             ->where('status','=','0')
             ->leftJoin('notifs','notifs.trip_id','=','trips.id')
             ->where('notifs.driver_id','=',Auth::id())
             ->where('notifs.trip_step','=',1)
-            ->whereDate('trips.pickup_at', '>', $today->format('Y-m-d H:i:s'))
+            ->whereDate('trips.pickup_at', '>', $today)
             ->with('driver','user','addresses')
             ->orderBy('trips.updated_at', 'desc')->paginate(10)->toArray();
         $res->success($listRequestTrip);
@@ -438,13 +439,12 @@ class TripController extends Controller
                 $this->driverController->notifyUser($driver->id,3,$trip->id,$driver->id);
                 Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
                 $trip->candidates()->detach();
-                $removeNotif = Notif::where('trip_id','=',$trip->id)
+                Notif::where('trip_id','=',$trip->id)
                     ->where('driver_id','!=',$driver->id)->update(['driver_id'=>null]);
-                //TODO here
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
-                $removeNotif = Notif::where('trip_id','=',$trip->id)
+                Notif::where('trip_id','=',$trip->id)
                     ->where('driver_id','=',$driver->id)->update(['driver_id'=>null]);
                 $trip['driver'] = null;
                 $this->driverController->notifyUser($driver->id,4,$trip->id,$driver->id);
@@ -520,7 +520,7 @@ class TripController extends Controller
             $destinationAddress = array_filter($trip->addresses->toArray(), function($address){
                 return $address['type'] === "2";
             })[1];
-            $distanceMatrixApi = json_decode( \GoogleMaps::load('distancematrix')
+            $distanceMatrixApi = json_decode( GoogleMaps::load('distancematrix')
                 ->setParamByKey ('origins' ,$pickupAddress['lattitude'].','.$pickupAddress['longitude'])
                 ->setParamByKey ('destinations' ,$destinationAddress['lattitude'].','.$destinationAddress['longitude'])
                 ->get());

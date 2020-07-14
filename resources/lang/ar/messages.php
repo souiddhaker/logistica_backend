@@ -21,6 +21,7 @@ return [
     'driver_details_fail' => 'تحقق من تفاصيل حسابك',
 
     'notif_not_found' => 'الإشعار غير موجود',
+    'error_server' => 'هناك مشكلة في السيرفر',
 
 
     'promocode_invalid' => 'الرمز الترويجي غير صالح',

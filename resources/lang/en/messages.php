@@ -32,6 +32,7 @@ return [
 
 
     'bags_error' => 'Please specify number of bags',
+    'error_server' => 'There is a problem on the server',
 
 
     'services_list' => 'List services',

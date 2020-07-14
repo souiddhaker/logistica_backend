@@ -24,17 +24,34 @@ class Hyperpay
     public function getAccessId( $params )
     {
         $client = new Client();
-//        return $params;
         $result = $client->post( $this->url, [
             'form_params'    =>
                 $params
             ,
             'headers' => [
-                'Authorization' => 'Bearer OGE4Mjk0MTc0ZDA1OTViYjAxNGQwNWQ4MjllNzAxZDF8OVRuSlBjMm45aA==',
+                'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
                 'Content-Type'  => 'application/x-www-form-urlencoded',
             ],
         ] );
-//        'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
+
+        return json_decode( $result->getBody(), true );
+    }
+
+    /**
+     * CURL request to Hyper Pay servers
+     * @param $params
+     *
+     * @return bool|string
+     */
+    public function getPaymentStatus(  $params )
+    {
+        $client = new Client();
+        $result = $client->get( 'https://test.oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'], [
+            'headers' => [
+                'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
+                'Content-Type'  => 'application/x-www-form-urlencoded',
+            ],
+        ] );
 
         return json_decode( $result->getBody(), true );
     }

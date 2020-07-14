@@ -4,7 +4,11 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ */
 class Rating extends Model
 {
     //
