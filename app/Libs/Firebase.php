@@ -78,4 +78,5 @@ class Firebase {
 
         return json_decode( $result->getBody(), true );
 
-    }}
+    }
+}

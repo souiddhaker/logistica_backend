@@ -144,6 +144,11 @@ Route::prefix('admin')->group(function(){
         Route::post('register', 'Api\AdminAuthController@register');
     });
 });
+Route::prefix('payment')->group(function(){
+    Route::post('/get_checkout_id','Api\PaymentController@getCheckoutID');
+    Route::post('/getstatus','Api\PaymentController@getCheckoutStatus');
+});
+
 Route::post('/test/{id}', 'Api\DriverController@getListDriverForTrip');
 Route::post('/notifyme/{id}','Api\DriverController@notifyMe');
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {

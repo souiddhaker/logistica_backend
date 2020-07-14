@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Libs\Hyperpay;
 use App\Models\Card;
 use App\Models\Result;
 use App\Models\Trip;
@@ -11,8 +12,20 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
-    //
+    public function getCheckoutID(Request $request)
+    {
+        $res = new Result();
+        $hyperPayApi = new Hyperpay();
+        $params = $request->all();
+        $response = $hyperPayApi->getAccessId($params);
+        $res->success($response);
+        return response()->json($res,200);
+    }
 
+    public function getCheckout()
+    {
+
+    }
     public function addCard()
     {
         $res = new Result();
