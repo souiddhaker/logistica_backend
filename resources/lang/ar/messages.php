@@ -17,6 +17,7 @@ return [
     'document_empty' => 'المرفق غير صحيح',
     'document_remove_fail' => 'فشلت إزالة المرفق',
     'document_not_found' => 'المرفق غير موجود',
+    'document_fail_upload' => 'لم يتم تحميل المستند',
     'driver_details_fail' => 'تحقق من تفاصيل حسابك',
 
     'notif_not_found' => 'الإشعار غير موجود',

@@ -488,10 +488,10 @@ class TripController extends Controller
             if ($response->success) {
                 $attachement = Document::find($response->response[0]->id);
                 $trip->attachements()->attach($attachement);
-                $res->success = true;
+                $res->success($attachement);
             }
         }else{
-            $res->fail('Fail to upload');
+            $res->fail('messages.document_fail_upload');
         }
         return response()->json($res,200);
     }
