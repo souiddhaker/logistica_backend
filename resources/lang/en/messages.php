@@ -18,7 +18,7 @@ return [
     'document_remove_fail' => 'Fail to remove document',
     'document_fail_upload' => 'Fail to upload document',
     'document_not_found' => 'Document not found',
-
+    'payment_failed' => 'Payment didn\'t go through',
     'notif_not_found' => 'Notification not found',
 
 

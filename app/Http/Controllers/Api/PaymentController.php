@@ -18,7 +18,7 @@ class PaymentController extends Controller
         $hyperPayApi = new Hyperpay();
         $params = $request->all();
         $response = $hyperPayApi->getAccessId($params);
-        $res->success($response);
+        $response?$res->success($response):$res->fail(trans('messages.error_server'));
         return response()->json($res,200);
     }
 
@@ -38,7 +38,7 @@ class PaymentController extends Controller
 
         $hyperPayApi = new Hyperpay();
         $response = $hyperPayApi->getPaymentStatus($params);
-        $res->success($response);
+        $response?$res->success($response):$res->fail(trans('messages.payment_failed'));
         return response()->json($res,200);
     }
 

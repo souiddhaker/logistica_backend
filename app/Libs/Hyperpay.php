@@ -5,6 +5,7 @@ namespace App\Libs;
 
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 class Hyperpay
 {
@@ -24,15 +25,20 @@ class Hyperpay
     public function getAccessId( $params )
     {
         $client = new Client();
-        $result = $client->post( $this->url, [
-            'form_params'    =>
-                $params
-            ,
-            'headers' => [
-                'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
-                'Content-Type'  => 'application/x-www-form-urlencoded',
-            ],
-        ] );
+        try {
+            $result = $client->post( $this->url, [
+                'form_params'    =>
+                    $params
+                ,
+                'headers' => [
+                    'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                ],
+            ] );
+        }catch (ClientException $e){
+            return null;
+        }
+
 
         return json_decode( $result->getBody(), true );
     }
@@ -46,13 +52,18 @@ class Hyperpay
     public function getPaymentStatus(  $params )
     {
         $client = new Client();
-        $result = $client->get( 'https://test.oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'], [
-            'headers' => [
-                'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
-                'Content-Type'  => 'application/x-www-form-urlencoded',
-            ],
-        ] );
+        try {
+            $result = $client->get( 'https://test.oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'], [
+                'headers' => [
+                    'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                ],
+            ] );
+        }catch (ClientException $e){
+            return null;
+        }
 
+//        if($result)
         return json_decode( $result->getBody(), true );
     }
 }
