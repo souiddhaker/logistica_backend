@@ -26,12 +26,14 @@ class Hyperpay
     {
         $client = new Client();
         try {
+            unset($params['type']);
+
             $result = $client->post( $this->url, [
                 'form_params'    =>
                     $params
                 ,
                 'headers' => [
-                    'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
+                    'Authorization' => 'Bearer OGE4Mjk0MTc0ZDA1OTViYjAxNGQwNWQ4MjllNzAxZDF8OVRuSlBjMm45aA==',
                     'Content-Type'  => 'application/x-www-form-urlencoded',
                 ],
             ] );

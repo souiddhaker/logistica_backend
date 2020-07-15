@@ -17,7 +17,7 @@ class PaymentController extends Controller
         $res = new Result();
         $hyperPayApi = new Hyperpay();
         $params = $request->all();
-        if ($params['type'] = 0)
+        if ($params['type'] == "0")
         {
             $params['entityId'] = "8a8294174d0595bb014d05d82e5b01d2";
         }else
