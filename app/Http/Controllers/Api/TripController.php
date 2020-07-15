@@ -122,7 +122,7 @@ class TripController extends Controller
         $page = $request->input('page', 1);
         switch ($key) {
             case "0":
-                $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
+                $trips = Trip::select(['id','status','pickup_at','total_price','driver_id','user_id','created_at'])
                     ->where(function($q) use($user) {
                         if ($user->getRoles() === json_encode(['client']))
                             $q->where('user_id', $user->id);
@@ -132,7 +132,7 @@ class TripController extends Controller
                     ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
                 break;
             case "4":
-                $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
+                $trips = Trip::select(['id','status','pickup_at','total_price','driver_id','user_id','created_at'])
                     ->where(function($q) use($user) {
                         if ($user->getRoles() === json_encode(['client'])){
                             $q->where('user_id', $user->id)
@@ -146,7 +146,7 @@ class TripController extends Controller
                     ->orderBy('updated_at', 'desc')->paginate(10)->toArray();
                 break;
             default:
-                $trips = Trip::select('id','status','pickup_at','total_price','driver_id','user_id','created_at')
+                $trips = Trip::select(['id','status','pickup_at','total_price','driver_id','user_id','created_at'])
                     ->where(function($q) use($user) {
                         if ($user->getRoles() === json_encode(['client'])){
                             $q->where('user_id', $user->id);
@@ -196,7 +196,6 @@ class TripController extends Controller
             $trip->payment_method = $payment_method->id;
         }
         $trip->save();
-
 
         $this->addAttachementsToTrip($data,$trip);
         $this->attachServices($data,$trip);
@@ -410,12 +409,7 @@ class TripController extends Controller
     {
         $res = new Result();
 
-        $validator = Validator::make($request->all(),
-            [
-                'trip_id' => 'required',
-                'driver_id' => 'required',
-                'accept' => 'required'
-            ]);
+        $validator = Validator::make($request->all(), ['trip_id' => 'required', 'driver_id' => 'required', 'accept' => 'required']);
         if ($validator->fails())
         {
             $res->fail(trans('messages.trip_not_found'));
