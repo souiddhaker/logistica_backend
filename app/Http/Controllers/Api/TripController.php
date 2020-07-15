@@ -364,10 +364,7 @@ class TripController extends Controller
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
             }else {
                 if ($user->getRoles() === json_encode(['client'])) {
-//                    $nextDriver = $this->driverController->filterAndGetFirstDriver($trip['id']);
-//                    $this->driverController->notifyUser(Auth::id(), 9, $trip['id'],$nextDriver->id);
-//                }else{
-                    $removeNotif = Notif::where('trip_id','=',$trip->id)
+                    Notif::where('trip_id','=',$trip->id)
                         ->where('driver_id','!=',null)->update(['driver_id'=>null]);
                     $trip->candidates()->detach();
                     $trip->save();

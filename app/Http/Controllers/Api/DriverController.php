@@ -12,29 +12,16 @@ use App\Models\Notif;
 use App\Models\Rating;
 use App\Models\Result;
 use App\Models\Trip;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Mockery\Matcher\Not;
-use PhpParser\Node\Expr\Cast\Object_;
+use Image;
 use PHPUnit\Util\Exception;
 use Validator;
 
 class DriverController extends Controller
 {
-
-    public function addAttachements(array $attachements)
-    {
-        $request = new Request();
-        foreach ($attachements as $attachement)
-        {
-            $request['type'] = $attachement['type'];
-            $request['document'] = $attachement['document'];
-            $response = $this->profileDocument($request);
-        }
-    }
 
     public function saveProfileDocuments(Request $request)
     {
@@ -43,87 +30,33 @@ class DriverController extends Controller
          * car 3
          * licence 2
          */
-        $identity1 = new Document();
-        $identity2 = new Document();
-        $car1 = new Document();
-        $car2 = new Document();
-        $car3 = new Document();
-        $licence1 = new Document();
-        $licence2 = new Document();
         $listDocument = [];
         try {
-
-
-        if ($request->file('identity1')){
-            $file = $request->file('identity1');
-            $img = \Image::make($file)->save(public_path('img/profile/') . time() .$file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $identity1->path = $name;
-            $identity1->type = 4;
-            $identity1->save();
-            array_push($listDocument,$identity1->id);
-        }
-        if ($request->file('identity2')){
-            $file = $request->file('identity2');
-            $img = \Image::make($file)->save(public_path('img/profile/') . time() .$file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $identity2->path = $name;
-            $identity2->type = 4;
-            $identity2->save();
-            array_push($listDocument,$identity2->id);
-
-        }
-        if ($request->file('car1')){
-            $file = $request->file('car1');
-            $img = \Image::make($file)->save(public_path('img/profile/') .time() . $file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $car1->path = $name;
-            $car1->type = 5;
-            $car1->save();
-            array_push($listDocument,$car1->id);
-
-        }
-        if ($request->file('car2')){
-            $file = $request->file('car2');
-            $img = \Image::make($file)->save(public_path('img/profile/') .time() . $file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $car2->path = $name;
-            $car2->type = 5;
-            $car2->save();
-            array_push($listDocument,$car2->id);
-
-        }
-        if ($request->file('car3')){
-            $file = $request->file('car3');
-            $img = \Image::make($file)->save(public_path('img/profile/') . time() .$file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $car3->path = $name;
-            $car3->type = 5;
-            $car3->save();
-            array_push($listDocument,$car3->id);
-
-        }
-        if ($request->file('licence1')){
-            $file = $request->file('licence1');
-            $img = \Image::make($file)->save(public_path('img/profile/').time() . $file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $licence1->path = $name;
-            $licence1->type = 6;
-            $licence1->save();
-            array_push($listDocument,$licence1->id);
-
-        }
-        if ($request->file('licence2')){
-            $file = $request->file('licence2');
-            $img = \Image::make($file)->save(public_path('img/profile/').time() . $file->getClientOriginalName());
-            $name = url('/') .'/img/profile/' . time() .$file->getClientOriginalName();
-            $licence2->path = $name;
-            $licence2->type = 6;
-            $licence2->save();
-            array_push($listDocument,$licence2->id);
-
-        }}catch (Exception $exception){
-            return $listDocument;
+            foreach ($request->files as $key =>$val)
+            {
+                    $newDocument = new Document();
+                    Image::make($val)->save(public_path('img/profile/') . time() .$val->getClientOriginalName());
+                    $name = url('/') .'/img/profile/' . time() .$val->getClientOriginalName();
+                    $newDocument->path = $name;
+                    switch ($key)
+                    {
+                        case ($key == "identity1") || ($key =="identity2"):
+                            $newDocument->type = 4;
+                            break;
+                        case ($key == "car1") || ($key =="car2") || ($key =="car3"):
+                            $newDocument->type =5;
+                            break;
+                        case ($key == "licence1") || ($key =="licence2"):
+                            $newDocument->type =6;
+                            break;
+                        default :
+                            $listDocument = [];
+                    }
+                    $newDocument->save();
+                    array_push($listDocument,$newDocument->id);
+            }
+        }catch (Exception $exception){
+            return [];
         }
         return $listDocument;
     }
@@ -163,7 +96,7 @@ class DriverController extends Controller
         }else{
             $this->removeDocumentWhenregister($listDocumentsDriverID);
         }
-        return response()->json($response,200);
+        return response()->json($listDocumentsDriverID,200);
     }
 
 
@@ -217,19 +150,6 @@ class DriverController extends Controller
         return response()->json($res,200);
     }
 
-    public function profileDocument(Request $request)
-    {
-        $documentController = new DocumentController();
-        $response = $documentController->store($request)->getData();
-
-        if ($response->success){
-            $driver = User::find(Auth::id())->profileDriver;
-            $attachement = Document::find($response->response[0]->id);
-            $driver->documents()->attach($attachement);
-        }
-        return response()->json($response,200);
-    }
-
     public function reviews()
     {
         $res = new Result();
@@ -261,16 +181,6 @@ class DriverController extends Controller
         }
 
         return response()->json($res,200);
-    }
-
-
-    public function test()
-    {
-        $res = new Result();
-        $res->success(User::where('roles',"=", json_encode(['captain']))->get());
-        $res->success(Driver::all());
-        return response()->json($res,200);
-
     }
 
     public function acceptTripFromDriver(Request $request)
@@ -320,7 +230,7 @@ class DriverController extends Controller
 
         $trip = Trip::where('id',$request['trip_id'])
             ->where('status',"=", "0")->first();
-        $removeNotif = Notif::where('trip_id','=',$trip?$trip->id:null)
+        Notif::where('trip_id','=',$trip?$trip->id:null)
             ->where('driver_id','=',Auth::id())->update(['driver_id'=>null]);
         if ($trip)
         {
@@ -332,6 +242,7 @@ class DriverController extends Controller
         }
         return response()->json($res,200);
     }
+
     public function updatePosition(Request $request)
     {
         $res = new Result();
@@ -577,7 +488,6 @@ class DriverController extends Controller
 
     public function notifyMe(int $id){
         $trip = Trip::first();
-        // TODO description colomun and route colomun database
         return response()->json($this->notifyUser($id,2,$trip->id,$id),200);
     }
 }

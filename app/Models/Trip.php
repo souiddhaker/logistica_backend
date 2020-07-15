@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Post
- *
  * @mixin Eloquent
+ * @mixin Builder
  */
 class Trip extends Model
 {
