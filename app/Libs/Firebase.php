@@ -48,7 +48,8 @@ class Firebase {
     public function sendMultiple( $registration_ids, $message ) {
         $fields  = array(
             'registration_ids' =>$registration_ids,
-            'notification' =>  $message
+            'notification' =>  $message,
+            'data' => $message['data']
         );
         return $this->sendPushNotification( $fields );
     }
