@@ -1,6 +1,7 @@
 <?php
 namespace App\Libs;
 use GuzzleHttp\Client;
+use PHPUnit\Util\Exception;
 
 class Firebase {
 
@@ -66,15 +67,21 @@ class Firebase {
         $url = 'https://fcm.googleapis.com/fcm/send';
 
         $client = new Client();
-        $result = $client->post( $url, [
-            'json'    =>
-                $fields
-            ,
-            'headers' => [
-                'Authorization' => 'key='.env('FCM_LEGACY_KEY'),
-                'Content-Type'  => 'application/json',
-            ],
-        ] );
+        try {
+            $result = $client->post( $url, [
+                'json'    =>
+                    $fields
+                ,
+                'headers' => [
+                    'Authorization' => 'key='.env('FCM_LEGACY_KEY'),
+                    'Content-Type'  => 'application/json',
+                ],
+            ] );
+
+        }catch (Exception $exception)
+        {
+            return false;
+        }
 
 
         return json_decode( $result->getBody(), true );

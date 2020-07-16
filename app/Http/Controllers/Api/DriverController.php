@@ -482,6 +482,7 @@ class DriverController extends Controller
         $user->notifs()->save($notif);
         $userController = new UserController();
         $request['payload'] = \GuzzleHttp\json_encode(["trip_id"=> $trip_id,"driver"=>$driver,"step"=>$step]);
+        $request['data'] = ["trip_id"=> $trip_id,"driver"=>$driver,"step"=>$step];
         $request['user_id'] = $id;
         $notify = $userController->notify($request);
         return $notify;

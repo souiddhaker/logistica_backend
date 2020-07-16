@@ -91,6 +91,7 @@ class UserController extends Controller
         $notification_payload   = $request['payload'];
         $notification_title     = $request['title'];
         $notification_message   = $request['message'];
+        $notification_data = $request['data'];
         $receiver_id =[];
         $users = UserFcm::where('user_id',$request['user_id'])->get();
 
@@ -99,7 +100,7 @@ class UserController extends Controller
         }
         try {
             $firebase = new Firebase();
-            $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload,'data'=>$notification_payload);
+            $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload,'data'=>$notification_data);
             return $firebase->sendMultiple(  $receiver_id,  $message );
         } catch ( Exception $ex ) {
             return false;
