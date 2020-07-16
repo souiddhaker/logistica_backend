@@ -99,7 +99,7 @@ class UserController extends Controller
         }
         try {
             $firebase = new Firebase();
-            $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload);
+            $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload,'data'=>$notification_payload);
             return $firebase->sendMultiple(  $receiver_id,  $message );
         } catch ( Exception $ex ) {
             return false;
