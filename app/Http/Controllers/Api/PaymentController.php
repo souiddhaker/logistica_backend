@@ -31,6 +31,8 @@ class PaymentController extends Controller
 
         $params = $request->all();
         $validator = Validator::make($params,['checkout_id' => 'required']);
+        $params['entityId'] =  $this->getEntityIdForType($params['type']);
+
         if ($validator->fails()) {
             $res->fail(trans('messages.error_server'));
             return response()->json($res, 200);
