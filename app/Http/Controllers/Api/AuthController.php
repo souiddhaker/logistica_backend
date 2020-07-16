@@ -223,7 +223,8 @@ class AuthController extends Controller
     {
         $accessToken = Auth::user()->token();
         $res = new Result();
-
+        $data = $request->all();
+        DB::table('users_fcm')->where('token', 'LIKE',$data['fcm_token'])->delete();
         DB::table('oauth_refresh_tokens')
             ->where('access_token_id', $accessToken->id)
             ->update(['revoked' => true]);
