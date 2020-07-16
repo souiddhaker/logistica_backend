@@ -33,7 +33,7 @@ class Hyperpay
                     $params
                 ,
                 'headers' => [
-                    'Authorization' => 'Bearer OGE4Mjk0MTc0ZDA1OTViYjAxNGQwNWQ4MjllNzAxZDF8OVRuSlBjMm45aA==',
+                    'Authorization' => 'Bearer '.env( 'HYPER_PAY_TOKEN'),
                     'Content-Type'  => 'application/x-www-form-urlencoded',
                 ],
             ] );
@@ -55,17 +55,18 @@ class Hyperpay
     {
         $client = new Client();
         try {
-            $result = $client->get( 'https://test.oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'], [
+            $url = 'https://test.oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'];
+
+            $result = $client->get( $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer '.env('HYPER_PAY_TOKEN'),
+                    'Authorization' => 'Bearer '.env( 'HYPER_PAY_TOKEN'),
                     'Content-Type'  => 'application/x-www-form-urlencoded',
                 ],
             ] );
         }catch (ClientException $e){
-            return null;
+            return $e->getMessage();
         }
 
-//        if($result)
         return json_decode( $result->getBody(), true );
     }
 }

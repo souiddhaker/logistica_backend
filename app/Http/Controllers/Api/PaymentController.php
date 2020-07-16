@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Libs\Hyperpay;
+use App\Models\Account;
 use App\Models\Result;
 use App\Models\Trip;
 use Illuminate\Http\Request;
@@ -17,11 +18,8 @@ class PaymentController extends Controller
         $res = new Result();
         $hyperPayApi = new Hyperpay();
         $params = $request->all();
-        if ($params['type'] == "0")
-        {
-            $params['entityId'] = "8a8294174d0595bb014d05d82e5b01d2";
-        }else
-            $params['entityId'] = "8a8294174d0595bb014d05d82e5b01d2";
+        $params['entityId'] =  $this->getEntityIdForType($params['type']);
+
         $response = $hyperPayApi->getAccessId($params);
         $response?$res->success($response):$res->fail(trans('messages.error_server'));
         return response()->json($res,200);
@@ -39,7 +37,7 @@ class PaymentController extends Controller
         }
         $hyperPayApi = new Hyperpay();
         $response = $hyperPayApi->getPaymentStatus($params);
-        $response?$res->success($response):$res->fail(trans('messages.payment_failed'));
+        $response["result"]["code"] == "000.000.000"?$res->success = trans('messages.payment_success'):$res->fail(trans('messages.payment_failed'));
         return response()->json($res,200);
     }
 
@@ -76,12 +74,26 @@ class PaymentController extends Controller
         return response()->json($res,200);
     }
 
-    public function payTripCost(int $id)
+    public function payTripCost(float $tripCost)
     {
-        $trip = Trip::find($id);
-        if ($trip && $trip->status == 2)
-        {
+        $account = Account::where('user_id', '=',Auth::id())->first();
+        $balance = $account->balance - $tripCost;
+        $account->update(['balance'=>$balance>=0?$balance:$balance=0]);
+        return $account;
+    }
 
+    public function getEntityIdForType(int $type)
+    {
+        switch ($type){
+            case ($type == 0) || ($type ==1):
+                $entityId = "8ac7a4c87314346b0173246ca65e083f";
+                break;
+            case 2 :
+                $entityId = "8ac7a4c87314346b0173246cf25d0844";
+                break;
+            default:
+                $entityId= "8ac7a4c87314346b0173246ca65e083f";
         }
+        return $entityId;
     }
 }

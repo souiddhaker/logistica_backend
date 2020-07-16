@@ -19,6 +19,8 @@ return [
     'document_fail_upload' => 'Fail to upload document',
     'document_not_found' => 'Document not found',
     'payment_failed' => 'Payment didn\'t go through',
+    'payment_success' => 'Payment completed',
+
     'notif_not_found' => 'Notification not found',
 
 

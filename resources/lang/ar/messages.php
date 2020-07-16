@@ -20,6 +20,7 @@ return [
     'document_fail_upload' => 'لم يتم تحميل المستند',
     'driver_details_fail' => 'تحقق من تفاصيل حسابك',
     'payment_failed' => 'لم يتم الدفع',
+    'payment_success' => 'تمت عملية الدفع',
 
     'notif_not_found' => 'الإشعار غير موجود',
     'error_server' => 'هناك مشكلة في السيرفر',
