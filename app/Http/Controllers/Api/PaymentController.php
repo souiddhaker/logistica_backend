@@ -39,7 +39,7 @@ class PaymentController extends Controller
         }
         $hyperPayApi = new Hyperpay();
         $response = $hyperPayApi->getPaymentStatus($params);
-        if ($response["result"]["code"] == "000.000.000")
+        if (isset($response["result"]["code"]) && $response["result"]["code"] == "000.000.000")
         {
             $res->success = true;
             $res->message = trans('messages.payment_success');
