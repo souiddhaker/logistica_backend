@@ -336,10 +336,11 @@ class TripController extends Controller
                     ->where('trip_id', '=',$trip['id'])->first();
                 $trip['alreadyApplied'] = $driverTrip ? true : false;
             }
-            if($trip['status'] == '0' && $user->getRoles() === json_encode(['client']) && count($trip->candidates)>0)
+            if($trip['status'] == '0' && $user->getRoles() === json_encode(['client']))
             {
                 $driverTrip = \DB::table('trip_user')
                     ->where('trip_id', '=',$trip['id'])->first();
+                if ($driverTrip)
                 $trip['driver_request'] =User::find($driverTrip->user_id);
             }
             $res->success($trip);
