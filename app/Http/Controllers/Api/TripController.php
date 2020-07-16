@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Account;
 use App\Models\Address;
 use App\Models\CancelTrip;
 use App\Models\CarCategory;
@@ -328,12 +329,18 @@ class TripController extends Controller
         $trip = $this->getById($id);
         $user = User::find(Auth::id());
         if ($trip){
+
             if($trip['status'] == '0' && $user->getRoles() === json_encode(['captain']) )
             {
                 $driverTrip = \DB::table('trip_user')->where('user_id', '=', $user->id)
                     ->where('trip_id', '=',$trip['id'])->first();
-
                 $trip['alreadyApplied'] = $driverTrip ? true : false;
+            }
+            if($trip['status'] == '0' && $user->getRoles() === json_encode(['client']))
+            {
+                $driverTrip = \DB::table('trip_user')
+                    ->where('trip_id', '=',$trip['id'])->first();
+                $trip['driver_request'] =User::find($driverTrip->user_id);
             }
             $res->success($trip);
         }
@@ -408,6 +415,7 @@ class TripController extends Controller
     public function confirmTripFromUser(Request $request)
     {
         $res = new Result();
+        $paymentController = new PaymentController();
 
         $validator = Validator::make($request->all(), ['trip_id' => 'required', 'driver_id' => 'required', 'accept' => 'required']);
         if ($validator->fails())
@@ -432,6 +440,7 @@ class TripController extends Controller
                 $trip->candidates()->detach();
                 Notif::where('trip_id','=',$trip->id)
                     ->where('driver_id','!=',$driver->id)->update(['driver_id'=>null]);
+                $paymentController->payTripCost($trip->id);
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
@@ -516,6 +525,7 @@ class TripController extends Controller
                 ->setParamByKey ('destinations' ,$destinationAddress['lattitude'].','.$destinationAddress['longitude'])
                 ->get());
             $response['trip'] = $this->getById($data['trip_id']);
+            $response['user_account'] = Account::where('user_id','=',Auth::id())->first();
             $response['driver'] = $driver;
             $response['driver_rating'] = $this->driverController->getDriverRating($driver->id);
             $response['distance'] = $distanceMatrixApi->rows[0]->elements[0]->distance->text;
