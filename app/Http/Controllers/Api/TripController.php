@@ -360,8 +360,8 @@ class TripController extends Controller
         if ($trip)
         {
             $cancelTrip = CancelTrip::create(['raison'=>$data['raison'],'by_user'=>$data['canceledByUser']]);
-            $trip->status = '3';
             if (in_array($trip->status, ['-1','1'])){
+                $trip->status = '3';
                 $trip->cancelTrip()->save($cancelTrip);
                 $trip->save();
                 $res->success($cancelTrip);
