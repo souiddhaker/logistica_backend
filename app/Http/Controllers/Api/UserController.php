@@ -36,8 +36,8 @@ class UserController extends Controller
 
         try {
             $name = time() . '.' . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-            $img = \Image::make($request->photo)->save(public_path('img/profile/') . $name);
-            $name = url('/') .'/img/profile/' . $name;
+            $img = \Image::make($request->photo)->save(public_path('img/attachement/') . $name);
+            $name = url('/') .'/img/attachement/' . $name;
             $user = Auth::user();
             $user->update(['image_url' => $name]);
             $res->success($user);

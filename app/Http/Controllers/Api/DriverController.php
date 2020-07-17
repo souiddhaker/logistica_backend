@@ -35,8 +35,8 @@ class DriverController extends Controller
             foreach ($request->files as $key =>$val)
             {
                     $newDocument = new Document();
-                    Image::make($val)->save(public_path('img/profile/') . time() .$val->getClientOriginalName());
-                    $name = url('/') .'/img/profile/' . time() .$val->getClientOriginalName();
+                    Image::make($val)->save(public_path('img/attachement/') . time() .$val->getClientOriginalName());
+                    $name = url('/') .'/img/attachement/' . time() .$val->getClientOriginalName();
                     $newDocument->path = $name;
                     switch ($key)
                     {

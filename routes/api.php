@@ -149,7 +149,7 @@ Route::prefix('payment')->group(function(){
     Route::post('/getstatus','Api\PaymentController@getCheckoutStatus');
 });
 
-Route::post('/test/{id}', 'Api\DriverController@getListDriverForTrip');
+Route::post('/test/{id}', 'Api\PaymentController@payTripCost')->middleware('auth:api');
 Route::post('/notifyme/{id}','Api\DriverController@notifyMe');
 Route::middleware('auth:api')->get('/getUser', function (Request $request) {
     return $request->user();
