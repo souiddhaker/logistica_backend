@@ -448,7 +448,11 @@ class TripController extends Controller
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
                 Notif::where('trip_id','=',$trip->id)
                     ->where('trip_step','=',1)
-                    ->where('driver_id','=',$driver->id)->update(['driver_id'=>null,"trip_step"=>-1]);
+                    ->where('driver_id','=',$driver->id)->update(['driver_id'=>null]);
+                Notif::where('trip_id','=',$trip->id)
+                    ->where('trip_step','=',9)
+                    ->where('driver_id','=',$driver->id)->update(["trip_step"=>-1]);
+
                 $trip['driver'] = null;
                 $this->driverController->notifyUser($driver->id,4,$trip->id,$driver->id);
                 $nextDriverToNotify = $this->driverController->filterAndGetFirstDriver($trip->id);
