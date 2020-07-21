@@ -63,7 +63,7 @@ return [
     'notif_user_when_driver_cancel_trip_title' => 'تم إلغاء الرحلة',
     'notif_driver_when_user_cancel_trip' => 'تم إلغاء الرحلة من قبل المستخدم',
     'notif_driver_when_user_cancel_trip_title' => 'تم إلغاء الرحلة',
-    'notif_user_when_driver_finish_trip' => 'الرحلة انتهت. هل تريد إنشاء واحدة أخرى ؟',
+    'notif_user_when_driver_finish_trip' => 'هل ترغب منا استلامها في محطه الوصول وايصالها مقر اقامتك؟',
     'notif_user_when_driver_finish_trip_title' => 'انتهت الرحلة',
     'notif_user_when_requested_driver' => 'نقترح سائق لرحلتك',
     'notif_user_when_requested_driver_title' => 'طلب سائق'
