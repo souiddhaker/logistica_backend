@@ -363,6 +363,7 @@ class DriverController extends Controller
         $titleEn = "";
         $request = new Request();
         $user = User::find($id);
+        if($user->lang)
         App::setLocale($user->lang);
         switch ($step){
             case 1 :
