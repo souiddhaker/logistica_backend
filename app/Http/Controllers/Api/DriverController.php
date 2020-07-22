@@ -473,16 +473,14 @@ class DriverController extends Controller
             'ar' => "توصيلة"
         ];
 
-//        $notif = new Notif();
-//        $notif->Title = $translationsTitle;
-//        $notif->description = $translationsDiscription;
-//        $notif->type = $translationsType;
-//        $notif->trip_id = $trip_id;
-//        $notif->trip_step = $step;
-//        $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
-
+        $notif = new Notif();
+        $notif->Title = $translationsTitle;
+        $notif->description = $translationsDiscription;
+        $notif->type = $translationsType;
+        $notif->trip_id = $trip_id;
+        $notif->trip_step = $step;
+        $notif->icon = 'https://logistica.wi-mobi.com/img/icon/icon.png';
         $user = User::find($id);
-        return $request['title'];
         $notif->driver_id = $driver;
         $user->notifs()->save($notif);
         $userController = new UserController();
