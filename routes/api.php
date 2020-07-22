@@ -28,6 +28,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('', 'Api\UserController@getUser');
         Route::post('/fcm', 'Api\UserController@userFcmToken');
         Route::post('/notify', 'Api\UserController@notify');
+        Route::post('/update_lang', 'Api\UserController@updateLang');
+
     });
     Route::prefix('services')->group(function () {
         Route::post('/car_categories', 'Api\ServiceController@getListCarCategories');

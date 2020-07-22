@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Libs\Firebase;
 use App\Models\Account;
 use App\Models\Result;
+use App\Models\User;
 use App\Models\UserFcm;
 use Exception;
 use Illuminate\Http\Request;
@@ -107,4 +108,11 @@ class UserController extends Controller
         }
     }
 
+    public function updatelang(Request $request)
+    {
+        $res= new Result();
+        $user = User::find(Auth::id());
+        isset($request['lang'])?$user->update(['lang'=> $request['lang']])&&$res->success($user->lang):$res->fail(trans('messages.server_error'));
+        return response()->json($res,200);
+    }
 }

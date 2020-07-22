@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStepToNotifsTable extends Migration
+class AddLangToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddStepToNotifsTable extends Migration
      */
     public function up()
     {
-        Schema::table('notifs', function (Blueprint $table) {
-            $table->integer('trip_step')->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('lang')->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ class AddStepToNotifsTable extends Migration
      */
     public function down()
     {
-        Schema::table('notifs', function (Blueprint $table) {
-            $table->dropColumn('trip_step')->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('lang')->nullable();
         });
     }
 }

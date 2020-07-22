@@ -173,7 +173,8 @@ class AuthController extends Controller
             'lastName' => request('lastName'),
             'email' => request('email'),
             'phone' => request('userPhone'),
-            'password' => bcrypt("logistica")
+            'password' => bcrypt("logistica"),
+            'lang' => app()->getLocale()
         ]);
         $user->addRole('client');
         $user->save();
