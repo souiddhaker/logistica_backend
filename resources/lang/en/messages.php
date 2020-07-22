@@ -59,7 +59,7 @@ return [
     'notif_user_when_driver_cancel_trip_title' => 'Trip canceled',
     'notif_driver_when_user_cancel_trip' => 'The trip has been canceled by the user',
     'notif_driver_when_user_cancel_trip_title' => 'Trip canceled',
-    'notif_user_when_driver_finish_trip' => 'Do you want us to receive it at the arrival station and deliver it to your residence?',
+    'notif_user_when_driver_finish_trip' => 'Do you want to deliver it to the residence?',
     'notif_user_when_driver_finish_trip_title' => 'Trip finished',
     'notif_user_when_requested_driver' => 'Logistica suggest for your a driver ',
     'notif_user_when_requested_driver_title' => 'Driver request'
