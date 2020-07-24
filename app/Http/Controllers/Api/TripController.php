@@ -373,12 +373,15 @@ class TripController extends Controller
                     $this->driverController->notifyUser($trip->driver_id,5,$trip->id,$trip->driver_id);
                 else
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
-            }else {
+            }else if ($trip->status == '0' && $user->getRoles() === json_encode(['client'])){
                 if ($user->getRoles() === json_encode(['client'])) {
                     Notif::where('trip_id','=',$trip->id)
                         ->where('driver_id','!=',null)->update(['driver_id'=>null]);
                     $trip->candidates()->detach();
+                    $trip->status = '3';
+                    $trip->cancelTrip()->save($cancelTrip);
                     $trip->save();
+                    $res->success($cancelTrip);
                 }
             }
             $res->success($trip);
