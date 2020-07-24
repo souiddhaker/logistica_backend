@@ -25,6 +25,7 @@ class UserSeeder extends Seeder
             'driver_note' => 'driver note',
             'user_id' => $userID,
             'pickup_at' => '2020-06-12 08:00:00',
+            'promocode_id' => 1,
             'driver_id' => $driverID]);
         $pickUp = Address::create([
             'primaryName' => 'King Abdulaziz International Airport',
@@ -169,28 +170,28 @@ class UserSeeder extends Seeder
 
             $user->profileDriver()->create(['status' => 0, 'cartype_id' => 1, 'is_active' => 0]);
             $user->profileDriver()->first()->documents()->create([
-                "type"=>'4',
-                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592904799.jpeg",
+                "type" => '4',
+                "path" => "https://logistica.wi-mobi.com/img/attachement/1592904799.jpeg",
             ]);
             $user->profileDriver()->first()->documents()->create([
-                "type"=>'4',
-                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925935.jpeg",
+                "type" => '4',
+                "path" => "https://logistica.wi-mobi.com/img/attachement/1592925935.jpeg",
             ]);
             $user->profileDriver()->first()->documents()->create([
-                "type"=>'5',
-                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925949.jpeg",
+                "type" => '5',
+                "path" => "https://logistica.wi-mobi.com/img/attachement/1592925949.jpeg",
             ]);
             $user->profileDriver()->first()->documents()->create([
-                "type"=>'5',
-                "path"=>"https://logistica.wi-mobi.com/img/attachement/1593081387.jpeg",
+                "type" => '5',
+                "path" => "https://logistica.wi-mobi.com/img/attachement/1593081387.jpeg",
             ]);
             $user->profileDriver()->first()->documents()->create([
-                "type"=>'6',
-                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925961.jpeg",
+                "type" => '6',
+                "path" => "https://logistica.wi-mobi.com/img/attachement/1592925961.jpeg",
             ]);
             $user->profileDriver()->first()->documents()->create([
-                "type"=>'6',
-                "path"=>"https://logistica.wi-mobi.com/img/attachement/1592925970.jpeg",
+                "type" => '6',
+                "path" => "https://logistica.wi-mobi.com/img/attachement/1592925970.jpeg",
             ]);
             $admin = User::create([
                 'firstName' => 'admin firstName',
@@ -200,7 +201,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('logistica'),
                 'roles' => json_encode(['admin'])
             ]);
-            AdminRoles::updateOne(["roles" => ['test'=>123456]], $admin['id']);
+            AdminRoles::updateOne(["roles" => ['test' => 123456]], $admin['id']);
             \App\Models\Settings::updateOne(
                 [
                     'company_percent' => '15',
@@ -208,6 +209,12 @@ class UserSeeder extends Seeder
                     'abort_percent_captain' => '10',
                     'percent_from' => '0'
                 ]);
+            \App\Models\Promocode::create([
+                'code' => 'TEST',
+                'pourcentage' => '3',
+                'status' => 'active',
+                'end_at' => '2021-01-01'
+            ]);
         }
     }
 }

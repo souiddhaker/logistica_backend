@@ -82,7 +82,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles'
+        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles','active'
     ];
 
     /**
@@ -109,7 +109,8 @@ class User extends Authenticatable implements JWTSubject
                 'firstName' => 'required',
                 'lastName' => 'required',
                 'email' => 'required|email|unique:users,email',
-                'phone' => 'required|unique:users,phone'
+                'phone' => 'required|unique:users,phone',
+                'active'=>'boolean'
             ];
         if(!$create){
             $roleData['email']='required';

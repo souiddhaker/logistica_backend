@@ -251,10 +251,10 @@ class AdminCrudController extends Controller
             case "claims":
 
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
-                    return $value!==null && in_array($key, ['id', 'trip_id', 'by_user', 'status', 'd_start_at', 'd_end_at']);
+                    return ($value!==null || $value===0) && in_array($key, ['id', 'trip_id', 'by_user', 'status', 'd_start_at', 'd_end_at','transaction_status']);
                 }, ARRAY_FILTER_USE_BOTH);
                 $sql = $this->filterDate($detailFilter, "created_at");
-                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'trip_id', 'by_user', 'status']);
+                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'trip_id', 'by_user', 'status','transaction_status']);
                 break;
             default:
                 $detailFilter = [];
