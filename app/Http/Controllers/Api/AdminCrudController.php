@@ -206,10 +206,10 @@ class AdminCrudController extends Controller
                     if($key=='transaction_status') {
                         if($safeValue==="0"){
 
-                            $sql[] = "$key = null";
+                            $sql[] = "$key IS NULL";
                         }else{
 
-                            $sql[] = "$key != null";
+                            $sql[] = "$key IS NOT NULL";
                         }
                     }
                     else{
@@ -236,9 +236,10 @@ class AdminCrudController extends Controller
                 break;
             case "trip":
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
-                    return $value && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id','transaction_status']);
+                    return ($value!==null ) && in_array($key, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id','transaction_status']);
                 }, ARRAY_FILTER_USE_BOTH);
                 $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id','transaction_status']);
+//                dd($sql);
                 break;
             case "couponCaptain":
             case "couponClient":
@@ -251,10 +252,10 @@ class AdminCrudController extends Controller
             case "claims":
 
                 $detailFilter = array_filter($request->all(), function ($value, $key) {
-                    return ($value!==null || $value===0) && in_array($key, ['id', 'trip_id', 'by_user', 'status', 'd_start_at', 'd_end_at','transaction_status']);
+                    return ($value!==null || $value===0) && in_array($key, ['id', 'trip_id', 'by_user', 'status', 'd_start_at', 'd_end_at']);
                 }, ARRAY_FILTER_USE_BOTH);
                 $sql = $this->filterDate($detailFilter, "created_at");
-                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'trip_id', 'by_user', 'status','transaction_status']);
+                $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'trip_id', 'by_user', 'status']);
                 break;
             default:
                 $detailFilter = [];
