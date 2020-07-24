@@ -284,6 +284,8 @@ class TripController extends Controller
                     break;
                 case "3" : $documents['receipt'] = $document;
                     break;
+                case "7" : $documents['pickup_receipt'] = $document;
+                    break;
             }
         }
         return $documents;

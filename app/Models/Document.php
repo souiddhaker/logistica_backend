@@ -21,6 +21,7 @@ class Document extends Model
      * 4 Driver profile identity
      * 5 Driver car photo
      * 6 Driver licence
+     * 7 trip pickup receipt
      */
 
     /**
