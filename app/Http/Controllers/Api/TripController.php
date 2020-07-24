@@ -275,6 +275,7 @@ class TripController extends Controller
         $documents['attachements']=[];
         $documents['reservation_hotel']=null;
         $documents['receipt']=null;
+        $documents['pickup_receipt'] = null;
         foreach ($attachementsCollection as $document)
         {
             switch ($document['type']){
