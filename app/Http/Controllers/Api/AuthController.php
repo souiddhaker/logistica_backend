@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Result;
 use App\Models\User;
-
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,29 +24,21 @@ class AuthController extends Controller
         $this->client = \Laravel\Passport\Client::where('password_client', 1)->first();
     }
 
-    public function verify(Request $request){
+    public function verify(Request $request)
+    {
         $res  = new Result();
 
-        $validator = Validator::make($request->all(),
-            [
-                'userPhone' => 'required|min:6'
-            ]);
+        $validator = Validator::make($request->all(), ['userPhone' => 'required|min:6']);
         if ($validator->fails()) {
             $res->fail(trans('messages.user_phone_invalid'));
             return response()->json($res, 200);
         }
         $phone = $request['userPhone'];
 
-        $verifCode = mt_rand(1000, 9999);
+        $verifyCode = mt_rand(1000, 9999);
 
-        $verification = new Verification();
-
-        $verification->verification_code = $verifCode;
-        $verification->phone = $phone;
-        $verification->code_expiry_minute =15;
-        $verification->save();
-
-
+        Verification::create(['verification_code'=> $verifyCode,
+            'phone'=>$phone, 'code_expiry_minute'=>15]);
         $res->success([]);
         $res->message =trans('messages.verif_code_send');
         return response()->json($res, 200);
@@ -89,11 +81,13 @@ class AuthController extends Controller
                 {
                     Auth::login($user);
                     $driverController = new DriverController();
-                    $response['user'] = $driverController->getProfile()->getData()->response[0];
-
+                    $response['user'] = $user->profileDriver ?$driverController->getProfile()->getData()->response[0] : $user;
+                    $response['isUser'] = false;
                 }
-                else
+                else{
                     $response['user'] = $user;
+                    $response['isUser'] = true;
+                }
                 $response['isAlreadyUser'] = true;
 
             }else {
@@ -104,7 +98,6 @@ class AuthController extends Controller
             $res->message = trans('messages.verif_code_correct');
             return response()->json($res, 200);
         }
-
         if ($verifCode === "0002")
         {
             $res->fail(trans('messages.verif_code_expired'));
@@ -180,16 +173,17 @@ class AuthController extends Controller
             'lastName' => request('lastName'),
             'email' => request('email'),
             'phone' => request('userPhone'),
-            'password' => bcrypt("logistica")
+            'password' => bcrypt("logistica"),
+            'lang' => app()->getLocale()
         ]);
-        $user->addRole('captain');
+        $user->addRole('client');
         $user->save();
         //Create User Credit account
-        $userController = new UserController();
-        $userController->createAccount($user->id);
+        $user->account()->save(Account::create(['balance'=>0]));
 
         $result = $this->issueToken($input, 'password');
         $result['user'] = $user;
+        $result['isUser'] = true;
         $result['isAlreadyUser'] = false;
         $res->success($result);
         return response()->json($res, 200);
@@ -230,7 +224,8 @@ class AuthController extends Controller
     {
         $accessToken = Auth::user()->token();
         $res = new Result();
-
+        $data = $request->all();
+        DB::table('users_fcm')->where('token', 'LIKE',$data['fcm_token'])->delete();
         DB::table('oauth_refresh_tokens')
             ->where('access_token_id', $accessToken->id)
             ->update(['revoked' => true]);

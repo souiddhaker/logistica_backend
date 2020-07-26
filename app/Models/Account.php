@@ -25,4 +25,9 @@ class Account extends Model
     protected $hidden = [
         'updated_at','created_at','id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

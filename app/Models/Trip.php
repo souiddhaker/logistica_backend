@@ -4,27 +4,25 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Post
- *
  * @mixin Eloquent
+ * @mixin Builder
  */
 class Trip extends Model
 {
-    //
-
     /**
      * Trip Status :
      *
-     * -1 : not confirmed by user
-     * 0 : not confirmed by driver
+     * -1 : waiting for pickup
+     * 0 : no matching
      * 1 : current
      * 2 : finished
      * 3 : canceled
-     *
+     * 4 : current history
      */
     protected $guarded = [];
 
@@ -49,7 +47,7 @@ class Trip extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements' ,'rating_id'
+        'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices','attachements' ,'rating_id'
     ];
     public static function updateOneTransaction($request,$id){
         $res = new Result();

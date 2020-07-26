@@ -28,7 +28,7 @@ class Address extends Model
     ];
 
     /**
-     * Get the user that owns the card.
+     * Get the user
      */
     public function user()
     {

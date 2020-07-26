@@ -31,7 +31,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Card::class);
     }
 
-
     /**
      * Get the promocodes for user.
      */
@@ -46,6 +45,13 @@ class User extends Authenticatable implements JWTSubject
     public function addresses()
     {
         return $this->hasMany(Address::class);
+    }
+    /**
+     * Get the account for user.
+     */
+    public function account()
+    {
+        return $this->hasOne(Account::class);
     }
 
     /**
@@ -67,13 +73,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Trip::class);
     }
 
+    public function notifs()
+    {
+        return $this->hasMany(Notif::class);
+    }
+
     public function profileDriver()
     {
         return $this->hasOne(Driver::class);
-    }
-
-    public function fcmUser(){
-        return $this->hasOne(UserFcm::class);
     }
 
     /**
@@ -82,7 +89,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles','active'
+        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles','lang','active'
     ];
 
     /**
@@ -91,7 +98,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver','deleted_at'
+        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver','deleted_at','account','lang'
     ];
 
     /**

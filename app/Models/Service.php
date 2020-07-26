@@ -14,7 +14,7 @@ use Spatie\Translatable\HasTranslations;
 class Service extends Model
 {
     //
-    use HasTranslations;
+       use HasTranslations;
 
     public $translatable = ['label'];
 

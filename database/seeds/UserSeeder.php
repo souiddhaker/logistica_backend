@@ -152,15 +152,31 @@ class UserSeeder extends Seeder
                 'firstName' => 'client firstName',
                 'lastName' => 'lastName',
                 'email' => 'client@mail.com',
-                'phone' => '123456321',
+                'phone' => '+216123123',
                 'password' => bcrypt('logistica'),
                 'roles' => json_encode(['client'])
             ]);
             $user = User::create([
                 'firstName' => 'captain firstName',
                 'lastName' => 'lastName',
-                'email' => 'captain@mail.com',
-                'phone' => '123456258',
+                'email' => 'captain1@mail.com',
+                'phone' => '+216123456789',
+                'password' => bcrypt('logistica'),
+                'roles'=>json_encode(['captain'])
+            ]);
+            User::create([
+                'firstName' => 'captain firstName',
+                'lastName' => 'lastName',
+                'email' => 'captain2@mail.com',
+                'phone' => '+216987654321',
+                'password' => bcrypt('logistica'),
+                'roles'=>json_encode(['captain'])
+            ]);
+            User::create([
+                'firstName' => 'captain firstName',
+                'lastName' => 'lastName',
+                'email' => 'captain3@mail.com',
+                'phone' => '+216232323',
                 'password' => bcrypt('logistica'),
                 'roles' => json_encode(['captain'])
             ]);

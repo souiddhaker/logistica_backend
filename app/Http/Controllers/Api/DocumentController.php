@@ -32,8 +32,10 @@ class DocumentController extends Controller
         }
         try {
             $name = time() . '.' . explode('/', explode(':', substr($request->document, 0, strpos($request->document, ';')))[1])[1];
-            $img = \Image::make($request->document)->save(public_path('img/attachement/') . $name);
-            $name = url('/') .'/img/attachement/' . $name;
+            $imageFolder =  '/img/attachement/';
+
+            $img = \Image::make($request->document)->save(public_path($imageFolder) . $name);
+            $name = url('/') .$imageFolder . $name;
 
             $document = new Document();
             $document->path = $name;
@@ -72,28 +74,36 @@ class DocumentController extends Controller
         if ($document)
         {
             try {
-                $user = User::find(Auth::id());
-
-//                if ($user->getRoles() === json_encode(['captain']))
-//                {
-//                    $position  = stripos($document->path,'img/profile/');
-//                    $image_path = public_path('img/profile/').substr($document->path,$position+12,strlen($document->path));
-//                }else{
-//                    $position  = stripos($document->path,'img/attachement/');
-//                    $image_path = public_path('img/attachement/').substr($document->path,$position+16,strlen($document->path));
-//                }
-////                str_replace("//","/",$image_path);
-//                return response()->json($image_path,200);
-//
-//                unlink($image_path);
+                $imageFolder =  '/img/attachement/';
+                $position  = stripos($document->path,$imageFolder);
+                $image_path = public_path($imageFolder).substr($document->path,$position+strlen($imageFolder),strlen($document->path));
+                unlink($image_path);
                 $res->success();
                 $document->delete();
+
             }catch (\ErrorException $e){
                 $res->fail(trans('messages.document_remove_fail'));
 
             }
         }else{
             $res->fail(trans('messages.document_not_found'));
+        }
+
+        return response()->json($res,200);
+    }
+
+    public function updateDocument(Request $request)
+    {
+        $res = new Result();
+        $res->success = true;
+        if (isset($request['id']))
+        $res = $this->remove($request['id'])->getData();
+        if ($res->success)
+        $res = $this->store($request)->getData();
+        if ($res->success){
+            $driver = User::find(Auth::id())->profileDriver;
+            $attachement = Document::find($res->response[0]->id);
+            $driver->documents()->attach($attachement);
         }
 
         return response()->json($res,200);

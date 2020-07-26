@@ -7,23 +7,15 @@ use App\Libs\Firebase;
 use App\Models\Account;
 use App\Models\AdminRoles;
 use App\Models\Result;
+use App\Models\User;
 use App\Models\UserFcm;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class UserController extends Controller
 {
-    //
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request)
     {
         $res = new Result();
@@ -37,12 +29,8 @@ class UserController extends Controller
     public function uploadImage(Request $request)
     {
         $res = new Result();
+        $validator = Validator::make($request->all(), ['photo' => 'required|base64image']);
 
-
-        $validator = Validator::make($request->all(),
-            [
-                'photo' => 'required|base64image',
-            ]);
         if ($validator->fails()) {
             $res->fail("Toutes les entrées sont requises");
             return response()->json($res, 200);
@@ -50,25 +38,16 @@ class UserController extends Controller
 
         try {
             $name = time() . '.' . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-
-            $img = \Image::make($request->photo)->save(public_path('img/profile/') . $name);
-            $name = url('/') . '/img/profile/' . $name;
-
+            $img = \Image::make($request->photo)->save(public_path('img/attachement/') . $name);
+            $name = url('/') .'/img/attachement/' . $name;
             $user = Auth::user();
             $user->update(['image_url' => $name]);
-
             $res->success($user);
-
             return response()->json($res, 200);
-
         } catch (Exception $e) {
             $res->fail($e);
-
-
             return response()->json($res, 200);
         }
-
-
     }
 
     public function getUser()
@@ -94,88 +73,56 @@ class UserController extends Controller
 
     public function createAccount(int $id)
     {
-        $accountDriver = new Account();
-        $accountDriver->balance = 0;
-        $accountDriver->user_id = $id;
-        $accountDriver->save();
+        return Account::create(['balance'=>0]);
     }
-
 
     public function userFcmToken(Request $request)
     {
-
         $res = new Result();
 
         $validator = Validator::make($request->all(),
-            [
-                'fcm' => 'required|string'
-            ]);
+            ['fcm' => 'required|string']);
         if ($validator->fails()) {
             $res->fail("FCM token not valid");
             return response()->json($res, 200);
         }
-        $user = Auth::user();
-        if ($user) {
-            $fcm = new UserFcm();
-            $fcm->user_id = $user->id;
-            $fcm->token = $request['fcm'];
-            $fcm->save();
-            $res->success($fcm);
-        } else {
-            $res->fail('User Not Found');
-        }
+        $userFCM = new UserFcm();
+        $userFCM->user_id = Auth::id();
+        $userFCM->token = $request['fcm'];
+        $userFCM->save();
+
+        $res->success($userFCM);
+
         return response()->json($res, 200);
 
     }
 
-
     public function notify(Request $request)
     {
-        $notification_payload = $request['payload'];
-        $notification_title = $request['title'];
-        $notification_message = $request['message'];
-        $receiver_id = [];
-//        return [UserFcm::where('user_id',$request['user_id'])->first()];
-        $users = [UserFcm::where('user_id', $request['user_id'])->first()];
-        foreach ($users as $user) {
-            array_push($receiver_id, $user['token']);
+        $notification_payload   = $request['payload'];
+        $notification_title     = $request['title'];
+        $notification_message   = $request['message'];
+        $notification_data = $request['data'];
+        $receiver_id =[];
+        $users = UserFcm::where('user_id',$request['user_id'])->get();
+
+        foreach($users as $user){
+            array_push($receiver_id,$user['token']);
         }
-//        return $receiver_id;
-//        if (isset($request['user_id'])){
-//
-//        }
-//        else if (isset($request['drivers']))
-//        {
-//
-//            return 1;
-//
-//            foreach ($request['drivers'] as $driver){
-//                $userFcm = UserFcm::where('user_id','=',$driver)->first();
-//                array_push($receiver_id,$userFcm['token']);
-//            }
-//        else{
-//            $users = UserFcm::select('token')->where('id','>',0)->get()->toArray();
-//            foreach($users as $user){
-//                array_push($receiver_id,$user['token']);
-//            }
-//        }
-
-//        return $receiver_id;
         try {
-
-
             $firebase = new Firebase();
-
-            $message = array('body' => $notification_message, 'title' => $notification_title, 'vibrate' => 1, 'sound' => 1, 'payload' => $notification_payload);
-
-            $response = '';
-
-            $response = $firebase->sendMultiple($receiver_id, $message);
-
-            return $response;
-        } catch (\Exception $ex) {
+            $message = array('body' =>  $notification_message , 'title' => $notification_title , 'vibrate' => 1, 'sound' => 1 ,'payload'=>$notification_payload,'data'=>$notification_data);
+            return $firebase->sendMultiple(  $receiver_id,  $message );
+        } catch ( Exception $ex ) {
             return false;
         }
     }
 
+    public function updatelang(Request $request)
+    {
+        $res= new Result();
+        $user = User::find(Auth::id());
+        isset($request['lang'])?$user->update(['lang'=> $request['lang']])&&$res->success($user->lang):$res->fail(trans('messages.server_error'));
+        return response()->json($res,200);
+    }
 }
