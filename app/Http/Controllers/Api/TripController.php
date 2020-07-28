@@ -370,7 +370,7 @@ class TripController extends Controller
                 $res->success($cancelTrip);
                 $res->message = trans('messages.cancel_trip');
                 if ($user->getRoles() === json_encode(['client']))
-                    $this->driverController->notifyUser($trip->driver_id,5,$trip->id,$trip->driver_id);
+                    $this->driverController->notifyUser($trip->driver_id,7,$trip->id,$trip->driver_id);
                 else
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
             }else if ($trip->status == '0' && $user->getRoles() === json_encode(['client'])){
