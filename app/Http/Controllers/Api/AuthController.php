@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Libs\Sms;
 use App\Models\Account;
 use App\Models\Result;
 use App\Models\User;
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Validator;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -39,8 +41,16 @@ class AuthController extends Controller
 
         Verification::create(['verification_code'=> $verifyCode,
             'phone'=>$phone, 'code_expiry_minute'=>15]);
-        $res->success([]);
-        $res->message =trans('messages.verif_code_send');
+
+        $sms = new Sms();
+        $response = $sms->send($phone,$verifyCode,date('Y-m-d'),date('H:i'));
+        if ($response && $response[0] == "3")
+        {
+            $res->success([]);
+            $res->message =trans('messages.verif_code_send');
+        }else{
+            $res->fail('Error Server try to resend SMS');
+        }
         return response()->json($res, 200);
     }
 
@@ -121,13 +131,21 @@ class AuthController extends Controller
             {
                 $res->fail(trans('messages.verif_code_expired'));
             } else {
-
                 $user = User::where('phone',$request['userPhone'])->first();
-                if ($user)
-                {
+                if ($user) {
                     $input['email'] = $user->email;
                     $response = $this->issueToken($input, 'password');
-                    $response['user'] = $user;
+                    if ($user->getRoles() === json_encode(['captain']))
+                    {
+                        Auth::login($user);
+                        $driverController = new DriverController();
+                        $response['user'] = $user->profileDriver ?$driverController->getProfile()->getData()->response[0] : $user;
+                        $response['isUser'] = false;
+                    }
+                    else{
+                        $response['user'] = $user;
+                        $response['isUser'] = true;
+                    }
                     $response['isAlreadyUser'] = true;
 
                 }else {
