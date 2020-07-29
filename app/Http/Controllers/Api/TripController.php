@@ -281,11 +281,11 @@ class TripController extends Controller
             switch ($document['type']){
                 case "1" : array_push($documents['attachements'],$document);
                     break;
-                case "2" : $documents['reservation_hotel'] = $document;
+                case "2" : array_push($documents['reservation_hotel'],$document);
                     break;
-                case "3" : $documents['receipt'] = $document;
+                case "3" : array_push($documents['receipt'],$document);
                     break;
-                case "7" : $documents['pickup_receipt'] = $document;
+                case "7" : array_push($documents['pickup_receipt'],$document);
                     break;
             }
         }
