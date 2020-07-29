@@ -41,7 +41,8 @@ class AuthController extends Controller
 
         Verification::create(['verification_code'=> $verifyCode,
             'phone'=>$phone, 'code_expiry_minute'=>15]);
-
+        $phone = str_replace('+', '', $phone);
+        $phone = str_replace(' ', '', $phone);
         $sms = new Sms();
         $response = $sms->send($phone,$verifyCode,date('Y-m-d'),date('H:i'));
         if ($response && $response[0] == "3")
