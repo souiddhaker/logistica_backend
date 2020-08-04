@@ -11,6 +11,7 @@ use App\Models\Driver;
 use App\Models\Notif;
 use App\Models\Rating;
 use App\Models\Result;
+use App\Models\Settings;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -272,7 +273,6 @@ class DriverController extends Controller
 
     public function getListDriverForTrip(int $trip_id)
     {
-
         $trip = Trip::where('id','=',$trip_id)
         ->where('status', '=','0')->first();
         if ($trip)
@@ -288,9 +288,15 @@ class DriverController extends Controller
                 JOIN drivers ON drivers.user_id = users.id
                 WHERE `address`.`type` = 4 AND users.roles LIKE "%captain%" AND drivers.status = 0 ORDER BY distance',
                 [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
-            foreach ($listDriver as $driver){
-                $this->notifyUser($driver->id,1,$trip_id,$driver->id);
-            }
+            if( $listDriver)
+            $listDriver = array_filter($listDriver, function($driver){
+                return $driver->distance < Settings::first()->coverage_range;
+            })[0];
+//            foreach ($listDriver as $driver){
+//                $this->notifyUser($driver->id,1,$trip_id,$driver->id);
+//            }
+
+            return response()->json($listDriver,200);
             return $listDriver;
         }else{
             return null;
