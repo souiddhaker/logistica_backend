@@ -63,7 +63,7 @@ class TripController extends Controller
         $today = Carbon::parse(Carbon::now())->timestamp;
         $listRequestTrip = Trip::select('trips.id','status','pickup_at','total_price','trips.driver_id','trips.user_id','trips.created_at')
             ->where('status','=','0')
-            ->leftJoin('notifs','notifs.trip_id','=','trips.id')
+                ->leftJoin('notifs','notifs.trip_id','=','trips.id')
             ->where('notifs.user_id','=',Auth::id())
             ->where('notifs.trip_step','=',1)
             ->where('notifs.driver_id','!=',null)
@@ -547,6 +547,16 @@ class TripController extends Controller
             $res->success($response);
         }else
             $res->fail(trans('messages.trip_not_found'));
+        return response()->json($res,200);
+    }
+
+
+    public function paytripComission(int $tripId)
+    {
+        $res = new Result();
+        $trip = Trip::find($tripId);
+        $user = $trip->user();
+        $driver = $trip->driver();
         return response()->json($res,200);
     }
 }

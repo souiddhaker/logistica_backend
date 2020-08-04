@@ -11,7 +11,9 @@ use App\Models\Driver;
 use App\Models\Notif;
 use App\Models\Promocode;
 use App\Models\Result;
+use App\Models\Service;
 use App\Models\Settings;
+use App\Models\SubService;
 use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,7 +23,6 @@ class AdminCrudController extends Controller
 
     public function __construct()
     {
-//            $this->middleware('auth:admin');
     }
 
     public function create(string $name, Request $request)
@@ -70,6 +71,14 @@ class AdminCrudController extends Controller
                 CarCategory::destroy($id);
                 $res->success("deleted successfully");
                 break;
+            case "service":
+                Service::destroy($id);
+                $res->success("deleted successfully");
+                break;
+            case "subservice":
+                SubService::destroy($id);
+                $res->success("deleted successfully");
+                break;
             default:
                 $res->fail("incorrect name");
         }
@@ -91,6 +100,12 @@ class AdminCrudController extends Controller
                 break;
             case "setting":
                 $res = Settings::updateOne($request->all());
+                break;
+            case "service":
+                $res = Service::updateOne($request, $id);
+                break;
+            case "subservice":
+                $res = SubService::updateOne($request, $id);
                 break;
             case "carType":
                 $res = CarCategory::updateOne($request, $id);
@@ -162,6 +177,14 @@ class AdminCrudController extends Controller
                 break;
             case "setting":
                 $data = Settings::limit(1)->get();
+                $res->success($data);
+                break;
+            case "service":
+                $data = Service::where('id', $id)->limit(1)->get();
+                $res->success($data);
+                break;
+            case "subservice":
+                $data = SubService::where('id', $id)->limit(1)->get();
                 $res->success($data);
                 break;
             case "carType":

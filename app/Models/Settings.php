@@ -20,18 +20,17 @@ class Settings extends Model
      * @var array
      */
     protected $fillable = [
-        'company_percent','abort_percent_client','abort_percent_captain','percent_from'
+        'company_percent','abort_percent_client','abort_percent_captain','percent_from','coverage_range'
     ];
-    protected $hidden = ['created_at','updated_at'];
+    protected $hidden = ['created_at','updated_at','abort_percent_client','abort_percent_captain'];
 
     static public function updateOne(array $request):Result{
         $res = new Result();
         $validator = Validator::make($request,
             [
                 'company_percent' => 'required',
-                'abort_percent_client' => 'required',
-                'abort_percent_captain' => 'required',
-                'percent_from' => 'required'
+                'percent_from' => 'required',
+                'coverage_range' => 'required'
             ]);
 
         if($validator->fails()){
