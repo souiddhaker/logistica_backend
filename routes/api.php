@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/car_categories', 'Api\ServiceController@getListCarCategories');
         Route::post('/list_services', 'Api\ServiceController@getListServices');
         Route::get('/list_services', 'Api\ServiceController@services');
+        Route::put('/list_services', 'Api\ServiceController@update');
     });
     Route::prefix('account')->group(function () {
         Route::post('/', 'Api\ServiceController@getListCarCategories');

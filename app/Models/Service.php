@@ -17,6 +17,7 @@ class Service extends Model
 {
     //
        use HasTranslations;
+    protected  $fillable = ['label', 'price'];
 
     public $translatable = ['label'];
 
@@ -74,4 +75,6 @@ class Service extends Model
         $res->success($listServices);
         return $res;
     }
+
+
 }

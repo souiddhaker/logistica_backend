@@ -108,4 +108,21 @@ class ServiceController extends Controller
     {
         return response()->json(Service::getAll(),200);
     }
+
+    public function update(Request $request)
+    {
+        $data = $request->all();
+        foreach ($data['services'] as $service)
+        {
+            if (isset($service['sub_services']))
+            {
+                foreach ($service['sub_services'] as $subservices)
+                {
+                    SubService::where('id',$subservices['id'])->update(collect($subservices)->except(['category_id'])->all());
+                }
+            }
+            Service::where('id',$service['id'])->update(collect($service)->except(['sub_services','category_id'])->all());
+        }
+        return response()->json(Service::getAll(),200);
+    }
 }
