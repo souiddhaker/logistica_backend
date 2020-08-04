@@ -103,4 +103,9 @@ class ServiceController extends Controller
         $res->success = true;
         return response()->json($res,200);
     }
+
+    public function services()
+    {
+        return response()->json(Service::getAll(),200);
+    }
 }

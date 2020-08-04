@@ -263,7 +263,6 @@ class AdminCrudController extends Controller
                 }, ARRAY_FILTER_USE_BOTH);
                 $sql = $this->filterDate($detailFilter, "created_at");
                 $sql = $this->toQuery($detailFilter, $sql, false, ['id', 'status', 'nbr_luggage', 'user_id', 'driver_id','transaction_status']);
-//                dd($sql);
                 break;
             case "couponCaptain":
             case "couponClient":

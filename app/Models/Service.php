@@ -54,4 +54,24 @@ class Service extends Model
         $res->success($id);
         return $res;
     }
+
+    static public function getAll()
+    {
+        $res = new Result();
+        $listCategory =  CategoryServices::all();
+        $listServices =[];
+        foreach ($listCategory as $category){
+            $listServices[$category->title] = Service::where('category_id', $category->id)->get();
+            foreach ($listServices[$category->title] as $service)
+            {
+                $subServices = SubService::where('service_id',$service->id)->get();
+                if (count($subServices)>0)
+                {
+                    $service['sub_services'] = $subServices;
+                }
+            }
+        }
+        $res->success($listServices);
+        return $res;
+    }
 }
