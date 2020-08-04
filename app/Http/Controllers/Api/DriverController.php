@@ -289,14 +289,13 @@ class DriverController extends Controller
                 WHERE `address`.`type` = 4 AND users.roles LIKE "%captain%" AND drivers.status = 0 ORDER BY distance',
                 [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
             if( $listDriver)
-            $listDriver = array_filter($listDriver, function($driver){
-                return $driver->distance < Settings::first()->coverage_range;
-            })[0];
-//            foreach ($listDriver as $driver){
-//                $this->notifyUser($driver->id,1,$trip_id,$driver->id);
-//            }
+                $listDriver = array_filter($listDriver, function($driver){
+                    return $driver->distance < Settings::first()->coverage_range;
+                });
+            foreach ($listDriver as $driver){
+                $this->notifyUser($driver->id,1,$trip_id,$driver->id);
+            }
 
-            return response()->json($listDriver,200);
             return $listDriver;
         }else{
             return null;
