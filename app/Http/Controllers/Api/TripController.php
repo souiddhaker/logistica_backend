@@ -340,7 +340,7 @@ class TripController extends Controller
                     ->where('trip_id', '=',$trip['id'])->first();
                 $trip['alreadyApplied'] = $driverTrip ? true : false;
 
-                $checkIfWasConcerned = Notif::where('trip_id','=',$trip->id)
+                $checkIfWasConcerned = Notif::where('trip_id','=',$id)
                     ->where('trip_step','=','10')
                     ->where('driver_id','!=',null)->get();
                 $trip['alreadyCanceled'] = $checkIfWasConcerned && !$driverTrip ? true : false;
