@@ -6,15 +6,42 @@ use App\Http\Controllers\Controller;
 use App\Models\Help;
 use App\Models\Result;
 use Illuminate\Http\Request;
-
+use Validator;
 class HelpController extends Controller
 {
-    public function getAllQuestions()
+    private $res;
+
+    public function __construct()
     {
-        $res = new Result();
-        $res->message = 'Questions list';
-        $res->response = Help::all();
-        $res->success = true;
-        return response()->json($res,200);
+        $this->res = new Result();
+    }
+    public function create(Request $request)
+    {
+        $data = $request->all();
+        $validator = Validator::make($data,[
+            'content' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $this->res->fail($validator->errors());
+            return response()->json($this->res, $this->res->status);
+        }
+
+        $help = Help::create($data);
+        $this->res->success($help);
+        return response()->json($this->res,200);
+    }
+
+    public function getAbout()
+    {
+        $this->res->success(Help::first());
+        return response()->json($this->res,200);
+    }
+
+    public function udapte(Request $request)
+    {
+        $help = Help::first()->update($request->all());
+        $this->res->success($help);
+        return response()->json($this->res,200);
     }
 }

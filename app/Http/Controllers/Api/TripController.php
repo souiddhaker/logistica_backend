@@ -339,6 +339,11 @@ class TripController extends Controller
                 $driverTrip = \DB::table('trip_user')->where('user_id', '=', $user->id)
                     ->where('trip_id', '=',$trip['id'])->first();
                 $trip['alreadyApplied'] = $driverTrip ? true : false;
+
+                $checkIfWasConcerned = Notif::where('trip_id','=',$trip->id)
+                    ->where('trip_step','=','10')
+                    ->where('driver_id','!=',null)->get();
+                $trip['alreadyCanceled'] = $checkIfWasConcerned && !$driverTrip ? true : false;
             }
             if($trip['status'] == '0' && $user->getRoles() === json_encode(['client']))
             {

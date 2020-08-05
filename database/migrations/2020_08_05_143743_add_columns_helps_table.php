@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHelpsTable extends Migration
+class AddColumnsHelpsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateHelpsTable extends Migration
      */
     public function up()
     {
-        Schema::create('helps', function (Blueprint $table) {
-
+        Schema::table('helps', function (Blueprint $table) {
+            $table->json('content')->nullable();
         });
     }
 
@@ -25,5 +25,7 @@ class CreateHelpsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('helps');
+
     }
 }

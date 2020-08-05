@@ -126,8 +126,10 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
     });
     Route::post('/updateposition', 'Api\DriverController@updatePosition');
 
-    Route::prefix('help')->group(function(){
-        Route::get('/list', 'Api\HelpController@getAllQuestions');
+    Route::prefix('about')->group(function(){
+        Route::post('/', 'Api\HelpController@create');
+        Route::get('/', 'Api\HelpController@getAbout');
+        Route::put('/', 'Api\HelpController@update');
     });
 
 });
