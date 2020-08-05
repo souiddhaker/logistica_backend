@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Libs\Hyperpay;
 use App\Models\Account;
 use App\Models\Result;
+use App\Models\Settings;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,11 +83,13 @@ class PaymentController extends Controller
         return response()->json($res,200);
     }
 
-    public function payTripCost(float $tripCost)
+    public function payTripCost(float $tripCost,int $driverId)
     {
         $account = Account::where('user_id', '=',Auth::id())->first();
         $balance = $account->balance - $tripCost;
         $account->update(['balance'=>$balance>=0?$balance:$balance=0]);
+        $balance = $account->balance - Settings::first()->company_percent;
+        Account::where('user_id', '=',$driverId)->update(['balance'=>$balance>=0?$balance:0]);
         return $account;
     }
 

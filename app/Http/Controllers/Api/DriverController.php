@@ -35,26 +35,26 @@ class DriverController extends Controller
         try {
             foreach ($request->files as $key =>$val)
             {
-                    $newDocument = new Document();
-                    Image::make($val)->save(public_path('img/attachement/') . time() .$val->getClientOriginalName());
-                    $name = url('/') .'/img/attachement/' . time() .$val->getClientOriginalName();
-                    $newDocument->path = $name;
-                    switch ($key)
-                    {
-                        case ($key == "identity1") || ($key =="identity2"):
-                            $newDocument->type = 4;
-                            break;
-                        case ($key == "car1") || ($key =="car2") || ($key =="car3"):
-                            $newDocument->type =5;
-                            break;
-                        case ($key == "licence1") || ($key =="licence2"):
-                            $newDocument->type =6;
-                            break;
-                        default :
-                            $listDocument = [];
-                    }
-                    $newDocument->save();
-                    array_push($listDocument,$newDocument->id);
+                $newDocument = new Document();
+                Image::make($val)->save(public_path('img/attachement/') . time() .$val->getClientOriginalName());
+                $name = url('/') .'/img/attachement/' . time() .$val->getClientOriginalName();
+                $newDocument->path = $name;
+                switch ($key)
+                {
+                    case ($key == "identity1") || ($key =="identity2"):
+                        $newDocument->type = 4;
+                        break;
+                    case ($key == "car1") || ($key =="car2") || ($key =="car3"):
+                        $newDocument->type =5;
+                        break;
+                    case ($key == "licence1") || ($key =="licence2"):
+                        $newDocument->type =6;
+                        break;
+                    default :
+                        $listDocument = [];
+                }
+                $newDocument->save();
+                array_push($listDocument,$newDocument->id);
             }
         }catch (Exception $exception){
             return [];
@@ -232,7 +232,7 @@ class DriverController extends Controller
         $trip = Trip::where('id',$request['trip_id'])
             ->where('status',"=", "0")->first();
         Notif::where('trip_id','=',$trip?$trip->id:null)
-            ->where('driver_id','=',Auth::id())->update(['driver_id'=>null]);
+            ->where('driver_id','=',Auth::id())->update(['driver_id'=>null,'trip_step'=>10]);
         if ($trip)
         {
             $trip->candidates()->wherePivot('user_id',Auth::id())->detach();

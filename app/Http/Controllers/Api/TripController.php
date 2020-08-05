@@ -444,11 +444,11 @@ class TripController extends Controller
                 $trip->save();
                 $trip['driver'] = $driver;
                 $this->driverController->notifyUser($driver->id,3,$trip->id,$driver->id);
-                Driver::where('user_id' ,'=',Auth::id())->update(['status'=>1]);
+                Driver::where('user_id' ,'=',$driver->id)->update(['status'=>1]);
                 $trip->candidates()->detach();
                 Notif::where('trip_id','=',$trip->id)
                     ->where('driver_id','!=',$driver->id)->update(['driver_id'=>null]);
-                $paymentController->payTripCost($trip->total_price);
+                $paymentController->payTripCost($trip->total_price,$driver->id);
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();
