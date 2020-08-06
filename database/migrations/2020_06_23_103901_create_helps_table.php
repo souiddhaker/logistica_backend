@@ -13,9 +13,7 @@ class CreateHelpsTable extends Migration
      */
     public function up()
     {
-        Schema::create('helps', function (Blueprint $table) {
 
-        });
     }
 
     /**
@@ -25,5 +23,6 @@ class CreateHelpsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('helps');
     }
 }

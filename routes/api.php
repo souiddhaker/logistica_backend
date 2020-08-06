@@ -22,6 +22,11 @@ Route::prefix('auth')->group(function () {
 
 });
 Route::group(['middleware' => 'auth:api'], function () {
+    Route::prefix('about')->group(function(){
+        Route::post('/', 'Api\HelpController@create');
+        Route::get('/', 'Api\HelpController@getAbout');
+        Route::put('/', 'Api\HelpController@update');
+    });
     Route::prefix('user')->group(function () {
         Route::put('', 'Api\UserController@update');
         Route::post('/profileImage', 'Api\UserController@uploadImage');
@@ -126,11 +131,7 @@ Route::group(['prefix' => 'driver','middleware' => ['auth:api']],function(){
     });
     Route::post('/updateposition', 'Api\DriverController@updatePosition');
 
-    Route::prefix('about')->group(function(){
-        Route::post('/', 'Api\HelpController@create');
-        Route::get('/', 'Api\HelpController@getAbout');
-        Route::put('/', 'Api\HelpController@update');
-    });
+
 
 });
 Route::get('/listcar','Api\ServiceController@listCar');

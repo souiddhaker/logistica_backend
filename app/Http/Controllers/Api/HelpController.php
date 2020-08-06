@@ -26,7 +26,7 @@ class HelpController extends Controller
             $this->res->fail($validator->errors());
             return response()->json($this->res, $this->res->status);
         }
-
+        Help::truncate();
         $help = Help::create($data);
         $this->res->success($help);
         return response()->json($this->res,200);
@@ -35,13 +35,6 @@ class HelpController extends Controller
     public function getAbout()
     {
         $this->res->success(Help::first());
-        return response()->json($this->res,200);
-    }
-
-    public function udapte(Request $request)
-    {
-        $help = Help::first()->update($request->all());
-        $this->res->success($help);
         return response()->json($this->res,200);
     }
 }

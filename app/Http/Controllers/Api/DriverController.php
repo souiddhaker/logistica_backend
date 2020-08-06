@@ -288,7 +288,7 @@ class DriverController extends Controller
                 JOIN drivers ON drivers.user_id = users.id
                 WHERE `address`.`type` = 4 AND users.roles LIKE "%captain%" AND drivers.status = 0 ORDER BY distance',
                 [$pickupAddress['lattitude'],$pickupAddress['longitude'],$pickupAddress['lattitude']]);
-            if( $listDriver)
+            if( count($listDriver)>0)
                 $listDriver = array_filter($listDriver, function($driver){
                     return $driver->distance < Settings::first()->coverage_range;
                 });

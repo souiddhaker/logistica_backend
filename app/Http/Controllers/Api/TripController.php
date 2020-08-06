@@ -63,7 +63,7 @@ class TripController extends Controller
         $today = Carbon::parse(Carbon::now())->timestamp;
         $listRequestTrip = Trip::select('trips.id','status','pickup_at','total_price','trips.driver_id','trips.user_id','trips.created_at')
             ->where('status','=','0')
-                ->leftJoin('notifs','notifs.trip_id','=','trips.id')
+            ->leftJoin('notifs','notifs.trip_id','=','trips.id')
             ->where('notifs.user_id','=',Auth::id())
             ->where('notifs.trip_step','=',1)
             ->where('notifs.driver_id','!=',null)
@@ -85,10 +85,10 @@ class TripController extends Controller
             ->where(function($q) use($user,$statusCurrent) {
                 if ($user->getRoles() === json_encode(['client'])){
                     $q->where('user_id', $user->id)
-                    ->whereIn('status', $statusCurrent);
+                        ->whereIn('status', $statusCurrent);
                 }else{
                     $q->where('driver_id', $user->id)
-                    ->whereIn('status', ['-1','1']);
+                        ->whereIn('status', ['-1','1']);
                 }
             })
             ->with('driver','user','addresses')
@@ -183,7 +183,7 @@ class TripController extends Controller
         $res = new Result();
         $data = $request->all();
         $trip = Trip::create(['status'=>'0', 'total_price'=>$data['total_price'],'nbr_luggage'=>$data['nbr_luggage'],
-        'driver_note'=>$data['note_driver'],'route'=>$data['route'],'trip_duration'=>$data['trip_duration'],'user_id'=>Auth::id(),'pickup_at'=>$data['pickup_at']]);
+            'driver_note'=>$data['note_driver'],'route'=>$data['route'],'trip_duration'=>$data['trip_duration'],'user_id'=>Auth::id(),'pickup_at'=>$data['pickup_at']]);
 
         $type_car = CarCategory::find($data['type_car_id']);
 
@@ -342,15 +342,15 @@ class TripController extends Controller
 
                 $checkIfWasConcerned = Notif::where('trip_id','=',$id)
                     ->where('trip_step','=','10')
-                    ->where('driver_id','!=',null)->get();
-                $trip['alreadyCanceled'] = $checkIfWasConcerned && !$driverTrip ? true : false;
+                    ->where('driver_id','=',null)->get();
+                $trip['alreadyCanceled'] = count($checkIfWasConcerned)>0 ? true : false;
             }
             if($trip['status'] == '0' && $user->getRoles() === json_encode(['client']))
             {
                 $driverTrip = \DB::table('trip_user')
                     ->where('trip_id', '=',$trip['id'])->first();
                 if ($driverTrip)
-                $trip['driver_request'] =User::find($driverTrip->user_id);
+                    $trip['driver_request'] =User::find($driverTrip->user_id);
             }
             $res->success($trip);
         }

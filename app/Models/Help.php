@@ -17,6 +17,6 @@ class Help extends Model
 
     public $translatable = ['title', 'description'];
 
-    protected $hidden = ['created_at','updated_at'];
-
+    protected $hidden = ['created_at','updated_at','id'];
+    protected $fillable = ['content'];
 }
