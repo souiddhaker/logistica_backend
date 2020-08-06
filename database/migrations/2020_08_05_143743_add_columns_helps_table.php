@@ -16,7 +16,7 @@ class AddColumnsHelpsTable extends Migration
 
         Schema::create('helps', function (Blueprint $table) {
             $table->increments('id');
-            $table->json('content')->nullable();
+            $table->text('content')->nullable();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
