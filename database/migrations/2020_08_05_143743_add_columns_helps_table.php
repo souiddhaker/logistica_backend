@@ -13,7 +13,6 @@ class AddColumnsHelpsTable extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('helps');
 
         Schema::create('helps', function (Blueprint $table) {
             $table->json('content')->nullable();
