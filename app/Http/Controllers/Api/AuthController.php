@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Libs\Sms;
 use App\Models\Account;
+use App\Models\BillingAddress;
 use App\Models\Result;
 use App\Models\User;
 use App\Models\Verification;
@@ -105,6 +106,8 @@ class AuthController extends Controller
                 $response['user'] = $user;
                 $response['isAlreadyUser'] = false;
             }
+            $response['user']['billingAddress'] = BillingAddress::where('user_id',$user->id)->first();
+
             $res->success($response);
             $res->message = trans('messages.verif_code_correct');
             return response()->json($res, 200);
