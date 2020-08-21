@@ -55,6 +55,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get the user billing address for user.
+     */
+    public function billingaddress()
+    {
+        return $this->hasOne(BillingAddress::class);
+    }
+
+    /**
      * Get the documents for user.
      */
     public function documents()

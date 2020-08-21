@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Libs\Firebase;
 use App\Models\Account;
 use App\Models\AdminRoles;
+use App\Models\BillingAddress;
 use App\Models\Result;
 use App\Models\User;
 use App\Models\UserFcm;
@@ -65,6 +66,7 @@ class UserController extends Controller
                 $user['adminRoles'] = [];
             }
         }
+        $user['billingAddress'] = BillingAddress::where('user_id',Auth::id())->first();
         $res->success($user);
         $res->message = trans('messages.user_details');
 
@@ -123,6 +125,19 @@ class UserController extends Controller
         $res= new Result();
         $user = User::find(Auth::id());
         isset($request['lang'])?$user->update(['lang'=> $request['lang']])&&$res->success($user->lang):$res->fail(trans('messages.server_error'));
+        return response()->json($res,200);
+    }
+
+
+    public function updateBillingAddress(Request $request)
+    {
+        $data = $request->all();
+        $res= new Result();
+        $user = User::find(Auth::id());
+        $billingAddress = BillingAddress::where('user_id',Auth::id())->first();
+        $billingAddress? $billingAddress->update($data): $billingAddress = BillingAddress::create($data);
+        $user->billingaddress()->save($billingAddress);
+        $res->success($billingAddress);
         return response()->json($res,200);
     }
 }

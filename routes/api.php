@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/fcm', 'Api\UserController@userFcmToken');
         Route::post('/notify', 'Api\UserController@notify');
         Route::post('/update_lang', 'Api\UserController@updateLang');
+        Route::put('/billing_address', 'Api\UserController@updateBillingAddress');
 
     });
     Route::prefix('services')->group(function () {
