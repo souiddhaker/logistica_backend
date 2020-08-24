@@ -182,20 +182,13 @@ class TripController extends Controller
     {
         $res = new Result();
         $data = $request->all();
-        $trip = Trip::create(['status'=>'0', 'total_price'=>$data['total_price'],'nbr_luggage'=>$data['nbr_luggage'],
+        $trip = Trip::create(['status'=>'0', 'total_price'=>$data['total_price'],'nbr_luggage'=>$data['nbr_luggage'],'payment_method'=>$data['payment_method'],
             'driver_note'=>$data['note_driver'],'route'=>$data['route'],'trip_duration'=>$data['trip_duration'],'user_id'=>Auth::id(),'pickup_at'=>$data['pickup_at']]);
 
         $type_car = CarCategory::find($data['type_car_id']);
 
         if($type_car){
             $trip->type_car()->associate($type_car)->save();
-        }
-
-        $payment_method = Card::find($data['payment_method']);
-
-        if($payment_method)
-        {
-            $trip->payment_method = $payment_method->id;
         }
         $trip->save();
 
@@ -317,7 +310,6 @@ class TripController extends Controller
         if ($trip)
         {
             $trip->services = $this->listServicesWithSubServices($trip);
-            $trip->payement_method = "Cash payment";
             $trip->rating = Rating::find($trip->rating_id);
             $attachementsCollection = collect($trip->attachements)->toArray();
 

@@ -72,6 +72,8 @@ class DriverController extends Controller
     {
         $res = new Result();
         $listDocumentsDriverID = $this->saveProfileDocuments($request);
+        return response()->json($listDocumentsDriverID,200);
+
         if (count($listDocumentsDriverID)<7)
         {
             $this->removeDocumentWhenregister($listDocumentsDriverID);
@@ -188,10 +190,7 @@ class DriverController extends Controller
     {
         $res = new Result();
 
-        $validator = Validator::make($request->all(),
-            [
-                'trip_id' => 'required'
-            ]);
+        $validator = Validator::make($request->all(), ['trip_id' => 'required']);
         if ($validator->fails())
         {
             $res->fail(trans('messages.trip_not_found'));
@@ -201,14 +200,18 @@ class DriverController extends Controller
         $trip = Trip::where('id',$request['trip_id'])
             ->where('status',"=", "0")->first();
 
+        $trip?$isAllowedTo=Account::select('balance')->where('user_id',Auth::id())->first()->balance>=(($trip->total_price*Settings::first()->company_percent)/100):$isAllowedTo=false;
         if ($trip)
         {
-            if (count($trip->candidates)==0){
-                $this->notifyUser($trip->user_id,9,$trip->id,Auth::id());
-            }
-            $trip->candidates()->attach(User::find( Auth::id()));
-            $trip->save();
-            $res->success($trip);
+            if ($isAllowedTo)
+            {
+                if (count($trip->candidates)==0)
+                    $this->notifyUser($trip->user_id,9,$trip->id,Auth::id());
+                $trip->candidates()->attach(User::find( Auth::id()));
+                $trip->save();
+                $res->success($trip);
+            }else
+                $res->fail(trans('messages.charge_account'));
         }else{
             $res->fail(trans('messages.trip_not_found'));
         }

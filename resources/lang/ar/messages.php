@@ -22,6 +22,8 @@ return [
     'payment_failed' => 'لم يتم الدفع',
     'payment_success' => 'تمت عملية الدفع',
 
+    'charge_account' => 'رصيدكم غير كافي للمشاركة في هذه الرحلة',
+
     'notif_not_found' => 'الإشعار غير موجود',
     'error_server' => 'هناك مشكلة في السيرفر',
 

@@ -21,6 +21,8 @@ return [
     'payment_failed' => 'Payment didn\'t go through',
     'payment_success' => 'Payment completed',
 
+    'charge_account' => 'Your balance is insufficient to participate in this trip',
+
     'notif_not_found' => 'Notification not found',
 
 
