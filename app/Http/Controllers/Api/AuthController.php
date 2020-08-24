@@ -101,7 +101,7 @@ class AuthController extends Controller
                     $response['isUser'] = true;
                 }
                 $response['isAlreadyUser'] = true;
-                $response['user']['billingAddress'] = BillingAddress::where('user_id',$user->id)->first();
+                $response['user']->billingAddress = BillingAddress::where('user_id',$user->id)->first();
 
             }else {
                 $response['user'] = $user;
