@@ -236,6 +236,7 @@ class DriverController extends Controller
             ->where('driver_id','=',Auth::id())->update(['driver_id'=>null,'trip_step'=>10]);
         if ($trip)
         {
+            Driver::where('user_id' ,'=',Auth::id())->update(['status'=>0]);
             $trip->candidates()->wherePivot('user_id',Auth::id())->detach();
             $trip->save();
             $res->success($trip);
