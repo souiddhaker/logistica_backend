@@ -86,6 +86,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/responseToDriver', 'Api\TripController@confirmTripFromUser');
 
     });
+    Route::prefix('payment')->group(function(){
+        Route::post('/get_checkout_id','Api\PaymentController@getCheckoutID');
+        Route::post('/getstatus','Api\PaymentController@getCheckoutStatus');
+    });
 });
 Route::group(['prefix' => 'account','middleware' => ['auth:api']],function(){
     Route::post('/addcredit','Api\AccountController@addCredit');
@@ -148,10 +152,7 @@ Route::prefix('admin')->group(function(){
         Route::post('login', 'Api\AdminAuthController@login');
     });
 });
-Route::prefix('payment')->group(function(){
-    Route::post('/get_checkout_id','Api\PaymentController@getCheckoutID');
-    Route::post('/getstatus','Api\PaymentController@getCheckoutStatus');
-});
+
 
 Route::post('/test/{id}', 'Api\DriverController@getListDriverForTrip')->middleware('auth:api');
 Route::post('/notifyme/{id}','Api\DriverController@notifyMe');

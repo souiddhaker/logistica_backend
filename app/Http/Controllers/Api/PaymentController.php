@@ -5,23 +5,28 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Libs\Hyperpay;
 use App\Models\Account;
+use App\Models\BillingAddress;
 use App\Models\Result;
 use App\Models\Settings;
 use App\Models\Trip;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class PaymentController extends Controller
 {
+
     public function getCheckoutID(Request $request)
     {
         $res = new Result();
         $hyperPayApi = new Hyperpay();
         $params = $request->all();
         $params['entityId'] =  $this->getEntityIdForType($params['type']);
+        $params['testMode'] =  "EXTERNAL";
 
-        $response = $hyperPayApi->getAccessId($params);
+        $paymentParams = array_merge($params,$this->getBillingData(Auth::id()));
+        $response = $hyperPayApi->getAccessId($paymentParams);
         $response?$res->success($response):$res->fail(trans('messages.error_server'));
         return response()->json($res,200);
     }
@@ -106,5 +111,23 @@ class PaymentController extends Controller
                 $entityId= "8ac7a4c87314346b0173246ca65e083f";
         }
         return $entityId;
+    }
+
+
+    public function getBillingData($idUser)
+    {
+        $user = Auth::user();
+        $billingAddress = BillingAddress::where('user_id',$idUser)->first();
+        $data = [];
+        $data['billing.street1'] = $billingAddress->street;
+        $data['billing.city'] = $billingAddress->city;
+        $data['billing.state'] = $billingAddress->state;
+        $data['billing.country'] = $billingAddress->country;
+        $data['billing.postcode'] = $billingAddress->postcode;
+        $data['customer.givenName'] = $user->firstName;
+        $data['customer.surname'] = $user->lastName;
+        $data['customer.email'] = $user->email;
+        $data['merchantTransactionId'] =$user->id;
+         return $data;
     }
 }
