@@ -72,8 +72,6 @@ class DriverController extends Controller
     {
         $res = new Result();
         $listDocumentsDriverID = $this->saveProfileDocuments($request);
-        return response()->json($listDocumentsDriverID,200);
-
         if (count($listDocumentsDriverID)<7)
         {
             $this->removeDocumentWhenregister($listDocumentsDriverID);
