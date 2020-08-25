@@ -40,7 +40,7 @@ class AddressController extends Controller
             return response()->json($res, 400);
         }
         $input = $request->all();
-        $address = Address::where('user_id',Auth::id())->where('place_id',$input['place_id'])->first();
+        $address = Address::where('user_id',Auth::id())->where('place_id',$input['place_id'])->where('type','=','3')->first();
         if(!$address)
         {
             $user = Auth::user();
