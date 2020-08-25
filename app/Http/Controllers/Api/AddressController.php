@@ -39,19 +39,22 @@ class AddressController extends Controller
             $res->fail(trans('messages.address_exists'));
             return response()->json($res, 400);
         }
-
         $input = $request->all();
-        $user = Auth::user();
-        $address = new Address();
-        $address->primaryName = $input['primaryName'];
-        $address->secondaryName = $input['secondaryName'];
-        $address->longitude = $input['longitude'];
-        $address->lattitude = $input['lattitude'];
-        $address->place_id = $input['place_id'];
-        $address->type = "3";
+        $address = Address::where('user_id',Auth::id())->where('place_id',$input['place_id'])->first();
+        if(!$address)
+        {
+            $user = Auth::user();
+            $address = new Address();
+            $address->primaryName = $input['primaryName'];
+            $address->secondaryName = $input['secondaryName'];
+            $address->longitude = $input['longitude'];
+            $address->lattitude = $input['lattitude'];
+            $address->place_id = $input['place_id'];
+            $address->type = "3";
+            $address->user_id = $user->id;
+            $address->save();
+        }
 
-        $address->user_id = $user->id;
-        $address->save();
         $res->success($address);
         return response()->json($res,200);
 
