@@ -367,7 +367,10 @@ class TripController extends Controller
                 $res->success($cancelTrip);
                 $res->message = trans('messages.cancel_trip');
                 if ($user->getRoles() === json_encode(['client']))
+                {
                     $this->driverController->notifyUser($trip->driver_id,7,$trip->id,$trip->driver_id);
+                    Driver::where('user_id' ,'=',$trip->driver_id)->update(['status'=>0]);
+                }
                 else
                 {
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
