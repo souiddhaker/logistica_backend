@@ -369,7 +369,10 @@ class TripController extends Controller
                 if ($user->getRoles() === json_encode(['client']))
                     $this->driverController->notifyUser($trip->driver_id,7,$trip->id,$trip->driver_id);
                 else
+                {
                     $this->driverController->notifyUser($trip->user_id,6,$trip->id,$user->id);
+                    Driver::where('user_id' ,'=',Auth::id())->update(['status'=>0]);
+                }
             }else if ($trip->status == '0' && $user->getRoles() === json_encode(['client'])){
                 if ($user->getRoles() === json_encode(['client'])) {
                     Notif::where('trip_id','=',$trip->id)
