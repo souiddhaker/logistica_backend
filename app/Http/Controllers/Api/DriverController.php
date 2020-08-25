@@ -200,7 +200,7 @@ class DriverController extends Controller
 
         if ($trip)
         {
-            $trip->payment_mehod==0?$isAllowedTo=Account::select('balance')->where('user_id',Auth::id())->first()->balance>=(($trip->total_price*Settings::first()->company_percent)/100):$isAllowedTo=false;
+            $trip->payment_mehod==0?$isAllowedTo=Account::select('balance')->where('user_id',Auth::id())->first()->balance>=(($trip->total_price*Settings::first()->company_percent)/100):$isAllowedTo=true;
             if ($isAllowedTo)
             {
                 if (count($trip->candidates)==0)
