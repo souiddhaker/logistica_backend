@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\Address;
+use App\Models\BillingAddress;
 use App\Models\CarCategory;
 use App\Models\Document;
 use App\Models\Driver;
@@ -140,7 +141,7 @@ class DriverController extends Controller
                if ($document['type'] === "6")
                    array_push($response['attachements']['licence'],$document);
            }
-
+           $response['billing_address'] = BillingAddress::where('user_id',Auth::id())->first();
            $res->success($response);
            $res->message= trans('messages.user_details');
        }else{
