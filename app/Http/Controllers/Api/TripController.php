@@ -445,7 +445,10 @@ class TripController extends Controller
                 $trip->candidates()->detach();
                 Notif::where('trip_id','=',$trip->id)
                     ->where('driver_id','!=',$driver->id)->update(['driver_id'=>null]);
+                if($trip->payment_method==0)
                 $paymentController->payTripCost($trip->total_price,$driver->id);
+                else
+                $paymentController->payTripCostUser($trip->total_price);
             }
             else{
                 $trip->candidates()->wherePivot('user_id',$driver->id)->detach();

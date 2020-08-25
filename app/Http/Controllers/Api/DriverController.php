@@ -198,9 +198,9 @@ class DriverController extends Controller
         $trip = Trip::where('id',$request['trip_id'])
             ->where('status',"=", "0")->first();
 
-        $trip?$isAllowedTo=Account::select('balance')->where('user_id',Auth::id())->first()->balance>=(($trip->total_price*Settings::first()->company_percent)/100):$isAllowedTo=false;
         if ($trip)
         {
+            $trip->payment_mehod==0?$isAllowedTo=Account::select('balance')->where('user_id',Auth::id())->first()->balance>=(($trip->total_price*Settings::first()->company_percent)/100):$isAllowedTo=false;
             if ($isAllowedTo)
             {
                 if (count($trip->candidates)==0)

@@ -90,11 +90,17 @@ class PaymentController extends Controller
 
     public function payTripCost(float $tripCost,int $driverId)
     {
+        $accountDriver = Account::where('user_id', '=',$driverId)->first();
+        $balance = $accountDriver->balance - (($tripCost*Settings::first()->company_percent)/100);
+        $accountDriver->update(['balance'=>$balance>=0?$balance:0]);
+        return $accountDriver;
+    }
+
+    public function payTripCostUser(float $tripCost)
+    {
         $account = Account::where('user_id', '=',Auth::id())->first();
         $balance = $account->balance - $tripCost;
         $account->update(['balance'=>$balance>=0?$balance:$balance=0]);
-        $balance = $account->balance - Settings::first()->company_percent;
-        Account::where('user_id', '=',$driverId)->update(['balance'=>$balance>=0?$balance:0]);
         return $account;
     }
 
