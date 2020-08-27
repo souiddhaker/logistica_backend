@@ -438,7 +438,7 @@ class TripController extends Controller
         $trip = Trip::where('id',$request['trip_id'])
             ->where('status','=','0')->first();
         $driver = User::find($request['driver_id']);
-        if ($trip and $driver)
+        if ($trip and $driver and $trip->candidates->contains($request['driver_id']))
         {
             if ($request['accept'])
             {
@@ -474,7 +474,7 @@ class TripController extends Controller
             }
             $res->success($trip);
         }else{
-            $res->fail(trans('messages.trip_not_found'));
+            !$trip->candidates->contains($request['driver_id'])?$res->fail(trans('messages.notif_user_when_driver_cancel_trip')):$res->fail(trans('messages.trip_not_found'));
         }
         return response()->json($res,200);
     }
