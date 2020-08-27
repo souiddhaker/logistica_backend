@@ -8,12 +8,13 @@ return [
     'verif_code_incorrect' => 'Verification code incorrect',
     'verif_code_correct' => 'Verification code correct',
     'verif_code_send' => 'Verification code has been sent',
-    'user_phone_exists' => 'This phone already exists',
     'user_email_exists' => 'This email already exists',
     'user_phone_invalid' => 'User phone not valid',
     'user_details' => 'User details',
     'driver_details_fail' => 'Check your account details',
 
+    'user_phone_exists' => 'This phone has already a user account',
+    'driver_phone_exists' => 'This phone has already a driver account',
     'document_empty' => 'Format document incorrect',
     'document_remove_fail' => 'Fail to remove document',
     'document_fail_upload' => 'Fail to upload document',
@@ -44,6 +45,8 @@ return [
     'address_exists' => 'Address already exists',
     'address_update_error' => 'Cannot update position',
     'note_error' => 'Please enter a driver note',
+
+    'trip_already_taken' => 'This trip already taken by another driver',
 
     'trip_not_found' => 'Trip not found',
     'cancel_trip' => 'The trip is canceled',

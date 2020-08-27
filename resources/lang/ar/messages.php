@@ -10,7 +10,8 @@ return [
     'verif_code_correct' => 'شيفرة التأكيد صحيح',
 
     'verif_code_send' => 'تم إرسال شيفرة التأكيد',
-    'user_phone_exists' => 'هذا الهاتف موجود سابقا',
+    'user_phone_exists' => 'هذا الهاتف لديه حساب مستخدم',
+    'driver_phone_exists' => 'هذا الهاتف لديه حساب سائق',
     'user_email_exists' => 'هذا البريد الإلكتروني موجود سابقا',
     'user_phone_invalid' => 'هاتف المستخدم غير صالح',
     'user_details' => 'بيانات المستخدم',
@@ -46,6 +47,8 @@ return [
     'address_update_error' => 'لا يمكن تحديث الموقع',
 
     'note_error' => ' يرجى إدخال ملاحظة للسائق',
+
+    'trip_already_taken' => 'هذه الرحلة قام بها سائق آخر',
 
     'trip_not_found' => 'الرحلة غير موجودة',
 

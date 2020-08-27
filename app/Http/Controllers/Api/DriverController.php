@@ -196,10 +196,9 @@ class DriverController extends Controller
             return response()->json($res, 200);
         }
 
-        $trip = Trip::where('id',$request['trip_id'])
-            ->where('status',"=", "0")->first();
+        $trip = Trip::where('id',$request['trip_id'])->first();
 
-        if ($trip)
+        if($trip && $trip->status == "0")
         {
             $trip->payment_method==0?$isAllowedTo=Account::select('balance')->where('user_id',Auth::id())->first()->balance>=(($trip->total_price*Settings::first()->company_percent)/100):$isAllowedTo=true;
             if ($isAllowedTo)
@@ -212,7 +211,7 @@ class DriverController extends Controller
             }else
                 $res->fail(trans('messages.charge_account'));
         }else{
-            $res->fail(trans('messages.trip_not_found'));
+            $res->fail(trans('messages.trip_already_taken'));
         }
         return response()->json($res,200);
     }
@@ -333,9 +332,13 @@ class DriverController extends Controller
     {
         $res = new Result();
         $trip = Trip::where('id', '=',$trip_id)
-            ->where('status','=' ,'-1')
             ->where('driver_id','=',Auth::id())->first();
-        if($trip)
+        if ($trip->status == "3")
+        {
+            $res->fail(trans('messages.notif_driver_when_user_cancel_trip'));
+            return response()->json($res,200);
+        }
+        if($trip && $trip->status == "-1")
         {
             $trip->update(['status'=>'1']);
             $this->notifyUser($trip->user_id,5,$trip->id,Auth::id());
@@ -349,9 +352,14 @@ class DriverController extends Controller
     public function finishedTrip(int $trip_id)
     {
         $res = new Result();
-        $trip = Trip::where('id', '=',$trip_id)
-            ->where('status','=' ,'1')->first();
-        if($trip)
+        $trip = Trip::where('id', '=',$trip_id)->first();
+
+        if ($trip->status == "3")
+        {
+            $res->fail(trans('messages.notif_driver_when_user_cancel_trip'));
+            return response()->json($res,200);
+        }
+        if($trip && $trip->status == "1")
         {
             $trip->update(['status'=>'2']);
             $res->success($trip);

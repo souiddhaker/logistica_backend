@@ -186,7 +186,8 @@ class AuthController extends Controller
                 return response()->json($res, 200);
             }
             else if($validator->errors()->has("userPhone")){
-                $res->fail(trans('messages.user_phone_exists'));
+                $user = User::where('phone',$input['userPhone'])->first();
+                $user->getRoles() === json_encode(['client'])?$res->fail(trans('messages.user_phone_exists')):$res->fail(trans('messages.driver_phone_exists'));
                 return response()->json($res, 200);
             }
         }
