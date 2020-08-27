@@ -510,7 +510,7 @@ class TripController extends Controller
                 $res->success($attachement);
             }
         }else{
-            $res->fail(trans('messages.document_fail_upload'));
+            $res->fail(trans('messages.notif_driver_when_user_cancel_trip'));
         }
         return response()->json($res,200);
     }
