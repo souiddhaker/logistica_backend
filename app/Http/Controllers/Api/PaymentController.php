@@ -23,7 +23,7 @@ class PaymentController extends Controller
         $hyperPayApi = new Hyperpay();
         $params = $request->all();
         $params['entityId'] =  $this->getEntityIdForType($params['type']);
-        $params['testMode'] =  "EXTERNAL";
+        // $params['testMode'] =  "EXTERNAL";
 
         $paymentParams = array_merge($params,$this->getBillingData(Auth::id()));
         $response = $hyperPayApi->getAccessId($paymentParams);
