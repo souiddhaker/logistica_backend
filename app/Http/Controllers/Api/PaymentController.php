@@ -28,7 +28,7 @@ class PaymentController extends Controller
         $paymentParams = array_merge($params,$this->getBillingData(Auth::id()));
         $response = $hyperPayApi->getAccessId($paymentParams);
         $response?$res->success($response):$res->fail(trans('messages.error_server'));
-        return response()->json($res,200);
+        return response()->json($response,200);
     }
 
     public function getCheckoutStatus(Request $request)
