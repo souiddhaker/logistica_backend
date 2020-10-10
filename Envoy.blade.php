@@ -33,7 +33,6 @@ ln -nfs {{ $new_release_dir }} {{ $app_dir }}/current
 @endtask
 @task('seed')
 cd {{ $new_release_dir }}
-/opt/plesk/php/7.3/bin/php artisan migrate
 /opt/plesk/php/7.3/bin/php artisan storage:link
 @endtask
 @story('deploy')
