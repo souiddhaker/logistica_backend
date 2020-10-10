@@ -180,9 +180,6 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('logistica'),
                 'roles' => json_encode(['captain'])
             ]);
-            $user->fcmUser()->create([
-                'token' => 'f_lxoOcE-AI:APA91bGAI74QC0z3_LamCa-8dEyey27KdwoYCC0Xue8HcvstEkYpDzo4BvIdJ8Otno1qlymsjsSSH7XBD9-viDgBy-kEozIHk5_kBgOAZ8mfZKGkQfG107-ILz9upgkxmUK2ugPxoyAh'
-            ]);
 
             $user->profileDriver()->create(['status' => 0, 'cartype_id' => 1, 'is_active' => 0]);
             $user->profileDriver()->first()->documents()->create([
