@@ -19,7 +19,7 @@ class CreateNotifsTable extends Migration
             $table->text('type')->nullable();
             $table->text('icon')->nullable();
 
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->integer('user_id')->unsigned();
 
             $table->timestamp('created_at')->useCurrent();

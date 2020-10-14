@@ -324,7 +324,7 @@ class DriverController extends Controller
 
     public function getDriverRating(int $id)
     {
-        return Rating::where('driver_id', '=', $id)->avg('value') ? null : 0;
+        return Rating::where('driver_id', '=', $id)->avg('value') ?  Rating::where('driver_id', '=', $id)->avg('value')  : 0;
     }
 
 
