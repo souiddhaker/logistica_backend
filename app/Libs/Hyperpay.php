@@ -55,7 +55,7 @@ class Hyperpay
     {
         $client = new Client();
         try {
-            $url = 'https://test.oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'];
+            $url = 'https://oppwa.com/v1/checkouts'.'/'.$params['checkout_id'].'/payment'.'?entityId='.$params['entityId'];
 
             $result = $client->get( $url, [
                 'headers' => [

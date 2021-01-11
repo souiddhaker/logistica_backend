@@ -23,8 +23,7 @@ class PaymentController extends Controller
         $hyperPayApi = new Hyperpay();
         $params = $request->all();
         $params['entityId'] =  $this->getEntityIdForType($params['type']);
-        // $params['testMode'] =  "EXTERNAL";
-
+        //$params['testMode'] =  "EXTERNAL";
         $paymentParams = array_merge($params,$this->getBillingData(Auth::id()));
         $response = $hyperPayApi->getAccessId($paymentParams);
         $response?$res->success($response):$res->fail(trans('messages.error_server'));
@@ -109,13 +108,13 @@ class PaymentController extends Controller
     {
         switch ($type){
             case ($type == 0) || ($type ==1):
-                $entityId = "8ac7a4c87314346b0173246ca65e083f";
+                $entityId = "8acda4cc7646baf90176dc13826d0212";
                 break;
             case 2 :
-                $entityId = "8ac7a4c87314346b0173246cf25d0844";
+                $entityId = "8acda4cc7646baf90176dc13e8d80220";
                 break;
             default:
-                $entityId= "8ac7a4c87314346b0173246ca65e083f";
+                $entityId= "8acda4cc7646baf90176dc13826d0212";
         }
         return $entityId;
     }
