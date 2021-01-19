@@ -16,7 +16,7 @@ use Spatie\Translatable\HasTranslations;
  */
 class CarCategory extends Model
 {
-    //
+
     use HasTranslations,SoftDeletes;
 
     protected  $fillable = ['model', 'type', 'capacity', 'price', 'image', 'range_luggage', 'price_100', 'price_101','price_1'];

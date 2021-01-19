@@ -21,7 +21,7 @@ class ServiceController extends Controller
 
         $validator = Validator::make($request->all(),
             [
-                'distance' => 'required',
+                'distance' => 'required|numeric',
                 'nbr_bags' => 'required']);
         if ($validator->fails())
         {
@@ -36,18 +36,25 @@ class ServiceController extends Controller
         }
 
         $distance = $request['distance'];
-
-        $priceKm = Price::where('from','<=',$distance)->where('to','>=',$distance)->first();
-        $listCarCategories = CarCategory::where('capacity','>=', $request['nbr_bags'])->get();
-        if (!$priceKm)
+        if($distance>=1 && $distance<=10)
         {
-            $priceKm = Price::first();
+            $attr="price_1";
         }
-        $list = [];
+        elseif ($distance>10 && $distance<=100)
+        {
+            $attr="price_100";
+        }
+        else
+        {
+            $attr="price_101";
+        }
 
+        $listCarCategories = CarCategory::where('capacity','>=', $request['nbr_bags'])->get();
+
+        $list = [];
         foreach ($listCarCategories as $type){
             $carTypeWithPrice = $type;
-            $carTypeWithPrice['price'] = $type->price + ($priceKm->cost * $distance);
+            $carTypeWithPrice['price'] = $type->price + ($type[$attr]*$distance);
             array_push($list,$carTypeWithPrice);
         }
 
