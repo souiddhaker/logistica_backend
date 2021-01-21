@@ -15,11 +15,8 @@ class AddressController extends Controller
     public function getAllFavoritesAddress()
     {
         $res = new Result();
-
         $userId = Auth::id();
-
         $listAddress = Address::where('user_id', '=', $userId)->where('type','=','3')->orderBy('created_at' , 'desc')->paginate(10);
-
         $res->message = trans('messages.addresses_list');
         $res->success($listAddress);
         return response()->json($res,200);

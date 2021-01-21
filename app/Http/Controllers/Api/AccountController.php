@@ -37,7 +37,8 @@ class AccountController extends Controller
                         $balance = (($isActif->response[0]->pourcentage * $request->balance)/100) + $balance;
                     else
                         $balance = $isActif->response[0]->pourcentage + $balance;
-                }else{
+                }
+                else{
                     $res->fail('Promocode already used');
                     return response()->json($res,200);
                 }

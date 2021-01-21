@@ -6,7 +6,6 @@ use App\Models\Account;
 use App\Models\Address;
 use App\Models\CancelTrip;
 use App\Models\CarCategory;
-use App\Models\Card;
 use App\Models\Document;
 use App\Models\Driver;
 use App\Models\Notif;

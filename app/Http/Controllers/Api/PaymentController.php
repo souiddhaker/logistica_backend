@@ -133,7 +133,8 @@ class PaymentController extends Controller
         $data['customer.givenName'] = $user->firstName;
         $data['customer.surname'] = $user->lastName;
         $data['customer.email'] = $user->email;
-        $data['merchantTransactionId'] =$user->id;
+        //Invoice ID(prefix id user +_)
+        $data['merchantTransactionId'] =uniqid($user->id.'_');
          return $data;
     }
 }
