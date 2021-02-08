@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 /**
  * Post
- *
  * @mixin Eloquent
  */
 class AdminRoles extends Model

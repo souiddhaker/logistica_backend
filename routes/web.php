@@ -15,8 +15,11 @@ use App\Http\Controllers\Api\TestController;
 Route::resource('cards','TestController');
 
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('terms_and_conditions',function()
+{
+    return view('terms_and_conditions');
 });
+
+
 
 
