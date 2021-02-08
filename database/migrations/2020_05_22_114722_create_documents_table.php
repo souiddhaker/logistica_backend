@@ -17,10 +17,7 @@ class CreateDocumentsTable extends Migration
             $table->increments('id');
             $table->string('path')->nullable();
             $table->string('type')->nullable();
-            $table->unsignedInteger('trip_id')->nullable();
 
-            $table->foreign('trip_id')->references('id')->on('trips')
-                ->onDelete('cascade');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
@@ -34,6 +31,6 @@ class CreateDocumentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('documents_tables');
+        Schema::dropIfExists('documents');
     }
 }

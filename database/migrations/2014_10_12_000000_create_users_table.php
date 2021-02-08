@@ -15,18 +15,21 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('firstName');
-            $table->string('lastName');
+            $table->string('firstName')->nullable();
+            $table->string('lastName')->nullable();
 
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->string('phone')->unique();
+            $table->string('phone')->nullable();
             $table->string('image_url')->default("");
+            $table->boolean('active')->default(true);
             $table->rememberToken();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 
+            $table->softDeletes();
+            $table->text('roles')->nullable();
         });
     }
 
@@ -37,6 +40,8 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::dropIfExists('users');
     }
 }

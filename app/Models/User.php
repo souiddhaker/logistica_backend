@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -18,7 +19,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  */
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable, HasApiTokens;
+    use Notifiable, HasApiTokens,SoftDeletes;
 
 
 
@@ -31,23 +32,63 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Get the cars for user.
+     * Get the promocodes for user.
+     */
+    public function promocodes()
+    {
+        return $this->belongsToMany(Promocode::class);
+    }
+
+    /**
+     * Get the addresses for user.
      */
     public function addresses()
     {
         return $this->hasMany(Address::class);
     }
+    /**
+     * Get the account for user.
+     */
+    public function account()
+    {
+        return $this->hasOne(Account::class);
+    }
 
     /**
-     * Get the cars for user.
+     * Get the user billing address for user.
+     */
+    public function billingaddress()
+    {
+        return $this->hasOne(BillingAddress::class);
+    }
+
+    /**
+     * Get the documents for user.
      */
     public function documents()
     {
         return $this->hasMany(Document::class);
     }
+    /**
+     * Get admin role
+     */
+    public function adminRoles()
+    {
+        return $this->hasOne(AdminRoles::class);
+    }
     public function trips()
     {
         return $this->hasMany(Trip::class);
+    }
+
+    public function notifs()
+    {
+        return $this->hasMany(Notif::class);
+    }
+
+    public function profileDriver()
+    {
+        return $this->hasOne(Driver::class);
     }
 
     /**
@@ -56,7 +97,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles'
+        'firstName', 'lastName', 'phone', 'email', 'password','image_url','roles','lang','active'
     ];
 
     /**
@@ -65,7 +106,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token','updated_at','created_at','email_verified_at','roles'
+        'password', 'remember_token','updated_at','created_at','email_verified_at','roles','profileDriver','deleted_at','account','lang'
     ];
 
     /**
@@ -76,15 +117,38 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    static public function createOne(Request $request,$role="admin"):Result{
-        $res = new Result();
-        $validator = Validator::make($request->all(),
+    static public function validate(Request $request,$role="admin",$create = true):\Illuminate\Validation\Validator{
+
+        $roleData=
             [
                 'firstName' => 'required',
                 'lastName' => 'required',
                 'email' => 'required|email|unique:users,email',
-                'phone' => 'required|unique:users,phone'
-            ]);
+                'phone' => 'required|unique:users,phone',
+                'active'=>'boolean'
+            ];
+        if(!$create){
+            $roleData['email']='required';
+            $roleData['phone']='required';
+        }
+        if($role === "admin"){
+            $roleData['roles']='required';
+        }
+        if($role === "captain"){
+            $roleData['is_active']='required';
+        }
+        return Validator::make($request->all(),$roleData);
+    }
+    static public function filterRequest($data){
+        $data= array_filter($data,function ($key){
+            $User = new User();
+           return in_array($key,$User->getFillable());
+        },ARRAY_FILTER_USE_KEY);
+        return $data;
+    }
+    static public function createOne(Request $request,$role="admin"):Result{
+        $res = new Result();
+        $validator = User::validate($request,$role);
         if($validator->fails()){
             $res->fail($validator->errors()->all());
             return $res;
@@ -92,21 +156,22 @@ class User extends Authenticatable implements JWTSubject
         $data= $validator->valid();
         $data['password']=bcrypt("logistica");
         $data['roles']=json_encode([$role]);
-        $user = User::create($data);
+        $user = User::create(User::filterRequest($data));
+        if($role=="captain"){
+            $user->profileDriver()->create(["is_active"=>$data['is_active']]);
+        }
+        if($role==="admin"){
+            AdminRoles::updateOne($request->all(),$user['id']);
+        }
         $res->success([
             "user"=>$user
         ]);
         return $res;
     }
+
     static public function updateOne(Request $request,int $id,$role="admin"):Result{
         $res = new Result();
-        $validator = Validator::make($request->all(),
-            [
-                'firstName' => 'required',
-                'lastName' => 'required',
-                'email' => 'required',
-                'phone' => 'required'
-            ]);
+        $validator = User::validate($request,$role,false);
         if($validator->fails()){
             $res->fail($validator->errors()->all());
             return $res;
@@ -114,9 +179,15 @@ class User extends Authenticatable implements JWTSubject
         $data= $validator->valid();
         $data['password']=bcrypt("logistica");
         $data['roles']=json_encode([$role]);
-        $id = User::where('id',$id)->update($data);
+        $idUser=User::where('id',$id)->update(User::filterRequest($data));
+        if($role=="captain"){
+            Driver::updateOrCreate(['user_id'=>$id],['is_active'=>$data['is_active']]);
+        }
+        if($role==="admin"){
+                AdminRoles::updateOne($request->all(),$id);
+        }
         $res->success([
-            "user"=>$id
+            "user"=>$idUser
         ]);
         return $res;
     }

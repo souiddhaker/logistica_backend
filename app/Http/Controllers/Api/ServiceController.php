@@ -9,14 +9,11 @@ use App\Models\Price;
 use App\Models\Result;
 use App\Models\Service;
 use App\Models\SubService;
-use App\Models\Trip;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Validator;
 
 class ServiceController extends Controller
 {
-    //
 
     public function getListCarCategories(Request $request)
     {
@@ -24,23 +21,40 @@ class ServiceController extends Controller
 
         $validator = Validator::make($request->all(),
             [
-                'distance' => 'required']);
+                'distance' => 'required|numeric',
+                'nbr_bags' => 'required']);
         if ($validator->fails())
         {
-            $res->fail(trans('messages.distance_error'));
-            return response()->json($res, 200);
+            if($validator->errors()->has("distance"))
+            {
+                $res->fail(trans('messages.distance_error'));
+                return response()->json($res, 200);
+            }else{
+                $res->fail(trans('messages.distance_error'));
+                return response()->json($res, 200);
+            }
         }
 
         $distance = $request['distance'];
+        if($distance>=1 && $distance<=10)
+        {
+            $attr="price_1";
+        }
+        elseif ($distance>10 && $distance<=100)
+        {
+            $attr="price_100";
+        }
+        else
+        {
+            $attr="price_101";
+        }
 
-        $priceKm = Price::where('from','<=',$distance)->where('to','>=',$distance)->first();
-        $listCarCategories = CarCategory::all();
+        $listCarCategories = CarCategory::where('capacity','>=', $request['nbr_bags'])->get();
 
         $list = [];
-
         foreach ($listCarCategories as $type){
             $carTypeWithPrice = $type;
-            $carTypeWithPrice['price'] = $type->price + ($priceKm->cost * $distance);
+            $carTypeWithPrice['price'] = $type->price + ($type[$attr]*$distance);
             array_push($list,$carTypeWithPrice);
         }
 
@@ -62,10 +76,6 @@ class ServiceController extends Controller
             $res->fail(trans('messages.bags_error'));
             return response()->json($res, 200);
         }
-        if ($request['language'])
-            app()->setLocale($request['language']);
-        else
-            app()->setLocale('en');
 
         $nbrBags = $request['bags'];
         $listCategory =  CategoryServices::all();
@@ -90,5 +100,36 @@ class ServiceController extends Controller
         $res->message = trans('messages.services_list');
 
         return response()->json($res,200);
+    }
+
+    public function listCar()
+    {
+        $res = new Result();
+        $listCars = CarCategory::all();
+        $res->response = $listCars;
+        $res->success = true;
+        return response()->json($res,200);
+    }
+
+    public function services()
+    {
+        return response()->json(Service::getAll(),200);
+    }
+
+    public function update(Request $request)
+    {
+        $data = $request->all();
+        foreach ($data['services'] as $service)
+        {
+            if (isset($service['sub_services']))
+            {
+                foreach ($service['sub_services'] as $subservices)
+                {
+                    SubService::where('id',$subservices['id'])->update(collect($subservices)->except(['category_id'])->all());
+                }
+            }
+            Service::where('id',$service['id'])->update(collect($service)->except(['sub_services','category_id'])->all());
+        }
+        return response()->json(Service::getAll(),200);
     }
 }

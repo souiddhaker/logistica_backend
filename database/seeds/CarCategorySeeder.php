@@ -19,7 +19,7 @@ class CarCategorySeeder extends Seeder
             'price' => 12,
             'capacity' => 3,
             'image' => 'https://logistica.wi-mobi.com/img/icon/car.png',
-            'range_luggage' => '1-3',
+            'range_luggage' => '3',
         ]);
         CarCategory::create([
             'model' => ['en' => 'Logística Van' , 'ar' => 'شاحنة لوجيستيكا'],

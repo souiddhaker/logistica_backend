@@ -6,7 +6,7 @@ use App\Models\Result;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Auth\AuthenticationException;
-
+use Sentry\Laravel\Facade as Sentry;
 class Handler extends ExceptionHandler
 {
     /**
@@ -38,6 +38,13 @@ class Handler extends ExceptionHandler
      */
     public function report(Throwable $exception)
     {
+        if (app()->bound('sentry') && $this->shouldReport($exception)) {
+//            dd( Sentry::captureException);
+           $test=app('sentry')->captureException($exception);
+//           dd("test".$test);
+//            Sentry::captureException($exception);
+        }
+
         parent::report($exception);
     }
 

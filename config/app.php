@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -174,7 +174,9 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Tymon\JWTAuth\Providers\LaravelServiceProvider::class
+        Sentry\Laravel\ServiceProvider::class,
+        GoogleMaps\ServiceProvider\GoogleMapsServiceProvider::class
+
     ],
 
     /*
@@ -226,7 +228,8 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Sentry' => Sentry\Laravel\Facade::class,
+        'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
     ],
 
 ];

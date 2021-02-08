@@ -3,11 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Eloquent;
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ */
 class Driver extends User
 {
+    use SoftDeletes;
+    protected $fillable = ['status','user_id','cartype_id','is_active'];
+    protected $hidden = ['created_at','updated_at','user_id'];
     //
     protected $table = 'drivers';
+
+
+    public function documents()
+    {
+        return $this->belongsToMany(Document::class);
+    }
 
     public function trips()
     {
@@ -17,5 +32,20 @@ class Driver extends User
     public function currentTrip()
     {
         return $this->hasOne(Trip::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function carType()
+    {
+        return $this->hasOne(CarCategory::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
     }
 }

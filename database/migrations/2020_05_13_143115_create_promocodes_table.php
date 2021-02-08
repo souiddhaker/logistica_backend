@@ -22,6 +22,8 @@ class CreatePromocodesTable extends Migration
             $table->integer('nbr_uses')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->integer('type')->default(0);
+            $table->softDeletes();
         });
     }
 

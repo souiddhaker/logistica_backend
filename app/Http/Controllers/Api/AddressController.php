@@ -18,7 +18,7 @@ class AddressController extends Controller
 
         $userId = Auth::id();
 
-        $listAddress = Address::where('user_id', '=', $userId)->where('type','=','3')->orderBy('created_at' , 'desc')->paginate(5);
+        $listAddress = Address::where('user_id', '=', $userId)->where('type','=','3')->orderBy('created_at' , 'desc')->paginate(10);
 
         $res->message = trans('messages.addresses_list');
         $res->success($listAddress);
@@ -32,24 +32,29 @@ class AddressController extends Controller
             [
                 'primaryName' => 'string|nullable',
                 'secondaryName' => 'string|nullable',
-                'place_id' => 'required|unique:address,place_id',
+                'place_id' => 'string|nullable',
             ]);
 
         if ($validator->fails()) {
             $res->fail(trans('messages.address_exists'));
             return response()->json($res, 400);
         }
-
         $input = $request->all();
-        $user = Auth::user();
-        $address = new Address();
-        $address->primaryName = $input['primaryName'];
-        $address->secondaryName = $input['secondaryName'];
-        $address->place_id = $input['place_id'];
-        $address->type = "3";
+        $address = Address::where('user_id',Auth::id())->where('place_id',$input['place_id'])->where('type','=','3')->first();
+        if(!$address)
+        {
+            $user = Auth::user();
+            $address = new Address();
+            $address->primaryName = $input['primaryName'];
+            $address->secondaryName = $input['secondaryName'];
+            $address->longitude = $input['longitude'];
+            $address->lattitude = $input['lattitude'];
+            $address->place_id = $input['place_id'];
+            $address->type = "3";
+            $address->user_id = $user->id;
+            $address->save();
+        }
 
-        $address->user_id = $user->id;
-        $address->save();
         $res->success($address);
         return response()->json($res,200);
 

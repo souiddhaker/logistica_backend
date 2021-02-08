@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class NotifController extends Controller
 {
-    //
+
 
     public function getAllNotifs()
     {
@@ -18,10 +18,11 @@ class NotifController extends Controller
 
         $userId = Auth::id();
 
-        $notifs = Notif::where('user_id', '=', $userId)->get();
-
-        $res->response = $notifs;
-        $res->success = true;
+        $notifs = Notif::where('user_id', '=', $userId)
+            ->orderByDesc('created_at')
+            ->paginate(10)->toArray();
+        Notif::where('user_id', '=', $userId)->update(['seen'=>true]);
+        $res->success($notifs);
         return response()->json($res,200);
     }
 
@@ -46,5 +47,14 @@ class NotifController extends Controller
         return response()->json($res,200);
     }
 
+    public function getUnread()
+    {
+        $res = new Result();
+        $userId = Auth::id();
+        $countUnRead = Notif::where('user_id', '=', $userId)
+            ->where('seen','=',null)->count('id');
+        $res->success(['unread'=>$countUnRead]);
+        return response()->json($res,200);
+    }
 
 }

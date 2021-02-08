@@ -4,16 +4,28 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 /**
- * Post
- *
  * @mixin Eloquent
+ * @mixin Builder
  */
 class Trip extends Model
 {
-    //
+    /**
+     * Trip Status :
+     *
+     * -1 : waiting for pickup
+     * 0 : no matching
+     * 1 : current
+     * 2 : finished
+     * 3 : canceled
+     * 4 : current history
+     */
+    protected $guarded = [];
+
 
     protected $dates = ['created_at', 'updated_at', 'pickup_at'];
 
@@ -35,8 +47,27 @@ class Trip extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','payment_method','subservices'
+        'updated_at','total_amount','type_car_id','promocode_id','user_id','driver_id','subservices','attachements' ,'rating_id'
     ];
+    public static function updateOneTransaction($request,$id){
+        $res = new Result();
+        $roleData=
+            [
+                'transaction_status' => 'required|between:0,2',
+                'transaction_note'=>'required'
+            ];
+        $validator = Validator::make($request->all(),$roleData);
+        if($validator->fails()){
+            $res->fail($validator->errors()->all());
+            return $res;
+        }
+        $data= $validator->valid();
+        $trip = Trip::where('id',$id)->update($data);
+        $res->success([
+            "update"=>$trip
+        ]);
+        return $res;
+    }
     public function services()
     {
         return $this->belongsToMany(Service::class);
@@ -58,12 +89,12 @@ class Trip extends Model
     }
     public function driver()
     {
-        return $this->belongsTo(Driver::class);
+        return $this->belongsTo(User::class);
     }
 
     public function attachements()
     {
-        return $this->hasMany(Document::class);
+        return $this->belongsToMany(Document::class);
     }
 
     public function cancelTrip()
@@ -85,4 +116,10 @@ class Trip extends Model
     {
         return $this->hasOne(Rating::class);
     }
+
+    public function candidates()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
 }

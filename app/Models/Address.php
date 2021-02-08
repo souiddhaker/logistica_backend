@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Address extends Model
 {
+    /**
+     *
+     * Address types :
+     * 1 : Pickup trip
+     * 2 : Destination trip
+     * 3 : favorite
+     * 4 : position driver
+     */
+
+
     protected $table = 'address';
     protected $guarded = [];
     /**
@@ -18,7 +28,7 @@ class Address extends Model
     ];
 
     /**
-     * Get the user that owns the card.
+     * Get the user
      */
     public function user()
     {

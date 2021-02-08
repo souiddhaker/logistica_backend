@@ -28,9 +28,7 @@ class Result
                 $this->response = [$data];
             }
         } else {
-
             array_push($this->response, $data);
-
         }
         $this->success = true;
         $this->message = trans('messages.success');

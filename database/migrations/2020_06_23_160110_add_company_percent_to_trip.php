@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddRoles extends Migration
+class AddCompanyPercentToTrip extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class AddRoles extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->text('roles')->nullable();
+        Schema::table('trips', function (Blueprint $table) {
+            $table->float('company_percent')->nullable();
         });
-        //
     }
 
     /**
@@ -26,9 +25,8 @@ class AddRoles extends Migration
      */
     public function down()
     {
-        //
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('roles');
+        Schema::table('trips', function (Blueprint $table) {
+            $table->dropColumn('company_percent');
         });
     }
 }

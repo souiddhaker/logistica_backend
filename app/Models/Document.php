@@ -4,10 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Post
+ *
+ * @mixin Eloquent
+ * @property string path
+ */
 class Document extends Model
 {
     //
 
+    /**
+     * 1 trip attachement
+     * 2 trip Hotel reservation
+     * 3 trip receipt
+     * 4 Driver profile identity
+     * 5 Driver car photo
+     * 6 Driver licence
+     * 7 trip pickup receipt
+     */
 
     /**
      * The attributes that should be hidden for arrays.
@@ -15,7 +30,7 @@ class Document extends Model
      * @var array
      */
     protected $hidden = [
-        'type', 'trip_id','updated_at','created_at'
+        'updated_at','created_at','pivot'
     ];
 
     /**
@@ -26,8 +41,4 @@ class Document extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function trip()
-    {
-        return $this->belongsTo(Trip::class);
-    }
 }

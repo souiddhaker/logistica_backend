@@ -23,6 +23,10 @@ class CreateCarcategoriesTable extends Migration
             $table->string('range_luggage')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->integer('price_100')->nullable();
+            $table->integer('price_101')->nullable();
+            $table->integer('price_1')->nullable();
+            $table->softDeletes();
         });
     }
 
@@ -33,6 +37,8 @@ class CreateCarcategoriesTable extends Migration
      */
     public function down()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::dropIfExists('car_categories');
     }
 }

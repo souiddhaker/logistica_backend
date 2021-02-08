@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Spatie\Translatable\HasTranslations;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Post
@@ -34,5 +36,21 @@ class SubService extends Model
         $this->belongsTo(Service::class);
     }
 
+    static public function updateOne(Request $request,$id):Result{
+        $res = new Result();
+        $validator = Validator::make($request->all(),
+            [
+                'label.ar' => 'required',
+                'label.en' => 'required',
+                'price' => 'required'
+            ]);
 
+        if($validator->fails()){
+            $res->fail($validator->errors()->all());
+            return $res;
+        }
+        $id = SubService::where('id', $id)->update($request->all());
+        $res->success($id);
+        return $res;
+    }
 }
